@@ -119,13 +119,13 @@ extension ImageCaptureCoreTransport: ICDeviceBrowserDelegate {
     @MainActor
     private func startBrowsingAfterAuthorization() async {
         let controlStatus = await requestControlAuthorizationIfNeeded()
-        guard controlStatus == ICAuthorizationStatusAuthorized else {
+        guard controlStatus == .authorized else {
             continuation?.yield(.error("Camera control permission was not granted."))
             return
         }
 
         let contentsStatus = await requestContentsAuthorizationIfNeeded()
-        guard contentsStatus == ICAuthorizationStatusAuthorized else {
+        guard contentsStatus == .authorized else {
             continuation?.yield(.error("Camera contents permission was not granted."))
             return
         }
@@ -136,7 +136,7 @@ extension ImageCaptureCoreTransport: ICDeviceBrowserDelegate {
     @MainActor
     private func requestControlAuthorizationIfNeeded() async -> ICAuthorizationStatus {
         let status = browser.controlAuthorizationStatus
-        guard status == ICAuthorizationStatusNotDetermined else { return status }
+        guard status == .notDetermined else { return status }
         return await withCheckedContinuation { continuation in
             browser.requestControlAuthorization { status in
                 continuation.resume(returning: status)
@@ -147,7 +147,7 @@ extension ImageCaptureCoreTransport: ICDeviceBrowserDelegate {
     @MainActor
     private func requestContentsAuthorizationIfNeeded() async -> ICAuthorizationStatus {
         let status = browser.contentsAuthorizationStatus
-        guard status == ICAuthorizationStatusNotDetermined else { return status }
+        guard status == .notDetermined else { return status }
         return await withCheckedContinuation { continuation in
             browser.requestContentsAuthorization { status in
                 continuation.resume(returning: status)
