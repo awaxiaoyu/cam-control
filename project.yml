@@ -8,7 +8,7 @@ settings:
     SWIFT_VERSION: 5.9
     IPHONEOS_DEPLOYMENT_TARGET: 17.0
     TARGETED_DEVICE_FAMILY: "1,2"
-    ENABLE_USER_SCRIPT_SANDBOXING: "YES"
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
 targets:
   CamControlCore:
     type: library.static
@@ -29,6 +29,7 @@ targets:
       - path: CamControlApp/Resources
     dependencies:
       - target: CamControlCore
+      - sdk: ImageCaptureCore.framework
     info:
       path: CamControlApp/Resources/Info.plist
     settings:
@@ -44,6 +45,7 @@ targets:
       - path: CamControlCoreTests/Sources
     dependencies:
       - target: CamControlCore
+      - sdk: ImageCaptureCore.framework
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aicomposition.camcontrol.tests
