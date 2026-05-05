@@ -22,7 +22,7 @@ public final class ImageCaptureCoreTransport: NSObject, CameraTransport, @unchec
         self.continuation = localContinuation
         super.init()
         browser.delegate = self
-        browser.browsedDeviceTypeMask = ICDeviceTypeMask(rawValue: ICDeviceTypeMask.camera.rawValue | ICDeviceLocationTypeMask.local.rawValue)
+        browser.browsedDeviceTypeMask = .camera
     }
 
     public func startBrowsing() {
