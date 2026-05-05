@@ -3,7 +3,7 @@ import Foundation
 
 public enum NikonLiveViewParser {
     public static func parse(data: Data, productID: UInt16) -> LiveViewFrame? {
-        guard data.count > 128 else { return nil }
+        guard data.count > 128 else { return parseByJPEGScan(data) }
         let offset = pictureOffset(productID: productID)
         if let offset, data.count > offset + 4 {
             let frame = parseKnownLayout(data: data, pictureOffset: offset)
