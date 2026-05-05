@@ -1,6 +1,7 @@
 import Foundation
 
 #if canImport(ImageCaptureCore)
+import CoreGraphics
 @preconcurrency import ImageCaptureCore
 
 public final class ImageCaptureCoreTransport: NSObject, CameraTransport, @unchecked Sendable {
@@ -128,6 +129,24 @@ extension ImageCaptureCoreTransport: ICDeviceBrowserDelegate {
 }
 
 extension ImageCaptureCoreTransport: ICCameraDeviceDelegate {
+    public func cameraDevice(_ camera: ICCameraDevice, didAdd items: [ICCameraItem]) {}
+
+    public func cameraDevice(_ camera: ICCameraDevice, didRemove items: [ICCameraItem]) {}
+
+    public func cameraDevice(_ camera: ICCameraDevice, didReceiveThumbnail thumbnail: CGImage?, for item: ICCameraItem, error: Error?) {}
+
+    public func cameraDevice(_ camera: ICCameraDevice, didReceiveMetadata metadata: [AnyHashable: Any]?, for item: ICCameraItem, error: Error?) {}
+
+    public func cameraDevice(_ camera: ICCameraDevice, didRenameItems items: [ICCameraItem]) {}
+
+    public func cameraDeviceDidChangeCapability(_ camera: ICCameraDevice) {}
+
+    public func deviceDidBecomeReady(withCompleteContentCatalog device: ICCameraDevice) {}
+
+    public func cameraDeviceDidRemoveAccessRestriction(_ device: ICDevice) {}
+
+    public func cameraDeviceDidEnableAccessRestriction(_ device: ICDevice) {}
+
     public func device(_ device: ICDevice, didOpenSessionWithError error: Error?) {
         if let error {
             openContinuation?.resume(throwing: error)
