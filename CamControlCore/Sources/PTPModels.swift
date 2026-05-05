@@ -97,6 +97,28 @@ public struct PTPDeviceInfo: Equatable, Sendable {
     public let deviceVersion: String
     public let serialNumber: String
 
+    public init(
+        operationsSupported: [UInt16],
+        eventsSupported: [UInt16],
+        devicePropertiesSupported: [UInt16],
+        captureFormats: [UInt16],
+        imageFormats: [UInt16],
+        manufacturer: String,
+        model: String,
+        deviceVersion: String,
+        serialNumber: String
+    ) {
+        self.operationsSupported = operationsSupported
+        self.eventsSupported = eventsSupported
+        self.devicePropertiesSupported = devicePropertiesSupported
+        self.captureFormats = captureFormats
+        self.imageFormats = imageFormats
+        self.manufacturer = manufacturer
+        self.model = model
+        self.deviceVersion = deviceVersion
+        self.serialNumber = serialNumber
+    }
+
     public static func parse(_ data: Data) throws -> PTPDeviceInfo {
         var reader = PTPDataReader(data)
         try reader.skip(2)
@@ -140,6 +162,15 @@ public struct DevicePropDesc: Equatable, Sendable {
     public let defaultValue: Int64
     public let currentValue: Int64
     public let form: DevicePropForm
+
+    public init(propertyCode: UInt16, dataType: UInt16, isSettable: Bool, defaultValue: Int64, currentValue: Int64, form: DevicePropForm) {
+        self.propertyCode = propertyCode
+        self.dataType = dataType
+        self.isSettable = isSettable
+        self.defaultValue = defaultValue
+        self.currentValue = currentValue
+        self.form = form
+    }
 
     public var values: [Int64] {
         switch form {
@@ -234,13 +265,25 @@ public struct PTPObjectInfo: Equatable, Identifiable, Sendable {
 public struct LiveViewFrame: Equatable, Sendable {
     public let jpegData: Data
     public let histogram: Data?
+    public let zoomFactor: UInt32?
+    public let zoomRect: CGRect?
     public let autofocusFrame: CGRect?
     public let wholeSize: CGSize?
     public let autofocusFrameSize: CGSize?
 
-    public init(jpegData: Data, histogram: Data? = nil, autofocusFrame: CGRect? = nil, wholeSize: CGSize? = nil, autofocusFrameSize: CGSize? = nil) {
+    public init(
+        jpegData: Data,
+        histogram: Data? = nil,
+        zoomFactor: UInt32? = nil,
+        zoomRect: CGRect? = nil,
+        autofocusFrame: CGRect? = nil,
+        wholeSize: CGSize? = nil,
+        autofocusFrameSize: CGSize? = nil
+    ) {
         self.jpegData = jpegData
         self.histogram = histogram
+        self.zoomFactor = zoomFactor
+        self.zoomRect = zoomRect
         self.autofocusFrame = autofocusFrame
         self.wholeSize = wholeSize
         self.autofocusFrameSize = autofocusFrameSize

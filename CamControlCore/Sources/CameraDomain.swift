@@ -22,10 +22,17 @@ public struct CameraDevice: Identifiable, Equatable, Sendable {
     }
 }
 
-public enum CameraTransportEvent: Sendable {
+public enum CameraTransportEvent: Equatable, Sendable {
     case deviceAdded(CameraDevice)
     case deviceRemoved(String)
     case ptpEvent(Data)
+    case devicePropertyChanged(UInt16, Int64?)
+    case propertyDescChanged(UInt16, [Int64])
+    case objectAdded(UInt32, UInt16?)
+    case captureComplete
+    case cameraBusy
+    case cameraCaptureChanged(Bool)
+    case bulbExposureTime(Int)
     case disconnected
     case error(String)
 }

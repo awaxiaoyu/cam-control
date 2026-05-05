@@ -43,8 +43,11 @@ public enum PTP {
         public static let eosSetPCConnectMode: UInt16 = 0x9114
         public static let eosSetEventMode: UInt16 = 0x9115
         public static let eosEventCheck: UInt16 = 0x9116
+        public static let eosTransferComplete: UInt16 = 0x9117
         public static let eosBulbStart: UInt16 = 0x9125
         public static let eosBulbEnd: UInt16 = 0x9126
+        public static let eosRemoteReleaseOn: UInt16 = 0x9128
+        public static let eosRemoteReleaseOff: UInt16 = 0x9129
         public static let eosGetLiveViewPicture: UInt16 = 0x9153
         public static let eosDriveLens: UInt16 = 0x9155
     }
@@ -57,7 +60,9 @@ public enum PTP {
         public static let nikonCaptureCompleteRecInSdram: UInt16 = 0xc102
         public static let eosObjectAdded: UInt16 = 0xc181
         public static let eosDevicePropChanged: UInt16 = 0xc189
+        public static let eosDevicePropDescChanged: UInt16 = 0xc18a
         public static let eosCameraStatus: UInt16 = 0xc18b
+        public static let eosWillSoonShutdown: UInt16 = 0xc18d
         public static let eosBulbExposureTime: UInt16 = 0xc194
     }
 

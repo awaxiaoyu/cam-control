@@ -100,6 +100,11 @@ public enum CanonLiveViewParser {
         var reader = PTPDataReader(data)
         var jpeg: Data?
         var histogram: Data?
+        var zoomFactor: UInt32?
+        var zoomRectLeft: UInt32?
+        var zoomRectTop: UInt32?
+        var zoomRectRight: UInt32?
+        var zoomRectBottom: UInt32?
 
         while reader.remainingCount >= 8 {
             guard let subLength = try? reader.readUInt32LE(), let type = try? reader.readUInt32LE(), subLength >= 8 else {
@@ -113,15 +118,38 @@ public enum CanonLiveViewParser {
                 jpeg = NikonLiveViewParser.extractJPEG(from: payload) ?? payload
             case 0x03:
                 histogram = payload
+            case 0x04:
+                var payloadReader = PTPDataReader(payload)
+                zoomFactor = try? payloadReader.readUInt32LE()
+            case 0x05:
+                var payloadReader = PTPDataReader(payload)
+                zoomRectRight = try? payloadReader.readUInt32LE()
+                zoomRectBottom = try? payloadReader.readUInt32LE()
+            case 0x06:
+                var payloadReader = PTPDataReader(payload)
+                zoomRectLeft = try? payloadReader.readUInt32LE()
+                zoomRectTop = try? payloadReader.readUInt32LE()
             default:
                 continue
             }
         }
 
         if let jpeg, !jpeg.isEmpty {
-            return LiveViewFrame(jpegData: jpeg, histogram: histogram)
+            return LiveViewFrame(
+                jpegData: jpeg,
+                histogram: histogram,
+                zoomFactor: zoomFactor,
+                zoomRect: makeZoomRect(left: zoomRectLeft, top: zoomRectTop, right: zoomRectRight, bottom: zoomRectBottom)
+            )
         }
         return NikonLiveViewParser.parseByJPEGScan(data)
+    }
+
+    private static func makeZoomRect(left: UInt32?, top: UInt32?, right: UInt32?, bottom: UInt32?) -> CGRect? {
+        guard let left, let top, let right, let bottom else { return nil }
+        let width = right > left ? right - left : right
+        let height = bottom > top ? bottom - top : bottom
+        return CGRect(x: CGFloat(left), y: CGFloat(top), width: CGFloat(width), height: CGFloat(height))
     }
 }
 

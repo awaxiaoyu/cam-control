@@ -14,6 +14,28 @@ public enum PTPClientError: Error, LocalizedError, Sendable {
     }
 }
 
+public struct PTPAction: Equatable, Sendable {
+    public let operationCode: UInt16
+    public let parameters: [UInt32]
+    public let outData: Data?
+    public let acceptedResponses: Set<UInt16>
+    public let retriesOnBusy: Int
+
+    public init(
+        operationCode: UInt16,
+        parameters: [UInt32] = [],
+        outData: Data? = nil,
+        acceptedResponses: Set<UInt16> = [PTP.Response.ok],
+        retriesOnBusy: Int = 3
+    ) {
+        self.operationCode = operationCode
+        self.parameters = parameters
+        self.outData = outData
+        self.acceptedResponses = acceptedResponses
+        self.retriesOnBusy = retriesOnBusy
+    }
+}
+
 public actor PTPClient {
     private let transport: CameraTransport
     private var transactionID: UInt32 = 1
@@ -28,11 +50,16 @@ public actor PTPClient {
         return transactionID
     }
 
+    public func currentTransactionID() -> UInt32 {
+        transactionID > 1 ? transactionID - 1 : 0
+    }
+
     @discardableResult
     public func execute(
         operationCode: UInt16,
         parameters: [UInt32] = [],
         outData: Data? = nil,
+        acceptedResponses: Set<UInt16> = [PTP.Response.ok],
         retriesOnBusy: Int = 3
     ) async throws -> PTPResponse {
         var attempts = 0
@@ -40,14 +67,59 @@ public actor PTPClient {
             let command = PTPCommand(operationCode: operationCode, transactionID: nextTransactionID(), parameters: parameters)
             let dataPhase = outData.map { command.encodeDataContainer(payload: $0) }
             let response = try await transport.send(command, outData: dataPhase)
-            if response.responseCode == PTP.Response.deviceBusy, attempts < retriesOnBusy {
+            if response.responseCode == PTP.Response.deviceBusy,
+               !acceptedResponses.contains(PTP.Response.deviceBusy),
+               attempts < retriesOnBusy {
                 attempts += 1
                 try await Task.sleep(nanoseconds: 250_000_000)
                 continue
             }
-            guard response.isOK else { throw PTPClientError.response(response.responseCode) }
+            guard response.isOK || acceptedResponses.contains(response.responseCode) else {
+                throw PTPClientError.response(response.responseCode)
+            }
             return response
         }
+    }
+
+    @discardableResult
+    public func execute(_ action: PTPAction) async throws -> PTPResponse {
+        try await execute(
+            operationCode: action.operationCode,
+            parameters: action.parameters,
+            outData: action.outData,
+            acceptedResponses: action.acceptedResponses,
+            retriesOnBusy: action.retriesOnBusy
+        )
+    }
+
+    @discardableResult
+    public func runActions(_ actions: [PTPAction]) async throws -> [PTPResponse] {
+        var responses: [PTPResponse] = []
+        responses.reserveCapacity(actions.count)
+        for action in actions {
+            responses.append(try await execute(action))
+        }
+        return responses
+    }
+
+    public func checkNikonEvents() async throws -> [CameraTransportEvent] {
+        let response = try await execute(
+            operationCode: PTP.Operation.nikonGetEvent,
+            acceptedResponses: [PTP.Response.ok, PTP.Response.deviceBusy],
+            retriesOnBusy: 0
+        )
+        guard response.responseCode != PTP.Response.deviceBusy else { return [.cameraBusy] }
+        return PTPEventParser.parseNikonEvents(response.payload)
+    }
+
+    public func checkCanonEvents() async throws -> [CameraTransportEvent] {
+        let response = try await execute(
+            operationCode: PTP.Operation.eosEventCheck,
+            acceptedResponses: [PTP.Response.ok, PTP.Response.deviceBusy],
+            retriesOnBusy: 0
+        )
+        guard response.responseCode != PTP.Response.deviceBusy else { return [.cameraBusy] }
+        return PTPEventParser.parseCanonEvents(response.payload)
     }
 
     public func getDeviceInfo() async throws -> PTPDeviceInfo {

@@ -10,12 +10,16 @@ public protocol CameraDriver: AnyObject {
     func capture(client: PTPClient) async throws
     func setLiveView(_ enabled: Bool, client: PTPClient) async throws
     func getLiveViewFrame(client: PTPClient) async throws -> LiveViewFrame?
+    func pollEvents(client: PTPClient) async throws -> [CameraTransportEvent]
+    func handleEvent(_ event: CameraTransportEvent, client: PTPClient) async throws -> [CameraPropertyState]?
     func focus(client: PTPClient) async throws
     func driveLens(direction: DriveLensDirection, step: DriveLensStep, client: PTPClient) async throws
     func setLiveViewAfArea(x: Double, y: Double, client: PTPClient) async throws
 }
 
 public extension CameraDriver {
+    func pollEvents(client: PTPClient) async throws -> [CameraTransportEvent] { [] }
+    func handleEvent(_ event: CameraTransportEvent, client: PTPClient) async throws -> [CameraPropertyState]? { nil }
     func focus(client: PTPClient) async throws {}
     func driveLens(direction: DriveLensDirection, step: DriveLensStep, client: PTPClient) async throws {}
     func setLiveViewAfArea(x: Double, y: Double, client: PTPClient) async throws {}
@@ -42,14 +46,24 @@ final class PropertyMap {
         descriptors[descriptor.propertyCode] = descriptor
     }
 
-    func states(current: [UInt16: Int64]) -> [CameraPropertyState] {
+    func states(current: [UInt16: Int64], settableOverride: ((CameraPropertyKey, DevicePropDesc) -> Bool)? = nil) -> [CameraPropertyState] {
         CameraPropertyKey.allCases.compactMap { key in
             guard let code = map[key] else { return nil }
+            let descriptor = descriptors[code].map { descriptor in
+                DevicePropDesc(
+                    propertyCode: descriptor.propertyCode,
+                    dataType: descriptor.dataType,
+                    isSettable: settableOverride?(key, descriptor) ?? descriptor.isSettable,
+                    defaultValue: descriptor.defaultValue,
+                    currentValue: descriptor.currentValue,
+                    form: descriptor.form
+                )
+            }
             return CameraPropertyState(
                 key: key,
                 ptpCode: code,
-                value: current[code] ?? descriptors[code]?.currentValue ?? 0,
-                descriptor: descriptors[code]
+                value: current[code] ?? descriptor?.currentValue ?? 0,
+                descriptor: descriptor
             )
         }
     }
@@ -88,14 +102,38 @@ public final class NikonCameraDriver: CameraDriver {
 
         buildPropertyMap()
         try await loadDescriptorsAndValues(client: client)
-        return CameraSnapshot(deviceInfo: info, capabilities: capabilities, properties: properties.states(current: currentValues), focusPoints: focusPoints(productID: productID))
+        return CameraSnapshot(deviceInfo: info, capabilities: capabilities, properties: propertyStates(), focusPoints: focusPoints(productID: productID))
     }
 
     public func refreshProperties(client: PTPClient) async throws -> [CameraPropertyState] {
         for descriptor in properties.descriptors.values {
             currentValues[descriptor.propertyCode] = try? await client.getDevicePropValue(descriptor.propertyCode, dataType: descriptor.dataType)
         }
-        return properties.states(current: currentValues)
+        return propertyStates()
+    }
+
+    public func pollEvents(client: PTPClient) async throws -> [CameraTransportEvent] {
+        guard supportedOperations.contains(PTP.Operation.nikonGetEvent) else { return [] }
+        return try await client.checkNikonEvents()
+    }
+
+    public func handleEvent(_ event: CameraTransportEvent, client: PTPClient) async throws -> [CameraPropertyState]? {
+        switch event {
+        case .devicePropertyChanged(let code, let value):
+            if let value {
+                currentValues[code] = value
+            } else if let descriptor = properties.descriptors[code] {
+                currentValues[code] = try? await client.getDevicePropValue(code, dataType: descriptor.dataType)
+            } else if supportedProperties.contains(code) {
+                try? await loadDescriptorAndValue(code: code, client: client)
+            }
+            return propertyStates()
+        case .propertyDescChanged(let code, let values):
+            updateDescriptorValues(code: code, values: values)
+            return propertyStates()
+        default:
+            return nil
+        }
     }
 
     public func setProperty(_ key: CameraPropertyKey, value: Int64, client: PTPClient) async throws {
@@ -137,6 +175,15 @@ public final class NikonCameraDriver: CameraDriver {
     public func focus(client: PTPClient) async throws {
         guard capabilities.autofocus else { return }
         try await client.execute(operationCode: PTP.Operation.nikonAfDrive, retriesOnBusy: 6)
+        for _ in 0..<10 {
+            try await Task.sleep(nanoseconds: 200_000_000)
+            do {
+                try await client.execute(operationCode: PTP.Operation.nikonDeviceReady, retriesOnBusy: 0)
+                return
+            } catch PTPClientError.response(let code) where code == PTP.Response.deviceBusy {
+                continue
+            }
+        }
     }
 
     public func driveLens(direction: DriveLensDirection, step: DriveLensStep, client: PTPClient) async throws {
@@ -155,7 +202,7 @@ public final class NikonCameraDriver: CameraDriver {
     private func buildPropertyMap() {
         if supportedProperties.contains(PTP.Property.nikonShutterSpeed) {
             properties.add(.shutterSpeed, PTP.Property.nikonShutterSpeed)
-        } else {
+        } else if supportedProperties.contains(PTP.Property.exposureTime) {
             properties.add(.shutterSpeed, PTP.Property.exposureTime)
         }
         properties.add(.aperture, PTP.Property.fNumber)
@@ -174,13 +221,57 @@ public final class NikonCameraDriver: CameraDriver {
     }
 
     private func loadDescriptorsAndValues(client: PTPClient) async throws {
-        for code in Set(properties.map.values) where supportedProperties.contains(code) {
-            do {
-                let descriptor = try await client.getDevicePropDesc(code)
-                properties.setDescriptor(descriptor)
-                currentValues[code] = try? await client.getDevicePropValue(code, dataType: descriptor.dataType)
-            } catch {
-                continue
+        var codes = Set(properties.map.values)
+        if supportedProperties.contains(PTP.Property.exposureTime) {
+            codes.insert(PTP.Property.exposureTime)
+        }
+        if supportedProperties.contains(PTP.Property.nikonEnableAfAreaPoint) {
+            codes.insert(PTP.Property.nikonEnableAfAreaPoint)
+        }
+        for code in codes where supportedProperties.contains(code) {
+            try? await loadDescriptorAndValue(code: code, client: client)
+        }
+        if properties.code(for: .shutterSpeed) == PTP.Property.nikonShutterSpeed,
+           let nikonDesc = properties.descriptors[PTP.Property.nikonShutterSpeed],
+           nikonDesc.values.count <= 4,
+           properties.descriptors[PTP.Property.exposureTime] != nil {
+            properties.add(.shutterSpeed, PTP.Property.exposureTime)
+        }
+    }
+
+    private func loadDescriptorAndValue(code: UInt16, client: PTPClient) async throws {
+        let descriptor = try await client.getDevicePropDesc(code)
+        properties.setDescriptor(descriptor)
+        currentValues[code] = try? await client.getDevicePropValue(code, dataType: descriptor.dataType)
+    }
+
+    private func updateDescriptorValues(code: UInt16, values: [Int64]) {
+        guard !values.isEmpty, let descriptor = properties.descriptors[code] else { return }
+        properties.setDescriptor(DevicePropDesc(
+            propertyCode: code,
+            dataType: descriptor.dataType,
+            isSettable: descriptor.isSettable,
+            defaultValue: descriptor.defaultValue,
+            currentValue: currentValues[code] ?? descriptor.currentValue,
+            form: .enumeration(values)
+        ))
+    }
+
+    private func propertyStates() -> [CameraPropertyState] {
+        properties.states(current: currentValues) { [currentValues] key, descriptor in
+            guard descriptor.isSettable else { return false }
+            guard let mode = currentValues[PTP.Property.exposureProgramMode] else { return false }
+            switch key {
+            case .shutterSpeed:
+                return mode == 4 || mode == 1
+            case .aperture:
+                return mode == 3 || mode == 1
+            case .iso, .whiteBalance, .exposureMeteringMode, .exposureCompensation:
+                return mode < 0x8010
+            case .colorTemperature:
+                return currentValues[PTP.Property.whiteBalance] == 0x8012
+            default:
+                return true
             }
         }
     }
@@ -210,14 +301,36 @@ public final class CanonCameraDriver: CameraDriver {
 
         buildPropertyMap()
         try await loadDescriptorsAndValues(client: client)
-        return CameraSnapshot(deviceInfo: info, capabilities: capabilities, properties: properties.states(current: currentValues), focusPoints: [])
+        return CameraSnapshot(deviceInfo: info, capabilities: capabilities, properties: propertyStates(), focusPoints: [])
     }
 
     public func refreshProperties(client: PTPClient) async throws -> [CameraPropertyState] {
         for descriptor in properties.descriptors.values {
             currentValues[descriptor.propertyCode] = try? await client.getDevicePropValue(descriptor.propertyCode, dataType: descriptor.dataType)
         }
-        return properties.states(current: currentValues)
+        return propertyStates()
+    }
+
+    public func pollEvents(client: PTPClient) async throws -> [CameraTransportEvent] {
+        guard supportedOperations.contains(PTP.Operation.eosEventCheck) else { return [] }
+        return try await client.checkCanonEvents()
+    }
+
+    public func handleEvent(_ event: CameraTransportEvent, client: PTPClient) async throws -> [CameraPropertyState]? {
+        switch event {
+        case .devicePropertyChanged(let code, let value):
+            if let value {
+                currentValues[code] = value
+            } else if let descriptor = properties.descriptors[code] {
+                currentValues[code] = try? await client.getDevicePropValue(code, dataType: descriptor.dataType)
+            }
+            return propertyStates()
+        case .propertyDescChanged(let code, let values):
+            updateDescriptorValues(code: code, values: values)
+            return propertyStates()
+        default:
+            return nil
+        }
     }
 
     public func setProperty(_ key: CameraPropertyKey, value: Int64, client: PTPClient) async throws {
@@ -241,7 +354,9 @@ public final class CanonCameraDriver: CameraDriver {
     public func setLiveView(_ enabled: Bool, client: PTPClient) async throws {
         guard capabilities.liveView else { return }
         let modeValue: Int64 = enabled ? 1 : 0
-        try await setEOSProperty(code: PTP.Property.eosEvfMode, value: modeValue, client: client)
+        if currentValues[PTP.Property.eosEvfMode] != modeValue {
+            try await setEOSProperty(code: PTP.Property.eosEvfMode, value: modeValue, client: client)
+        }
         let existing = currentValues[PTP.Property.eosEvfOutputDevice] ?? 0
         let pcBit: Int64 = 2
         let output = enabled ? (existing | pcBit) : (existing & ~pcBit)
@@ -295,6 +410,47 @@ public final class CanonCameraDriver: CameraDriver {
         payload.appendUInt32LE(UInt32(truncatingIfNeeded: value))
         try await client.execute(operationCode: PTP.Operation.eosSetDevicePropValue, outData: payload, retriesOnBusy: 6)
         currentValues[code] = value
+    }
+
+    private func updateDescriptorValues(code: UInt16, values: [Int64]) {
+        guard !values.isEmpty else { return }
+        let descriptor = properties.descriptors[code] ?? DevicePropDesc(
+            propertyCode: code,
+            dataType: PTP.DataType.uint32,
+            isSettable: true,
+            defaultValue: currentValues[code] ?? 0,
+            currentValue: currentValues[code] ?? 0,
+            form: .none
+        )
+        properties.setDescriptor(DevicePropDesc(
+            propertyCode: code,
+            dataType: descriptor.dataType,
+            isSettable: descriptor.isSettable,
+            defaultValue: descriptor.defaultValue,
+            currentValue: currentValues[code] ?? descriptor.currentValue,
+            form: .enumeration(values)
+        ))
+    }
+
+    private func propertyStates() -> [CameraPropertyState] {
+        properties.states(current: currentValues) { [currentValues] key, descriptor in
+            guard descriptor.isSettable else { return false }
+            guard let mode = currentValues[PTP.Property.eosShootingMode] else { return false }
+            switch key {
+            case .shutterSpeed:
+                return mode == 3 || mode == 1
+            case .aperture:
+                return mode == 3 || mode == 2
+            case .iso, .whiteBalance, .exposureMeteringMode:
+                return mode >= 0 && mode <= 6
+            case .exposureCompensation:
+                return Set<Int64>([0, 1, 2, 5, 6]).contains(mode)
+            case .colorTemperature:
+                return currentValues[PTP.Property.eosWhiteBalance] == 9
+            default:
+                return true
+            }
+        }
     }
 }
 

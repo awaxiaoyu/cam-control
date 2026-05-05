@@ -13,9 +13,11 @@ public final class CameraController: ObservableObject {
 
     private let transport: CameraTransport
     private var eventTask: Task<Void, Never>?
+    private var ptpEventTask: Task<Void, Never>?
     private var liveViewTask: Task<Void, Never>?
     private var client: PTPClient?
     private var driver: CameraDriver?
+    private var liveViewEmptyFrames = 0
 
     public init(transport: CameraTransport) {
         self.transport = transport
@@ -63,6 +65,7 @@ public final class CameraController: ObservableObject {
             self.snapshot = snapshot
             self.status = .connected(resolvedDevice)
             self.lastError = nil
+            self.startPTPEventPolling()
             await refreshGallery()
         } catch {
             lastError = error.localizedDescription
@@ -71,6 +74,8 @@ public final class CameraController: ObservableObject {
     }
 
     public func disconnect() async {
+        ptpEventTask?.cancel()
+        ptpEventTask = nil
         stopLiveView()
         if let client {
             await client.closePTPSession()
@@ -81,6 +86,7 @@ public final class CameraController: ObservableObject {
         snapshot = .empty
         galleryItems = []
         liveViewFrame = nil
+        liveViewEmptyFrames = 0
         isLiveViewActive = false
         status = devices.isEmpty ? .idle : .browsing
     }
@@ -224,6 +230,12 @@ public final class CameraController: ObservableObject {
         do {
             if let frame = try await driver.getLiveViewFrame(client: client) {
                 liveViewFrame = frame
+                liveViewEmptyFrames = 0
+            } else if isLiveViewActive {
+                liveViewEmptyFrames += 1
+                if liveViewEmptyFrames == 10 {
+                    lastError = "Live View did not return a frame."
+                }
             }
         } catch {
             lastError = error.localizedDescription
@@ -244,13 +256,86 @@ public final class CameraController: ObservableObject {
             if case .connected(let device) = status, device.id == id {
                 await disconnect()
             }
-        case .ptpEvent:
-            await refreshProperties()
+        case .ptpEvent(let data):
+            let parsed = parsePTPEventData(data)
+            if parsed.isEmpty {
+                await refreshProperties()
+                await refreshGallery()
+            } else {
+                await handle(parsed)
+            }
+        case .devicePropertyChanged, .propertyDescChanged:
+            await refreshAfterDriverEvent(event)
+        case .objectAdded:
             await refreshGallery()
+        case .captureComplete:
+            await refreshGallery()
+        case .cameraBusy:
+            lastError = "Camera is busy. Please try again in a moment."
+        case .cameraCaptureChanged(let capturing):
+            if !capturing {
+                await refreshGallery()
+            }
+        case .bulbExposureTime:
+            break
         case .disconnected:
             await disconnect()
         case .error(let message):
             lastError = message
+        }
+    }
+
+    private func handle(_ events: [CameraTransportEvent]) async {
+        for event in events {
+            await handle(event)
+        }
+    }
+
+    private func startPTPEventPolling() {
+        ptpEventTask?.cancel()
+        ptpEventTask = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.pollPTPEvents()
+                try? await Task.sleep(nanoseconds: 900_000_000)
+            }
+        }
+    }
+
+    private func pollPTPEvents() async {
+        guard let client, let driver else { return }
+        do {
+            let events = try await driver.pollEvents(client: client)
+            await handle(events)
+        } catch PTPClientError.response(let code) where code == PTP.Response.deviceBusy {
+            lastError = "Camera is busy. Please try again in a moment."
+        } catch {
+            lastError = error.localizedDescription
+        }
+    }
+
+    private func refreshAfterDriverEvent(_ event: CameraTransportEvent) async {
+        guard let client, let driver else { return }
+        do {
+            if let properties = try await driver.handleEvent(event, client: client) {
+                snapshot.properties = properties
+            } else {
+                await refreshProperties()
+            }
+        } catch {
+            lastError = error.localizedDescription
+        }
+    }
+
+    private func parsePTPEventData(_ data: Data) -> [CameraTransportEvent] {
+        let standard = PTPEventParser.parseStandardEventContainer(data)
+        if !standard.isEmpty { return standard }
+        switch driver?.vendor {
+        case .nikon:
+            return PTPEventParser.parseNikonEvents(data)
+        case .canon:
+            return PTPEventParser.parseCanonEvents(data)
+        case .unknown, nil:
+            return []
         }
     }
 
