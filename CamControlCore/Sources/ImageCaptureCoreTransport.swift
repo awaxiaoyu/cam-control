@@ -26,7 +26,9 @@ public final class ImageCaptureCoreTransport: NSObject, CameraTransport, @unchec
     }
 
     public func startBrowsing() {
-        browser.start()
+        Task { @MainActor [weak self] in
+            await self?.startBrowsingAfterAuthorization()
+        }
     }
 
     public func stopBrowsing() {
@@ -112,6 +114,45 @@ extension ImageCaptureCoreTransport: ICDeviceBrowserDelegate {
         let name = camera.name ?? "Camera"
         let vendor = inferVendor(name: name, vendorID: nil)
         return CameraDevice(id: deviceUUID(camera), name: name, vendorID: nil, productID: nil, vendor: vendor)
+    }
+
+    @MainActor
+    private func startBrowsingAfterAuthorization() async {
+        let controlStatus = await requestControlAuthorizationIfNeeded()
+        guard controlStatus == ICAuthorizationStatusAuthorized else {
+            continuation?.yield(.error("Camera control permission was not granted."))
+            return
+        }
+
+        let contentsStatus = await requestContentsAuthorizationIfNeeded()
+        guard contentsStatus == ICAuthorizationStatusAuthorized else {
+            continuation?.yield(.error("Camera contents permission was not granted."))
+            return
+        }
+
+        browser.start()
+    }
+
+    @MainActor
+    private func requestControlAuthorizationIfNeeded() async -> ICAuthorizationStatus {
+        let status = browser.controlAuthorizationStatus
+        guard status == ICAuthorizationStatusNotDetermined else { return status }
+        return await withCheckedContinuation { continuation in
+            browser.requestControlAuthorization { status in
+                continuation.resume(returning: status)
+            }
+        }
+    }
+
+    @MainActor
+    private func requestContentsAuthorizationIfNeeded() async -> ICAuthorizationStatus {
+        let status = browser.contentsAuthorizationStatus
+        guard status == ICAuthorizationStatusNotDetermined else { return status }
+        return await withCheckedContinuation { continuation in
+            browser.requestContentsAuthorization { status in
+                continuation.resume(returning: status)
+            }
+        }
     }
 
     private func deviceUUID(_ device: ICDevice) -> String {
