@@ -32,7 +32,7 @@ final class CameraControllerTests: XCTestCase {
         XCTAssertTrue(transport.sentCommands.contains { $0.operationCode == PTP.Operation.initiateCapture })
     }
 
-    private static func deviceInfoPayload() -> Data {
+    nonisolated private static func deviceInfoPayload() -> Data {
         var data = Data()
         data.appendUInt16LE(100)
         data.appendUInt32LE(0)

@@ -74,7 +74,7 @@ jobs:
       - name: Package unsigned IPA
         run: |
           mkdir -p Payload
-          cp -R build/iphoneos/CamControl.app Payload/
+          cp -R build/iphoneos/CamControlApp.app Payload/
           /usr/bin/zip -qry CamControl-unsigned.ipa Payload
 
       - name: Upload unsigned IPA
