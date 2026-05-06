@@ -101,7 +101,7 @@ public enum LiveViewHistogram {
     public static func makeLuminanceHistogram(fromJPEG data: Data) -> Data? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
-            return nil
+            return makeCompressedDataFallback(from: data)
         }
         return makeLuminanceHistogram(from: image)
     }
@@ -156,6 +156,15 @@ public enum LiveViewHistogram {
             let luminance = Int((77 * r + 150 * g + 29 * b) >> 8)
             bins[luminance] += 1
             index += bytesPerPixel
+        }
+        return normalize(bins)
+    }
+
+    private static func makeCompressedDataFallback(from data: Data) -> Data? {
+        guard !data.isEmpty else { return nil }
+        var bins = [UInt32](repeating: 0, count: 256)
+        for byte in data {
+            bins[Int(byte)] += 1
         }
         return normalize(bins)
     }
