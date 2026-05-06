@@ -3,15 +3,28 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var controller: CameraController
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
-        NavigationSplitView {
-            DeviceListView()
-        } detail: {
-            if case .connected = controller.status {
-                CameraWorkspaceView()
+        Group {
+            if horizontalSizeClass == .compact {
+                NavigationStack {
+                    if case .connected = controller.status {
+                        CameraWorkspaceView()
+                    } else {
+                        DeviceListView()
+                    }
+                }
             } else {
-                EmptyCameraView()
+                NavigationSplitView {
+                    DeviceListView()
+                } detail: {
+                    if case .connected = controller.status {
+                        CameraWorkspaceView()
+                    } else {
+                        EmptyCameraView()
+                    }
+                }
             }
         }
         .alert("Camera", isPresented: Binding(

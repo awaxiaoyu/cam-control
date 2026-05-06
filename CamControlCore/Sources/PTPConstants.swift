@@ -71,6 +71,7 @@ public enum PTP {
         public static let generalError: UInt16 = 0x2002
         public static let sessionNotOpen: UInt16 = 0x2003
         public static let operationNotSupported: UInt16 = 0x2005
+        public static let storeNotAvailable: UInt16 = 0x2013
         public static let deviceBusy: UInt16 = 0x2019
         public static let invalidParameter: UInt16 = 0x201d
         public static let sessionAlreadyOpen: UInt16 = 0x201e
@@ -149,6 +150,7 @@ public enum PTP {
         case Response.generalError: return "GeneralError"
         case Response.sessionNotOpen: return "SessionNotOpen"
         case Response.operationNotSupported: return "OperationNotSupported"
+        case Response.storeNotAvailable: return "StoreNotAvailable"
         case Response.deviceBusy: return "DeviceBusy"
         case Response.invalidParameter: return "InvalidParameter"
         case Response.sessionAlreadyOpen: return "SessionAlreadyOpen"

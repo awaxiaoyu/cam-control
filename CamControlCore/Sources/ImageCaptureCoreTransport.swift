@@ -164,8 +164,15 @@ extension ImageCaptureCoreTransport: ICDeviceBrowserDelegate {
 
     private func inferVendor(name: String, vendorID: UInt16?) -> CameraVendor {
         if vendorID == PTP.Vendor.nikon || name.localizedCaseInsensitiveContains("nikon") { return .nikon }
+        if looksLikeNikonModel(name) { return .nikon }
         if vendorID == PTP.Vendor.canon || name.localizedCaseInsensitiveContains("canon") || name.localizedCaseInsensitiveContains("eos") { return .canon }
         return .unknown
+    }
+
+    private func looksLikeNikonModel(_ name: String) -> Bool {
+        let normalized = name.replacingOccurrences(of: " ", with: "").uppercased()
+        guard normalized.hasPrefix("D") else { return false }
+        return normalized.dropFirst().first?.isNumber == true
     }
 }
 

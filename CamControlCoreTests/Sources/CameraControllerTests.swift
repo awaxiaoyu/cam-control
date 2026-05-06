@@ -32,7 +32,63 @@ final class CameraControllerTests: XCTestCase {
         XCTAssertTrue(transport.sentCommands.contains { $0.operationCode == PTP.Operation.initiateCapture })
     }
 
-    nonisolated private static func deviceInfoPayload() -> Data {
+    func testUnknownDModelResolvesAsNikonAndUpdatesDeviceList() async throws {
+        let device = CameraDevice(id: "mock", name: "D7500", vendorID: nil, productID: nil, vendor: .unknown)
+        let transport = MockCameraTransport { command, _ in
+            switch command.operationCode {
+            case PTP.Operation.getDeviceInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.deviceInfoPayload(manufacturer: "", model: "D7500"), rawResponse: Data())
+            case PTP.Operation.getStorageIDs:
+                var payload = Data()
+                payload.appendUInt32LE(0)
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            default:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            }
+        }
+        let controller = CameraController(transport: transport)
+        controller.startBrowsing()
+        transport.yield(.deviceAdded(device))
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        await controller.connect(to: device)
+
+        XCTAssertEqual(controller.devices.first?.vendor, .nikon)
+        guard case .connected(let connected) = controller.status else {
+            XCTFail("Expected connected")
+            return
+        }
+        XCTAssertEqual(connected.vendor, .nikon)
+    }
+
+    func testStoreNotAvailableDoesNotSurfaceAsConnectionError() async throws {
+        let device = CameraDevice(id: "mock", name: "D7500", vendorID: nil, productID: nil, vendor: .unknown)
+        let transport = MockCameraTransport { command, _ in
+            switch command.operationCode {
+            case PTP.Operation.getDeviceInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.deviceInfoPayload(manufacturer: "", model: "D7500"), rawResponse: Data())
+            case PTP.Operation.getStorageIDs:
+                return PTPResponse(responseCode: PTP.Response.storeNotAvailable, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            default:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            }
+        }
+        let controller = CameraController(transport: transport)
+        controller.startBrowsing()
+        transport.yield(.deviceAdded(device))
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        await controller.connect(to: device)
+
+        XCTAssertNil(controller.lastError)
+        XCTAssertTrue(controller.galleryItems.isEmpty)
+        guard case .connected = controller.status else {
+            XCTFail("Expected connected")
+            return
+        }
+    }
+
+    nonisolated private static func deviceInfoPayload(manufacturer: String = "Nikon", model: String = "D7000") -> Data {
         var data = Data()
         data.appendUInt16LE(100)
         data.appendUInt32LE(0)
@@ -52,8 +108,8 @@ final class CameraControllerTests: XCTestCase {
         data.appendUInt16Array([])
         data.appendUInt16Array([])
         data.appendUInt16Array([PTP.ObjectFormat.exifJpeg])
-        data.appendPTPString("Nikon")
-        data.appendPTPString("D7000")
+        data.appendPTPString(manufacturer)
+        data.appendPTPString(model)
         data.appendPTPString("1.0")
         data.appendPTPString("123")
         return data

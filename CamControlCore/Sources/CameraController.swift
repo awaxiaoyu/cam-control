@@ -62,6 +62,9 @@ public final class CameraController: ObservableObject {
             let snapshot = try await driver.open(client: client, info: info, device: resolvedDevice)
             self.client = client
             self.driver = driver
+            if let index = devices.firstIndex(where: { $0.id == device.id }) {
+                devices[index] = resolvedDevice
+            }
             self.snapshot = snapshot
             self.status = .connected(resolvedDevice)
             self.lastError = nil
@@ -200,6 +203,8 @@ public final class CameraController: ObservableObject {
                 }
             }
             galleryItems = items
+        } catch PTPClientError.response(let code) where code == PTP.Response.storeNotAvailable {
+            galleryItems = []
         } catch {
             lastError = error.localizedDescription
         }
@@ -357,6 +362,8 @@ public final class CameraController: ObservableObject {
             vendor = device.vendor
         } else if name.localizedCaseInsensitiveContains("nikon") {
             vendor = .nikon
+        } else if looksLikeNikonModel(info.model) || looksLikeNikonModel(device.name) {
+            vendor = .nikon
         } else if name.localizedCaseInsensitiveContains("canon") || name.localizedCaseInsensitiveContains("eos") {
             vendor = .canon
         } else {
@@ -384,6 +391,12 @@ public final class CameraController: ObservableObject {
         if normalized.contains("D3S") { return PTP.NikonProduct.d3s }
         if normalized.contains("D3") { return PTP.NikonProduct.d3 }
         return nil
+    }
+
+    private func looksLikeNikonModel(_ model: String) -> Bool {
+        let normalized = model.replacingOccurrences(of: " ", with: "").uppercased()
+        guard normalized.hasPrefix("D") else { return false }
+        return normalized.dropFirst().first?.isNumber == true
     }
 
     private func isImage(_ format: UInt16) -> Bool {
