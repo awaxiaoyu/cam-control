@@ -46,7 +46,7 @@ struct GalleryView: View {
         .refreshable {
             await controller.refreshGallery()
         }
-        .sheet(item: $selectedItem) { item in
+        .fullScreenCover(item: $selectedItem) { item in
             PicturePreview(item: item)
                 .environmentObject(controller)
         }
@@ -61,14 +61,17 @@ private struct PicturePreview: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            ZStack {
+                Color.black.ignoresSafeArea()
                 if let url, let image = PlatformImage(contentsOfFile: url.path) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .background(Color.black)
+                    ZoomableFrame {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                    }
                 } else {
                     ProgressView()
+                        .tint(.white)
                         .task {
                             url = await controller.download(item)
                         }
@@ -76,9 +79,12 @@ private struct PicturePreview: View {
             }
             .navigationTitle(item.filename)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.black, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }
+                        .foregroundStyle(.white)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -87,6 +93,7 @@ private struct PicturePreview: View {
                         Image(systemName: "square.and.arrow.down")
                     }
                     .disabled(url == nil)
+                    .foregroundStyle(.white)
                 }
             }
         }

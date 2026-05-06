@@ -15,6 +15,7 @@ public protocol CameraDriver: AnyObject {
     func focus(client: PTPClient) async throws
     func driveLens(direction: DriveLensDirection, step: DriveLensStep, client: PTPClient) async throws
     func setLiveViewAfArea(x: Double, y: Double, client: PTPClient) async throws
+    func endBulb(client: PTPClient) async throws
 }
 
 public extension CameraDriver {
@@ -23,6 +24,7 @@ public extension CameraDriver {
     func focus(client: PTPClient) async throws {}
     func driveLens(direction: DriveLensDirection, step: DriveLensStep, client: PTPClient) async throws {}
     func setLiveViewAfArea(x: Double, y: Double, client: PTPClient) async throws {}
+    func endBulb(client: PTPClient) async throws {}
 }
 
 final class PropertyMap {
@@ -402,6 +404,11 @@ public final class CanonCameraDriver: CameraDriver {
         var value: UInt32 = direction == .near ? 0 : 0x8000
         value |= UInt32(step.rawValue)
         try await client.execute(operationCode: PTP.Operation.eosDriveLens, parameters: [value])
+    }
+
+    public func endBulb(client: PTPClient) async throws {
+        guard capabilities.bulb else { return }
+        try await client.execute(operationCode: PTP.Operation.eosBulbEnd, retriesOnBusy: 6)
     }
 
     private func buildPropertyMap() {

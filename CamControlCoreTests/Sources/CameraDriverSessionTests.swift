@@ -43,6 +43,20 @@ final class CameraDriverSessionTests: XCTestCase {
         ])
     }
 
+    func testCanonEndBulbSendsBulbEnd() async throws {
+        let transport = MockCameraTransport { command, _ in
+            PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+        }
+        let client = PTPClient(transport: transport)
+        let driver = CanonCameraDriver()
+        let device = CameraDevice(id: "canon", name: "Canon", vendorID: PTP.Vendor.canon, productID: nil, vendor: .canon)
+
+        _ = try await driver.open(client: client, info: canonInfo(bulb: true), device: device)
+        try await driver.endBulb(client: client)
+
+        XCTAssertTrue(transport.sentCommands.contains { $0.operationCode == PTP.Operation.eosBulbEnd })
+    }
+
     func testNikonStopLiveViewAcceptsAlreadyStoppedResponse() async throws {
         let transport = MockCameraTransport { command, _ in
             if command.operationCode == PTP.Operation.nikonGetVendorPropCodes {
@@ -152,15 +166,19 @@ final class CameraDriverSessionTests: XCTestCase {
         return data
     }
 
-    private func canonInfo() -> PTPDeviceInfo {
-        PTPDeviceInfo(
-            operationsSupported: [
-                PTP.Operation.openSession,
-                PTP.Operation.eosSetPCConnectMode,
-                PTP.Operation.eosSetEventMode,
-                PTP.Operation.eosEventCheck,
-                PTP.Operation.eosGetLiveViewPicture
-            ],
+    private func canonInfo(bulb: Bool = false) -> PTPDeviceInfo {
+        var operations = [
+            PTP.Operation.openSession,
+            PTP.Operation.eosSetPCConnectMode,
+            PTP.Operation.eosSetEventMode,
+            PTP.Operation.eosEventCheck,
+            PTP.Operation.eosGetLiveViewPicture
+        ]
+        if bulb {
+            operations.append(contentsOf: [PTP.Operation.eosBulbStart, PTP.Operation.eosBulbEnd])
+        }
+        return PTPDeviceInfo(
+            operationsSupported: operations,
             eventsSupported: [],
             devicePropertiesSupported: [],
             captureFormats: [],

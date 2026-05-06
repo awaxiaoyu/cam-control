@@ -8,8 +8,11 @@ public final class CameraController: ObservableObject {
     @Published public private(set) var snapshot: CameraSnapshot = .empty
     @Published public private(set) var liveViewFrame: LiveViewFrame?
     @Published public private(set) var galleryItems: [GalleryItem] = []
+    @Published public private(set) var pictureStreamItems: [GalleryItem] = []
     @Published public private(set) var lastError: String?
     @Published public private(set) var isLiveViewActive = false
+    @Published public private(set) var isBulbActive = false
+    @Published public private(set) var bulbElapsedSeconds = 0
 
     private let transport: CameraTransport
     private var eventTask: Task<Void, Never>?
@@ -90,24 +93,43 @@ public final class CameraController: ObservableObject {
         driver = nil
         snapshot = .empty
         galleryItems = []
+        pictureStreamItems = []
         liveViewFrame = nil
         liveViewEmptyFrames = 0
         storageWarningShown = false
         isLiveViewActive = false
+        isBulbActive = false
+        bulbElapsedSeconds = 0
         status = devices.isEmpty ? .idle : .browsing
     }
 
     public func capture() async {
         guard let client, let driver else { return }
         do {
+            if isBulbActive {
+                try await driver.endBulb(client: client)
+                isBulbActive = false
+                bulbElapsedSeconds = 0
+                await refreshGallery()
+                return
+            }
             let previousHandles = Set(galleryItems.map(\.objectHandle))
+            let shouldRestartLiveView = isLiveViewActive && driver.vendor == .nikon
             if isLiveViewActive, driver.vendor == .nikon {
                 cancelLiveViewLoop()
                 try await driver.setLiveView(false, client: client)
                 isLiveViewActive = false
             }
             try await driver.capture(client: client)
+            if startsBulbCapture(driver: driver) {
+                isBulbActive = true
+                bulbElapsedSeconds = 0
+                return
+            }
             await refreshAfterCapture(previousHandles: previousHandles)
+            if shouldRestartLiveView {
+                await startLiveView()
+            }
         } catch {
             lastError = error.localizedDescription
         }
@@ -227,7 +249,8 @@ public final class CameraController: ObservableObject {
             try? await Task.sleep(nanoseconds: attempt == 0 ? 700_000_000 : 500_000_000)
             await pollPTPEvents(reportBusy: false)
             await refreshGallery()
-            if galleryItems.contains(where: { !previousHandles.contains($0.objectHandle) }) {
+            if let item = galleryItems.first(where: { !previousHandles.contains($0.objectHandle) }) {
+                addToPictureStream(item)
                 return
             }
         }
@@ -295,6 +318,15 @@ public final class CameraController: ObservableObject {
     private func upsertGalleryItem(_ item: GalleryItem) {
         galleryItems.removeAll { $0.objectHandle == item.objectHandle }
         galleryItems.insert(item, at: 0)
+        addToPictureStream(item)
+    }
+
+    private func addToPictureStream(_ item: GalleryItem) {
+        pictureStreamItems.removeAll { $0.objectHandle == item.objectHandle }
+        pictureStreamItems.insert(item, at: 0)
+        if pictureStreamItems.count > 40 {
+            pictureStreamItems.removeLast(pictureStreamItems.count - 40)
+        }
     }
 
     private func cacheThumbnail(for info: PTPObjectInfo) async -> URL? {
@@ -388,10 +420,15 @@ public final class CameraController: ObservableObject {
             lastError = "Camera is busy. Please try again in a moment."
         case .cameraCaptureChanged(let capturing):
             if !capturing {
+                isBulbActive = false
+                bulbElapsedSeconds = 0
+            }
+            if !capturing {
                 await refreshGallery()
             }
-        case .bulbExposureTime:
-            break
+        case .bulbExposureTime(let seconds):
+            isBulbActive = true
+            bulbElapsedSeconds = seconds
         case .disconnected:
             await disconnect()
         case .error(let message):
@@ -467,6 +504,11 @@ public final class CameraController: ObservableObject {
         case .unknown:
             return NikonCameraDriver()
         }
+    }
+
+    private func startsBulbCapture(driver: CameraDriver) -> Bool {
+        guard driver.vendor == .canon, snapshot.capabilities.bulb else { return false }
+        return snapshot.properties.first { $0.key == .shutterSpeed }?.value == 0x0c
     }
 
     private func resolveDevice(_ device: CameraDevice, info: PTPDeviceInfo) -> CameraDevice {

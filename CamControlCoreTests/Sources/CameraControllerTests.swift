@@ -120,6 +120,114 @@ final class CameraControllerTests: XCTestCase {
         XCTAssertNotNil(controller.galleryItems.first?.thumbnailURL)
     }
 
+    func testObjectAddedEventAddsPictureStreamItem() async throws {
+        let device = CameraDevice(id: "mock", name: "D7500", vendorID: nil, productID: nil, vendor: .unknown)
+        let handle: UInt32 = 77
+        let transport = MockCameraTransport { command, _ in
+            switch command.operationCode {
+            case PTP.Operation.getDeviceInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.deviceInfoPayload(manufacturer: "Nikon", model: "D7500"), rawResponse: Data())
+            case PTP.Operation.getStorageIDs:
+                var payload = Data()
+                payload.appendUInt32LE(0)
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            case PTP.Operation.getObjectInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.objectInfoPayload(handle: handle, filename: "DSC_0077.JPG"), rawResponse: Data())
+            case PTP.Operation.getThumb:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data([0xff, 0xd8, 0xff, 0xd9]), rawResponse: Data())
+            default:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            }
+        }
+        let controller = CameraController(transport: transport)
+        controller.startBrowsing()
+        transport.yield(.deviceAdded(device))
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        await controller.connect(to: device)
+        transport.yield(.objectAdded(handle, PTP.ObjectFormat.exifJpeg))
+        try? await Task.sleep(nanoseconds: 150_000_000)
+
+        XCTAssertEqual(controller.pictureStreamItems.first?.objectHandle, handle)
+        XCTAssertEqual(controller.pictureStreamItems.first?.filename, "DSC_0077.JPG")
+    }
+
+    func testCaptureRefreshAddsNewObjectToPictureStream() async throws {
+        final class CaptureState: @unchecked Sendable {
+            var didCapture = false
+        }
+
+        let device = CameraDevice(id: "mock", name: "D7500", vendorID: PTP.Vendor.nikon, productID: PTP.NikonProduct.d7000, vendor: .nikon)
+        let handle: UInt32 = 88
+        let state = CaptureState()
+        let transport = MockCameraTransport { command, _ in
+            switch command.operationCode {
+            case PTP.Operation.getDeviceInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.deviceInfoPayload(manufacturer: "Nikon", model: "D7500"), rawResponse: Data())
+            case PTP.Operation.initiateCapture:
+                state.didCapture = true
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            case PTP.Operation.getStorageIDs:
+                var payload = Data()
+                payload.appendUInt32LE(1)
+                payload.appendUInt32LE(1)
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            case PTP.Operation.getObjectHandles:
+                var payload = Data()
+                payload.appendUInt32LE(state.didCapture ? 1 : 0)
+                if state.didCapture {
+                    payload.appendUInt32LE(handle)
+                }
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            case PTP.Operation.getObjectInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.objectInfoPayload(handle: handle, filename: "DSC_0088.JPG"), rawResponse: Data())
+            case PTP.Operation.getThumb:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data([0xff, 0xd8, 0xff, 0xd9]), rawResponse: Data())
+            default:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            }
+        }
+        let controller = CameraController(transport: transport)
+        controller.startBrowsing()
+        transport.yield(.deviceAdded(device))
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        await controller.connect(to: device)
+        await controller.capture()
+
+        XCTAssertEqual(controller.pictureStreamItems.first?.objectHandle, handle)
+    }
+
+    func testNikonLiveViewRestartsAfterCapture() async throws {
+        let device = CameraDevice(id: "mock", name: "D7000", vendorID: PTP.Vendor.nikon, productID: PTP.NikonProduct.d7000, vendor: .nikon)
+        let transport = MockCameraTransport { command, _ in
+            switch command.operationCode {
+            case PTP.Operation.getDeviceInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.deviceInfoPayload(manufacturer: "Nikon", model: "D7000"), rawResponse: Data())
+            case PTP.Operation.getStorageIDs:
+                var payload = Data()
+                payload.appendUInt32LE(0)
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            case PTP.Operation.nikonGetLiveViewImage:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data([0xff, 0xd8, 0xff, 0xd9]), rawResponse: Data())
+            default:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            }
+        }
+        let controller = CameraController(transport: transport)
+        controller.startBrowsing()
+        transport.yield(.deviceAdded(device))
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        await controller.connect(to: device)
+        await controller.startLiveView()
+        await controller.capture()
+        controller.stopLiveView()
+
+        let startCount = transport.sentCommands.filter { $0.operationCode == PTP.Operation.nikonStartLiveView }.count
+        XCTAssertGreaterThanOrEqual(startCount, 2)
+    }
+
     func testLiveViewNotActiveResponseHasReadableMessage() {
         XCTAssertEqual(PTP.responseName(PTP.Response.nikonNotLiveView), "NotLiveView")
         XCTAssertEqual(PTPClientError.response(PTP.Response.nikonNotLiveView).localizedDescription, "Live View is not active.")

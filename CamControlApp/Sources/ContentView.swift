@@ -103,10 +103,16 @@ private struct CameraWorkspaceView: View {
             Button {
                 Task { await controller.capture() }
             } label: {
-                Image(systemName: "camera.circle.fill")
+                Image(systemName: controller.isBulbActive ? "stop.circle.fill" : "camera.circle.fill")
             }
-            .accessibilityLabel("Shoot")
+            .accessibilityLabel(controller.isBulbActive ? "Stop bulb" : "Shoot")
             .buttonStyle(.borderedProminent)
+
+            if controller.isBulbActive {
+                Text("\(controller.bulbElapsedSeconds)s")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
 
             Button {
                 Task { await controller.disconnect() }
