@@ -77,7 +77,7 @@ final class CameraDriverSessionTests: XCTestCase {
                 PTP.Operation.nikonGetLiveViewImage
             ])
         }
-        PTPDeviceInfo(
+        return PTPDeviceInfo(
             operationsSupported: operations,
             eventsSupported: [],
             devicePropertiesSupported: [],
