@@ -76,6 +76,8 @@ jobs:
           rm -rf Payload CamControl-unsigned.ipa
           mkdir -p Payload
           cp -R build/iphoneos/CamControl.app Payload/
+          /usr/libexec/PlistBuddy -c "Print :NSCameraUsageDescription" Payload/CamControl.app/Info.plist
+          /usr/libexec/PlistBuddy -c "Print :NSPhotoLibraryAddUsageDescription" Payload/CamControl.app/Info.plist
           /usr/bin/ditto -c -k --keepParent Payload CamControl-unsigned.ipa
 
       - name: Upload unsigned IPA
