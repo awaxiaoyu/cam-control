@@ -92,7 +92,7 @@ public final class NikonCameraDriver: CameraDriver {
         capabilities.driveLens = supportedOperations.contains(PTP.Operation.nikonMfDrive)
         capabilities.liveViewAfArea = supportedOperations.contains(PTP.Operation.nikonChangeAfArea)
         capabilities.autofocus = supportedOperations.contains(PTP.Operation.nikonAfDrive)
-        capabilities.histogram = false
+        capabilities.histogram = capabilities.liveView
 
         try await client.openPTPSession()
 

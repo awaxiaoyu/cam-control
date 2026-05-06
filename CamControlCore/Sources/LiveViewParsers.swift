@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import ImageIO
 
 public enum NikonLiveViewParser {
     public static func parse(data: Data, productID: UInt16) -> LiveViewFrame? {
@@ -47,6 +48,7 @@ public enum NikonLiveViewParser {
         )
         return LiveViewFrame(
             jpegData: jpeg,
+            histogram: LiveViewHistogram.makeLuminanceHistogram(fromJPEG: jpeg),
             autofocusFrame: afRect,
             wholeSize: CGSize(width: CGFloat(wholeWidth), height: CGFloat(wholeHeight)),
             autofocusFrameSize: afSize
@@ -68,7 +70,7 @@ public enum NikonLiveViewParser {
 
     public static func parseByJPEGScan(_ data: Data) -> LiveViewFrame? {
         guard let jpeg = extractJPEG(from: data) else { return nil }
-        return LiveViewFrame(jpegData: jpeg)
+        return LiveViewFrame(jpegData: jpeg, histogram: LiveViewHistogram.makeLuminanceHistogram(fromJPEG: jpeg))
     }
 
     public static func extractJPEG(from data: Data) -> Data? {
@@ -92,6 +94,70 @@ public enum NikonLiveViewParser {
             index += 1
         }
         return data.subdata(in: jpegStart..<data.count)
+    }
+}
+
+public enum LiveViewHistogram {
+    public static func makeLuminanceHistogram(fromJPEG data: Data) -> Data? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+            return nil
+        }
+        return makeLuminanceHistogram(from: image)
+    }
+
+    public static func normalize(_ bins: [UInt32]) -> Data {
+        guard let maximum = bins.max(), maximum > 0 else {
+            return Data(repeating: 0, count: 256)
+        }
+        var output = Data()
+        output.reserveCapacity(256)
+        for value in bins.prefix(256) {
+            output.append(UInt8(min(255, (value * 255) / maximum)))
+        }
+        if output.count < 256 {
+            output.append(contentsOf: repeatElement(UInt8(0), count: 256 - output.count))
+        }
+        return output
+    }
+
+    private static func makeLuminanceHistogram(from image: CGImage) -> Data? {
+        let width = image.width
+        let height = image.height
+        guard width > 0, height > 0 else { return nil }
+        let bytesPerPixel = 4
+        let bytesPerRow = width * bytesPerPixel
+        var pixels = [UInt8](repeating: 0, count: height * bytesPerRow)
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let rendered = pixels.withUnsafeMutableBytes { buffer -> Bool in
+            guard let baseAddress = buffer.baseAddress,
+                  let context = CGContext(
+                    data: baseAddress,
+                    width: width,
+                    height: height,
+                    bitsPerComponent: 8,
+                    bytesPerRow: bytesPerRow,
+                    space: colorSpace,
+                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+                  ) else {
+                return false
+            }
+            context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
+            return true
+        }
+        guard rendered else { return nil }
+
+        var bins = [UInt32](repeating: 0, count: 256)
+        var index = 0
+        while index + 2 < pixels.count {
+            let r = UInt32(pixels[index])
+            let g = UInt32(pixels[index + 1])
+            let b = UInt32(pixels[index + 2])
+            let luminance = Int((77 * r + 150 * g + 29 * b) >> 8)
+            bins[luminance] += 1
+            index += bytesPerPixel
+        }
+        return normalize(bins)
     }
 }
 

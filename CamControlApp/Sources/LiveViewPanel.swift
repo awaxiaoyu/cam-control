@@ -15,6 +15,12 @@ struct LiveViewPanel: View {
                             .overlay(alignment: .topLeading) {
                                 AutofocusOverlay(frame: frame)
                             }
+                            .overlay(alignment: .bottomTrailing) {
+                                if controller.snapshot.capabilities.histogram, let histogram = frame.histogram {
+                                    HistogramOverlay(histogram: histogram)
+                                        .padding(10)
+                                }
+                            }
                     } else {
                         Image(systemName: "viewfinder")
                             .font(.system(size: 48))
@@ -102,5 +108,43 @@ private struct AutofocusOverlay: View {
                     )
             }
         }
+    }
+}
+
+private struct HistogramOverlay: View {
+    let histogram: Data
+
+    var body: some View {
+        let bars = barHeights()
+        HStack(alignment: .bottom, spacing: 1) {
+            ForEach(Array(bars.enumerated()), id: \.offset) { _, value in
+                Capsule()
+                    .fill(Color.white.opacity(0.85))
+                    .frame(width: 2, height: max(2, 44 * value))
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 7)
+        .frame(width: 150, height: 64, alignment: .bottom)
+        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func barHeights(count: Int = 48) -> [CGFloat] {
+        let bytes = [UInt8](histogram)
+        guard !bytes.isEmpty else { return [] }
+        let bucketSize = max(1, bytes.count / count)
+        var values: [CGFloat] = []
+        values.reserveCapacity(count)
+        for bucket in 0..<count {
+            let start = bucket * bucketSize
+            let end = min(bytes.count, start + bucketSize)
+            guard start < end else {
+                values.append(0)
+                continue
+            }
+            let sum = bytes[start..<end].reduce(0) { $0 + Int($1) }
+            values.append(CGFloat(sum) / CGFloat((end - start) * 255))
+        }
+        return values
     }
 }
