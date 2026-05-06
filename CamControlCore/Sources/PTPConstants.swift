@@ -75,6 +75,7 @@ public enum PTP {
         public static let deviceBusy: UInt16 = 0x2019
         public static let invalidParameter: UInt16 = 0x201d
         public static let sessionAlreadyOpen: UInt16 = 0x201e
+        public static let nikonNotLiveView: UInt16 = 0xa00b
     }
 
     public enum Property {
@@ -154,6 +155,7 @@ public enum PTP {
         case Response.deviceBusy: return "DeviceBusy"
         case Response.invalidParameter: return "InvalidParameter"
         case Response.sessionAlreadyOpen: return "SessionAlreadyOpen"
+        case Response.nikonNotLiveView: return "NotLiveView"
         default: return "0x\(String(code, radix: 16))"
         }
     }

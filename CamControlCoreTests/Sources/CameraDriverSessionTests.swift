@@ -43,14 +43,42 @@ final class CameraDriverSessionTests: XCTestCase {
         ])
     }
 
-    private func nikonInfo() -> PTPDeviceInfo {
+    func testNikonStopLiveViewAcceptsAlreadyStoppedResponse() async throws {
+        let transport = MockCameraTransport { command, _ in
+            if command.operationCode == PTP.Operation.nikonGetVendorPropCodes {
+                var payload = Data()
+                payload.appendUInt32LE(0)
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            }
+            let responseCode = command.operationCode == PTP.Operation.nikonEndLiveView ? PTP.Response.nikonNotLiveView : PTP.Response.ok
+            return PTPResponse(responseCode: responseCode, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+        }
+        let client = PTPClient(transport: transport)
+        let driver = NikonCameraDriver()
+        let device = CameraDevice(id: "nikon", name: "Nikon", vendorID: PTP.Vendor.nikon, productID: PTP.NikonProduct.d7000, vendor: .nikon)
+
+        _ = try await driver.open(client: client, info: nikonInfo(liveView: true), device: device)
+
+        try await driver.setLiveView(false, client: client)
+        XCTAssertTrue(transport.sentCommands.contains { $0.operationCode == PTP.Operation.nikonEndLiveView })
+    }
+
+    private func nikonInfo(liveView: Bool = false) -> PTPDeviceInfo {
+        var operations: [UInt16] = [
+            PTP.Operation.openSession,
+            PTP.Operation.nikonGetVendorPropCodes,
+            PTP.Operation.setDevicePropValue,
+            PTP.Operation.nikonGetEvent
+        ]
+        if liveView {
+            operations.append(contentsOf: [
+                PTP.Operation.nikonStartLiveView,
+                PTP.Operation.nikonEndLiveView,
+                PTP.Operation.nikonGetLiveViewImage
+            ])
+        }
         PTPDeviceInfo(
-            operationsSupported: [
-                PTP.Operation.openSession,
-                PTP.Operation.nikonGetVendorPropCodes,
-                PTP.Operation.setDevicePropValue,
-                PTP.Operation.nikonGetEvent
-            ],
+            operationsSupported: operations,
             eventsSupported: [],
             devicePropertiesSupported: [],
             captureFormats: [],

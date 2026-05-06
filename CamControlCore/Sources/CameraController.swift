@@ -18,6 +18,7 @@ public final class CameraController: ObservableObject {
     private var client: PTPClient?
     private var driver: CameraDriver?
     private var liveViewEmptyFrames = 0
+    private var storageWarningShown = false
 
     public init(transport: CameraTransport) {
         self.transport = transport
@@ -60,6 +61,7 @@ public final class CameraController: ObservableObject {
             let resolvedDevice = resolveDevice(device, info: info)
             let driver = makeDriver(for: resolvedDevice)
             let snapshot = try await driver.open(client: client, info: info, device: resolvedDevice)
+            self.storageWarningShown = false
             self.client = client
             self.driver = driver
             if let index = devices.firstIndex(where: { $0.id == device.id }) {
@@ -90,6 +92,7 @@ public final class CameraController: ObservableObject {
         galleryItems = []
         liveViewFrame = nil
         liveViewEmptyFrames = 0
+        storageWarningShown = false
         isLiveViewActive = false
         status = devices.isEmpty ? .idle : .browsing
     }
@@ -98,6 +101,7 @@ public final class CameraController: ObservableObject {
         guard let client, let driver else { return }
         do {
             if isLiveViewActive, driver.vendor == .nikon {
+                cancelLiveViewLoop()
                 try await driver.setLiveView(false, client: client)
                 isLiveViewActive = false
             }
@@ -137,6 +141,7 @@ public final class CameraController: ObservableObject {
         do {
             try await driver.setLiveView(true, client: client)
             isLiveViewActive = true
+            liveViewEmptyFrames = 0
             liveViewTask?.cancel()
             liveViewTask = Task { [weak self] in
                 while !Task.isCancelled {
@@ -150,8 +155,7 @@ public final class CameraController: ObservableObject {
     }
 
     public func stopLiveView() {
-        liveViewTask?.cancel()
-        liveViewTask = nil
+        cancelLiveViewLoop()
         Task { [weak self] in
             guard let self else { return }
             guard let client = self.client, let driver = self.driver else { return }
@@ -205,6 +209,10 @@ public final class CameraController: ObservableObject {
             galleryItems = items
         } catch PTPClientError.response(let code) where code == PTP.Response.storeNotAvailable {
             galleryItems = []
+            if !storageWarningShown {
+                storageWarningShown = true
+                lastError = PTPClientError.response(code).localizedDescription
+            }
         } catch {
             lastError = error.localizedDescription
         }
@@ -242,9 +250,19 @@ public final class CameraController: ObservableObject {
                     lastError = "Live View did not return a frame."
                 }
             }
+        } catch PTPClientError.response(let code) where code == PTP.Response.nikonNotLiveView {
+            cancelLiveViewLoop()
+            isLiveViewActive = false
         } catch {
             lastError = error.localizedDescription
         }
+    }
+
+    private func cancelLiveViewLoop() {
+        liveViewTask?.cancel()
+        liveViewTask = nil
+        liveViewFrame = nil
+        liveViewEmptyFrames = 0
     }
 
     private func handle(_ event: CameraTransportEvent) async {

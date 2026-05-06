@@ -103,8 +103,9 @@ private struct CameraWorkspaceView: View {
             Button {
                 Task { await controller.capture() }
             } label: {
-                Label("Shoot", systemImage: "camera.circle.fill")
+                Image(systemName: "camera.circle.fill")
             }
+            .accessibilityLabel("Shoot")
             .buttonStyle(.borderedProminent)
 
             Button {

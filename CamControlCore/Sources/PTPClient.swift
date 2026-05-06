@@ -7,6 +7,12 @@ public enum PTPClientError: Error, LocalizedError, Sendable {
     public var errorDescription: String? {
         switch self {
         case .response(let code):
+            if code == PTP.Response.storeNotAvailable {
+                return "No storage card found. Insert a card to browse or save photos."
+            }
+            if code == PTP.Response.nikonNotLiveView {
+                return "Live View is not active."
+            }
             return "Camera returned \(PTP.responseName(code))."
         case .missingPayload:
             return "Camera response did not include data."

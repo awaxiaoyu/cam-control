@@ -160,13 +160,22 @@ public final class NikonCameraDriver: CameraDriver {
                 }
             }
         } else {
-            try await client.execute(operationCode: PTP.Operation.nikonEndLiveView, retriesOnBusy: 6)
+            try await client.execute(
+                operationCode: PTP.Operation.nikonEndLiveView,
+                acceptedResponses: [PTP.Response.ok, PTP.Response.nikonNotLiveView],
+                retriesOnBusy: 6
+            )
         }
     }
 
     public func getLiveViewFrame(client: PTPClient) async throws -> LiveViewFrame? {
         guard capabilities.liveView else { return nil }
-        let response = try await client.execute(operationCode: PTP.Operation.nikonGetLiveViewImage, retriesOnBusy: 8)
+        let response = try await client.execute(
+            operationCode: PTP.Operation.nikonGetLiveViewImage,
+            acceptedResponses: [PTP.Response.ok, PTP.Response.nikonNotLiveView],
+            retriesOnBusy: 8
+        )
+        guard response.responseCode != PTP.Response.nikonNotLiveView else { return nil }
         let frame = NikonLiveViewParser.parse(data: response.payload, productID: productID)
         lastFrame = frame
         return frame

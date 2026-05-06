@@ -61,7 +61,7 @@ final class CameraControllerTests: XCTestCase {
         XCTAssertEqual(connected.vendor, .nikon)
     }
 
-    func testStoreNotAvailableDoesNotSurfaceAsConnectionError() async throws {
+    func testStoreNotAvailableWarnsWithoutFailingConnection() async throws {
         let device = CameraDevice(id: "mock", name: "D7500", vendorID: nil, productID: nil, vendor: .unknown)
         let transport = MockCameraTransport { command, _ in
             switch command.operationCode {
@@ -80,12 +80,17 @@ final class CameraControllerTests: XCTestCase {
 
         await controller.connect(to: device)
 
-        XCTAssertNil(controller.lastError)
+        XCTAssertEqual(controller.lastError, "No storage card found. Insert a card to browse or save photos.")
         XCTAssertTrue(controller.galleryItems.isEmpty)
         guard case .connected = controller.status else {
             XCTFail("Expected connected")
             return
         }
+    }
+
+    func testLiveViewNotActiveResponseHasReadableMessage() {
+        XCTAssertEqual(PTP.responseName(PTP.Response.nikonNotLiveView), "NotLiveView")
+        XCTAssertEqual(PTPClientError.response(PTP.Response.nikonNotLiveView).localizedDescription, "Live View is not active.")
     }
 
     nonisolated private static func deviceInfoPayload(manufacturer: String = "Nikon", model: String = "D7000") -> Data {
