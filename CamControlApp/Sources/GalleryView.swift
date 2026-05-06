@@ -17,7 +17,7 @@ struct GalleryView: View {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(.secondarySystemGroupedBackground))
-                                if let url = item.cachedURL, let image = PlatformImage(contentsOfFile: url.path) {
+                                if let url = item.thumbnailURL ?? item.cachedURL, let image = PlatformImage(contentsOfFile: url.path) {
                                     Image(uiImage: image)
                                         .resizable()
                                         .scaledToFill()

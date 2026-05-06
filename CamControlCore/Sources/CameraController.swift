@@ -100,14 +100,14 @@ public final class CameraController: ObservableObject {
     public func capture() async {
         guard let client, let driver else { return }
         do {
+            let previousHandles = Set(galleryItems.map(\.objectHandle))
             if isLiveViewActive, driver.vendor == .nikon {
                 cancelLiveViewLoop()
                 try await driver.setLiveView(false, client: client)
                 isLiveViewActive = false
             }
             try await driver.capture(client: client)
-            try await Task.sleep(nanoseconds: 600_000_000)
-            await refreshGallery()
+            await refreshAfterCapture(previousHandles: previousHandles)
         } catch {
             lastError = error.localizedDescription
         }
@@ -198,15 +198,19 @@ public final class CameraController: ObservableObject {
         guard let client else { return }
         do {
             let storageIDs = try await client.getStorageIDs()
+            let previousItems = Dictionary(uniqueKeysWithValues: galleryItems.map { ($0.objectHandle, $0) })
+            var seenHandles = Set<UInt32>()
             var items: [GalleryItem] = []
             for storageID in storageIDs {
-                let handles = try await client.getObjectHandles(storageID: storageID)
-                for handle in handles.suffix(80).reversed() {
-                    guard let info = try? await client.getObjectInfo(handle: handle), isImage(info.objectFormat) else { continue }
-                    items.append(GalleryItem(objectHandle: handle, filename: info.filename, objectFormat: info.objectFormat, compressedSize: info.compressedSize))
+                let handles = try await objectHandlesForGallery(storageID: storageID, client: client)
+                for handle in handles.suffix(80).reversed() where seenHandles.insert(handle).inserted {
+                    guard let info = try? await client.getObjectInfo(handle: handle), isImage(info.objectFormat, filename: info.filename) else { continue }
+                    items.append(await galleryItem(for: info, previous: previousItems[handle]))
                 }
             }
-            galleryItems = items
+            if !items.isEmpty || galleryItems.isEmpty {
+                galleryItems = items
+            }
         } catch PTPClientError.response(let code) where code == PTP.Response.storeNotAvailable {
             galleryItems = []
             if !storageWarningShown {
@@ -218,14 +222,101 @@ public final class CameraController: ObservableObject {
         }
     }
 
+    private func refreshAfterCapture(previousHandles: Set<UInt32>) async {
+        for attempt in 0..<8 {
+            try? await Task.sleep(nanoseconds: attempt == 0 ? 700_000_000 : 500_000_000)
+            await pollPTPEvents(reportBusy: false)
+            await refreshGallery()
+            if galleryItems.contains(where: { !previousHandles.contains($0.objectHandle) }) {
+                return
+            }
+        }
+    }
+
+    private func objectHandlesForGallery(storageID: UInt32, client: PTPClient) async throws -> [UInt32] {
+        var handles: [UInt32]
+        do {
+            handles = try await client.getObjectHandles(storageID: storageID)
+        } catch PTPClientError.response(let code) where code == PTP.Response.storeNotAvailable {
+            throw PTPClientError.response(code)
+        } catch {
+            handles = []
+        }
+        guard handles.isEmpty else { return handles }
+
+        let formats = [
+            PTP.ObjectFormat.exifJpeg,
+            PTP.ObjectFormat.unknownImageObject,
+            PTP.ObjectFormat.tiffEP,
+            PTP.ObjectFormat.jfif,
+            PTP.ObjectFormat.png,
+            PTP.ObjectFormat.tiff,
+            PTP.ObjectFormat.eosCRW,
+            PTP.ObjectFormat.eosCRW3
+        ]
+        var seen = Set<UInt32>()
+        for format in formats {
+            let formatHandles = (try? await client.getObjectHandles(storageID: storageID, objectFormat: format)) ?? []
+            for handle in formatHandles where seen.insert(handle).inserted {
+                handles.append(handle)
+            }
+        }
+        return handles
+    }
+
+    private func galleryItem(for info: PTPObjectInfo, previous: GalleryItem?) async -> GalleryItem {
+        var item = GalleryItem(
+            objectHandle: info.objectHandle,
+            filename: info.filename,
+            objectFormat: info.objectFormat,
+            compressedSize: info.compressedSize,
+            thumbnailURL: previous?.thumbnailURL,
+            cachedURL: previous?.cachedURL
+        )
+        if item.thumbnailURL == nil {
+            item.thumbnailURL = await cacheThumbnail(for: info)
+        }
+        return item
+    }
+
+    private func addOrUpdateGalleryObject(handle: UInt32, format: UInt16?) async {
+        guard let client else { return }
+        do {
+            let info = try await client.getObjectInfo(handle: handle)
+            guard isImage(info.objectFormat, filename: info.filename) || format.map({ isImage($0) }) == true else { return }
+            let previous = galleryItems.first { $0.objectHandle == handle }
+            upsertGalleryItem(await galleryItem(for: info, previous: previous))
+        } catch {
+            guard let format, isImage(format) else { return }
+            upsertGalleryItem(GalleryItem(objectHandle: handle, filename: "IMG_\(handle)", objectFormat: format, compressedSize: 0))
+        }
+    }
+
+    private func upsertGalleryItem(_ item: GalleryItem) {
+        galleryItems.removeAll { $0.objectHandle == item.objectHandle }
+        galleryItems.insert(item, at: 0)
+    }
+
+    private func cacheThumbnail(for info: PTPObjectInfo) async -> URL? {
+        guard let client, isThumbnailImage(info.thumbFormat) else { return nil }
+        do {
+            let data = try await client.getThumb(handle: info.objectHandle)
+            guard !data.isEmpty else { return nil }
+            let directory = try cacheDirectory(named: "Thumbnails")
+            let url = directory.appendingPathComponent("\(info.objectHandle).jpg")
+            try data.write(to: url, options: .atomic)
+            return url
+        } catch {
+            return nil
+        }
+    }
+
     @discardableResult
     public func download(_ item: GalleryItem) async -> URL? {
         guard let client else { return nil }
         do {
             let data = try await client.getObject(handle: item.objectHandle)
-            let directory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-                .appendingPathComponent("CamControl", isDirectory: true)
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            let directory = try cacheDirectory(named: "Images")
             let url = directory.appendingPathComponent(item.filename)
             try data.write(to: url, options: .atomic)
             if let index = galleryItems.firstIndex(where: { $0.objectHandle == item.objectHandle }) {
@@ -289,8 +380,8 @@ public final class CameraController: ObservableObject {
             }
         case .devicePropertyChanged, .propertyDescChanged:
             await refreshAfterDriverEvent(event)
-        case .objectAdded:
-            await refreshGallery()
+        case .objectAdded(let handle, let format):
+            await addOrUpdateGalleryObject(handle: handle, format: format)
         case .captureComplete:
             await refreshGallery()
         case .cameraBusy:
@@ -324,15 +415,20 @@ public final class CameraController: ObservableObject {
         }
     }
 
-    private func pollPTPEvents() async {
+    private func pollPTPEvents(reportBusy: Bool = true) async {
         guard let client, let driver else { return }
         do {
-            let events = try await driver.pollEvents(client: client)
+            let polledEvents = try await driver.pollEvents(client: client)
+            let events = polledEvents.filter { reportBusy || $0 != .cameraBusy }
             await handle(events)
         } catch PTPClientError.response(let code) where code == PTP.Response.deviceBusy {
-            lastError = "Camera is busy. Please try again in a moment."
+            if reportBusy {
+                lastError = "Camera is busy. Please try again in a moment."
+            }
         } catch {
-            lastError = error.localizedDescription
+            if reportBusy {
+                lastError = error.localizedDescription
+            }
         }
     }
 
@@ -417,12 +513,34 @@ public final class CameraController: ObservableObject {
         return normalized.dropFirst().first?.isNumber == true
     }
 
-    private func isImage(_ format: UInt16) -> Bool {
+    private func cacheDirectory(named name: String) throws -> URL {
+        let directory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+            .appendingPathComponent("CamControl", isDirectory: true)
+            .appendingPathComponent(name, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
+    private func isThumbnailImage(_ format: UInt16) -> Bool {
         switch format {
-        case PTP.ObjectFormat.exifJpeg, PTP.ObjectFormat.tiff, PTP.ObjectFormat.eosCRW, PTP.ObjectFormat.eosCRW3:
+        case PTP.ObjectFormat.exifJpeg, PTP.ObjectFormat.jfif:
             return true
         default:
             return false
+        }
+    }
+
+    private func isImage(_ format: UInt16, filename: String? = nil) -> Bool {
+        if (UInt16(0x3800)...UInt16(0x3810)).contains(format) {
+            return true
+        }
+        switch format {
+        case PTP.ObjectFormat.eosCRW, PTP.ObjectFormat.eosCRW3:
+            return true
+        default:
+            guard let filename else { return false }
+            let ext = (filename as NSString).pathExtension.lowercased()
+            return ["jpg", "jpeg", "nef", "nrw", "raw", "cr2", "cr3", "tif", "tiff", "heif", "heic"].contains(ext)
         }
     }
 }

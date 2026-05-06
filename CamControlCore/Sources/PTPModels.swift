@@ -233,6 +233,8 @@ public struct PTPObjectInfo: Equatable, Identifiable, Sendable {
     public let storageID: UInt32
     public let objectFormat: UInt16
     public let compressedSize: UInt32
+    public let thumbFormat: UInt16
+    public let thumbCompressedSize: UInt32
     public let filename: String
 
     public static func parse(handle: UInt32, data: Data) throws -> PTPObjectInfo {
@@ -241,7 +243,8 @@ public struct PTPObjectInfo: Equatable, Identifiable, Sendable {
         let format = try reader.readUInt16LE()
         try reader.skip(2)
         let size = try reader.readUInt32LE()
-        try reader.skip(2)
+        let thumbFormat = try reader.readUInt16LE()
+        let thumbSize = try reader.readUInt32LE()
         try reader.skip(4)
         try reader.skip(4)
         try reader.skip(4)
@@ -257,6 +260,8 @@ public struct PTPObjectInfo: Equatable, Identifiable, Sendable {
             storageID: storageID,
             objectFormat: format,
             compressedSize: size,
+            thumbFormat: thumbFormat,
+            thumbCompressedSize: thumbSize,
             filename: filename.isEmpty ? "IMG_\(handle)" : filename
         )
     }

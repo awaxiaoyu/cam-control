@@ -160,13 +160,15 @@ public struct GalleryItem: Equatable, Identifiable, Sendable {
     public let filename: String
     public let objectFormat: UInt16
     public let compressedSize: UInt32
+    public var thumbnailURL: URL?
     public var cachedURL: URL?
 
-    public init(objectHandle: UInt32, filename: String, objectFormat: UInt16, compressedSize: UInt32, cachedURL: URL? = nil) {
+    public init(objectHandle: UInt32, filename: String, objectFormat: UInt16, compressedSize: UInt32, thumbnailURL: URL? = nil, cachedURL: URL? = nil) {
         self.objectHandle = objectHandle
         self.filename = filename
         self.objectFormat = objectFormat
         self.compressedSize = compressedSize
+        self.thumbnailURL = thumbnailURL
         self.cachedURL = cachedURL
     }
 }

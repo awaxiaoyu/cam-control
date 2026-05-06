@@ -88,6 +88,38 @@ final class CameraControllerTests: XCTestCase {
         }
     }
 
+    func testObjectAddedEventCreatesGalleryItem() async throws {
+        let device = CameraDevice(id: "mock", name: "D7500", vendorID: nil, productID: nil, vendor: .unknown)
+        let handle: UInt32 = 42
+        let transport = MockCameraTransport { command, _ in
+            switch command.operationCode {
+            case PTP.Operation.getDeviceInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.deviceInfoPayload(manufacturer: "Nikon", model: "D7500"), rawResponse: Data())
+            case PTP.Operation.getStorageIDs:
+                var payload = Data()
+                payload.appendUInt32LE(0)
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            case PTP.Operation.getObjectInfo:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Self.objectInfoPayload(handle: handle, filename: "DSC_0001.JPG"), rawResponse: Data())
+            case PTP.Operation.getThumb:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data([0xff, 0xd8, 0xff, 0xd9]), rawResponse: Data())
+            default:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            }
+        }
+        let controller = CameraController(transport: transport)
+        controller.startBrowsing()
+        transport.yield(.deviceAdded(device))
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        await controller.connect(to: device)
+        transport.yield(.objectAdded(handle, PTP.ObjectFormat.exifJpeg))
+        try? await Task.sleep(nanoseconds: 150_000_000)
+
+        XCTAssertEqual(controller.galleryItems.first?.objectHandle, handle)
+        XCTAssertNotNil(controller.galleryItems.first?.thumbnailURL)
+    }
+
     func testLiveViewNotActiveResponseHasReadableMessage() {
         XCTAssertEqual(PTP.responseName(PTP.Response.nikonNotLiveView), "NotLiveView")
         XCTAssertEqual(PTPClientError.response(PTP.Response.nikonNotLiveView).localizedDescription, "Live View is not active.")
@@ -117,6 +149,30 @@ final class CameraControllerTests: XCTestCase {
         data.appendPTPString(model)
         data.appendPTPString("1.0")
         data.appendPTPString("123")
+        return data
+    }
+
+    nonisolated private static func objectInfoPayload(handle: UInt32, filename: String) -> Data {
+        var data = Data()
+        data.appendUInt32LE(0x00000001)
+        data.appendUInt16LE(PTP.ObjectFormat.exifJpeg)
+        data.appendUInt16LE(0)
+        data.appendUInt32LE(12345)
+        data.appendUInt16LE(PTP.ObjectFormat.exifJpeg)
+        data.appendUInt32LE(256)
+        data.appendUInt32LE(160)
+        data.appendUInt32LE(120)
+        data.appendUInt32LE(4000)
+        data.appendUInt32LE(3000)
+        data.appendUInt32LE(24)
+        data.appendUInt32LE(0)
+        data.appendUInt16LE(0)
+        data.appendUInt32LE(0)
+        data.appendUInt32LE(1)
+        data.appendPTPString(filename)
+        data.appendPTPString("")
+        data.appendPTPString("")
+        data.appendPTPString("")
         return data
     }
 }

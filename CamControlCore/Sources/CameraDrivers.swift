@@ -49,21 +49,23 @@ final class PropertyMap {
     func states(current: [UInt16: Int64], settableOverride: ((CameraPropertyKey, DevicePropDesc) -> Bool)? = nil) -> [CameraPropertyState] {
         CameraPropertyKey.allCases.compactMap { key in
             guard let code = map[key] else { return nil }
-            let descriptor = descriptors[code].map { descriptor in
-                DevicePropDesc(
-                    propertyCode: descriptor.propertyCode,
-                    dataType: descriptor.dataType,
-                    isSettable: settableOverride?(key, descriptor) ?? descriptor.isSettable,
-                    defaultValue: descriptor.defaultValue,
-                    currentValue: descriptor.currentValue,
-                    form: descriptor.form
-                )
+            guard let descriptor = descriptors[code] else {
+                guard let value = current[code] else { return nil }
+                return CameraPropertyState(key: key, ptpCode: code, value: value, descriptor: nil)
             }
+            let adjustedDescriptor = DevicePropDesc(
+                propertyCode: descriptor.propertyCode,
+                dataType: descriptor.dataType,
+                isSettable: settableOverride?(key, descriptor) ?? descriptor.isSettable,
+                defaultValue: descriptor.defaultValue,
+                currentValue: descriptor.currentValue,
+                form: descriptor.form
+            )
             return CameraPropertyState(
                 key: key,
                 ptpCode: code,
-                value: current[code] ?? descriptor?.currentValue ?? 0,
-                descriptor: descriptor
+                value: current[code] ?? adjustedDescriptor.currentValue,
+                descriptor: adjustedDescriptor
             )
         }
     }
@@ -268,14 +270,30 @@ public final class NikonCameraDriver: CameraDriver {
 
     private func propertyStates() -> [CameraPropertyState] {
         properties.states(current: currentValues) { [currentValues] key, descriptor in
-            guard descriptor.isSettable else { return false }
-            guard let mode = currentValues[PTP.Property.exposureProgramMode] else { return false }
+            let remoteEditableKeys: Set<CameraPropertyKey> = [
+                .shutterSpeed,
+                .aperture,
+                .iso,
+                .whiteBalance,
+                .colorTemperature,
+                .pictureStyle,
+                .exposureMeteringMode,
+                .focusMeteringMode,
+                .currentFocusPoint,
+                .exposureCompensation
+            ]
+            let canSend = descriptor.isSettable || (remoteEditableKeys.contains(key) && !descriptor.values.isEmpty)
+            guard canSend else { return false }
+            let mode = currentValues[PTP.Property.exposureProgramMode]
             switch key {
             case .shutterSpeed:
+                guard let mode else { return true }
                 return mode == 4 || mode == 1
             case .aperture:
+                guard let mode else { return true }
                 return mode == 3 || mode == 1
             case .iso, .whiteBalance, .exposureMeteringMode, .exposureCompensation:
+                guard let mode else { return true }
                 return mode < 0x8010
             case .colorTemperature:
                 return currentValues[PTP.Property.whiteBalance] == 0x8012

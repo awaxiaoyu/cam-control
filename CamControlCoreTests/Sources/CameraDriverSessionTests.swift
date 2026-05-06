@@ -63,12 +63,59 @@ final class CameraDriverSessionTests: XCTestCase {
         XCTAssertTrue(transport.sentCommands.contains { $0.operationCode == PTP.Operation.nikonEndLiveView })
     }
 
-    private func nikonInfo(liveView: Bool = false) -> PTPDeviceInfo {
+    func testNikonControlPropertiesCanOverrideReadOnlyDescriptorFlag() async throws {
+        let currentValues: [UInt16: Int64] = [
+            PTP.Property.fNumber: 560,
+            PTP.Property.exposureIndex: 400,
+            PTP.Property.exposureProgramMode: 3
+        ]
+        let transport = MockCameraTransport { command, _ in
+            switch command.operationCode {
+            case PTP.Operation.nikonGetVendorPropCodes:
+                var payload = Data()
+                payload.appendUInt32LE(0)
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: payload, rawResponse: Data())
+            case PTP.Operation.getDevicePropDesc:
+                let code = UInt16(truncatingIfNeeded: command.parameters[0])
+                return PTPResponse(
+                    responseCode: PTP.Response.ok,
+                    transactionID: command.transactionID,
+                    parameters: [],
+                    payload: Self.devicePropDescPayload(code: code, current: currentValues[code] ?? 0),
+                    rawResponse: Data()
+                )
+            case PTP.Operation.getDevicePropValue:
+                let code = UInt16(truncatingIfNeeded: command.parameters[0])
+                return PTPResponse(
+                    responseCode: PTP.Response.ok,
+                    transactionID: command.transactionID,
+                    parameters: [],
+                    payload: try! Data.ptpValue(currentValues[code] ?? 0, dataType: PTP.DataType.uint16),
+                    rawResponse: Data()
+                )
+            default:
+                return PTPResponse(responseCode: PTP.Response.ok, transactionID: command.transactionID, parameters: [], payload: Data(), rawResponse: Data())
+            }
+        }
+        let client = PTPClient(transport: transport)
+        let driver = NikonCameraDriver()
+        let device = CameraDevice(id: "nikon", name: "D7500", vendorID: PTP.Vendor.nikon, productID: nil, vendor: .nikon)
+
+        let snapshot = try await driver.open(client: client, info: nikonInfo(properties: Array(currentValues.keys)), device: device)
+
+        XCTAssertEqual(snapshot.properties.first { $0.key == .aperture }?.descriptor?.isSettable, true)
+        XCTAssertEqual(snapshot.properties.first { $0.key == .iso }?.descriptor?.isSettable, true)
+        XCTAssertEqual(snapshot.properties.first { $0.key == .shootingMode }?.descriptor?.isSettable, false)
+    }
+
+    private func nikonInfo(liveView: Bool = false, properties: [UInt16] = []) -> PTPDeviceInfo {
         var operations: [UInt16] = [
             PTP.Operation.openSession,
             PTP.Operation.nikonGetVendorPropCodes,
             PTP.Operation.setDevicePropValue,
-            PTP.Operation.nikonGetEvent
+            PTP.Operation.nikonGetEvent,
+            PTP.Operation.getDevicePropDesc,
+            PTP.Operation.getDevicePropValue
         ]
         if liveView {
             operations.append(contentsOf: [
@@ -80,7 +127,7 @@ final class CameraDriverSessionTests: XCTestCase {
         return PTPDeviceInfo(
             operationsSupported: operations,
             eventsSupported: [],
-            devicePropertiesSupported: [],
+            devicePropertiesSupported: properties,
             captureFormats: [],
             imageFormats: [PTP.ObjectFormat.exifJpeg],
             manufacturer: "Nikon",
@@ -88,6 +135,21 @@ final class CameraDriverSessionTests: XCTestCase {
             deviceVersion: "1.0",
             serialNumber: "123"
         )
+    }
+
+    nonisolated private static func devicePropDescPayload(code: UInt16, current: Int64) -> Data {
+        var data = Data()
+        data.appendUInt16LE(code)
+        data.appendUInt16LE(PTP.DataType.uint16)
+        data.appendUInt8(0)
+        data.appendUInt16LE(UInt16(truncatingIfNeeded: current))
+        data.appendUInt16LE(UInt16(truncatingIfNeeded: current))
+        data.appendUInt8(2)
+        data.appendUInt16LE(3)
+        data.appendUInt16LE(UInt16(truncatingIfNeeded: current))
+        data.appendUInt16LE(UInt16(truncatingIfNeeded: current + 1))
+        data.appendUInt16LE(UInt16(truncatingIfNeeded: current + 2))
+        return data
     }
 
     private func canonInfo() -> PTPDeviceInfo {

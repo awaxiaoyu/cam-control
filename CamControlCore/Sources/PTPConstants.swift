@@ -28,6 +28,7 @@ public enum PTP {
         public static let getDevicePropValue: UInt16 = 0x1015
         public static let setDevicePropValue: UInt16 = 0x1016
         public static let nikonInitiateCaptureRecInSdram: UInt16 = 0x90c0
+        public static let nikonInitiateCaptureRecInMedia: UInt16 = 0x9207
         public static let nikonAfDrive: UInt16 = 0x90c1
         public static let nikonChangeCameraMode: UInt16 = 0x90c2
         public static let nikonGetEvent: UInt16 = 0x90c7
@@ -71,6 +72,7 @@ public enum PTP {
         public static let generalError: UInt16 = 0x2002
         public static let sessionNotOpen: UInt16 = 0x2003
         public static let operationNotSupported: UInt16 = 0x2005
+        public static let noThumbnailPresent: UInt16 = 0x2010
         public static let storeNotAvailable: UInt16 = 0x2013
         public static let deviceBusy: UInt16 = 0x2019
         public static let invalidParameter: UInt16 = 0x201d
@@ -122,7 +124,11 @@ public enum PTP {
 
     public enum ObjectFormat {
         public static let association: UInt16 = 0x3001
+        public static let unknownImageObject: UInt16 = 0x3800
         public static let exifJpeg: UInt16 = 0x3801
+        public static let tiffEP: UInt16 = 0x3802
+        public static let jfif: UInt16 = 0x3808
+        public static let png: UInt16 = 0x380b
         public static let tiff: UInt16 = 0x380d
         public static let eosCRW: UInt16 = 0xb101
         public static let eosCRW3: UInt16 = 0xb103
@@ -151,6 +157,7 @@ public enum PTP {
         case Response.generalError: return "GeneralError"
         case Response.sessionNotOpen: return "SessionNotOpen"
         case Response.operationNotSupported: return "OperationNotSupported"
+        case Response.noThumbnailPresent: return "NoThumbnailPresent"
         case Response.storeNotAvailable: return "StoreNotAvailable"
         case Response.deviceBusy: return "DeviceBusy"
         case Response.invalidParameter: return "InvalidParameter"

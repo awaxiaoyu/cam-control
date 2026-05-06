@@ -163,7 +163,7 @@ public actor PTPClient {
     }
 
     public func initiateCapture() async throws {
-        try await execute(operationCode: PTP.Operation.initiateCapture)
+        try await execute(operationCode: PTP.Operation.initiateCapture, parameters: [0, 0], retriesOnBusy: 6)
     }
 
     public func getUInt16Array(operationCode: UInt16, parameters: [UInt32] = []) async throws -> [UInt16] {
@@ -210,7 +210,13 @@ public actor PTPClient {
     }
 
     public func getThumb(handle: UInt32) async throws -> Data {
-        let response = try await execute(operationCode: PTP.Operation.getThumb, parameters: [handle], retriesOnBusy: 8)
+        let response = try await execute(
+            operationCode: PTP.Operation.getThumb,
+            parameters: [handle],
+            acceptedResponses: [PTP.Response.ok, PTP.Response.noThumbnailPresent],
+            retriesOnBusy: 8
+        )
+        guard response.responseCode != PTP.Response.noThumbnailPresent else { return Data() }
         return response.payload
     }
 }
