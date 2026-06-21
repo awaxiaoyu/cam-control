@@ -1,6 +1,6 @@
 # CamControl
 
-SwiftUI iOS port of Remote Your Cam USB.
+SwiftUI iOS port of Remote Your Cam USB.（only support Nikon，Canon and Sony）
 
 This project keeps the original Apache 2.0 license and rewrites the Android USB Host transport around Apple's public ImageCaptureCore APIs. The app targets iOS 17 and newer SDKs, including iOS 26.
 
