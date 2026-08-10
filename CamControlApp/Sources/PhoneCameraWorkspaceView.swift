@@ -4,89 +4,154 @@ import SwiftUI
 import UIKit
 
 struct PhoneCameraWorkspaceView: View {
-    @AppStorage("camera.source.kind") private var selectedSourceRaw = CameraSourceKind.tethered.rawValue
+    @AppStorage("camera.source.kind") private var selectedSourceRaw = CameraSourceKind.phone.rawValue
     @StateObject private var camera = PhoneCameraViewModel()
+    @State private var page: WorkspaceTab?
 
     var body: some View {
-        ShootingHUDLayout(
-            title: "Phone Camera",
-            subtitle: camera.activePosition == .front ? "Front camera" : "Back camera",
-            timecode: "00:00:00:00",
-            topItems: topItems,
-            bottomCards: bottomCards,
-            navSelection: .camera,
-            isCaptureActive: false,
-            isLiveActive: camera.isSessionRunning,
-            canCapture: camera.isReady,
-            canFocus: false,
-            canToggleLive: false,
-            onCapture: {
-                camera.capturePhoto()
-            },
-            onToggleLive: {},
-            onFocus: {},
-            onRefresh: {
-                if camera.canSwitchCamera {
-                    camera.switchCamera()
-                } else {
-                    camera.start()
-                }
-            },
-            onNavigate: { item in
-                if item == .settings || item == .media || item == .chat {
-                    selectedSourceRaw = CameraSourceKind.tethered.rawValue
-                }
-            }
-        ) {
-            ZStack {
-                PhoneCameraPreview(session: camera.session, activePosition: camera.activePosition)
-                    .ignoresSafeArea()
+        ZStack {
+            ShootingHUDLayout(
+                title: "Blackmagic Camera",
+                subtitle: camera.activePosition == .front ? "Front Camera" : "Back Camera",
+                timecode: "00:00:00:00",
+                topItems: topItems,
+                bottomCards: bottomCards,
+                navSelection: navSelection,
+                isCaptureActive: false,
+                isLiveActive: camera.isSessionRunning,
+                canCapture: camera.isReady,
+                canFocus: false,
+                canToggleLive: false,
+                onCapture: {
+                    camera.capturePhoto()
+                },
+                onToggleLive: {},
+                onFocus: {},
+                onRefresh: {
+                    if camera.canSwitchCamera {
+                        camera.switchCamera()
+                    } else {
+                        camera.start()
+                    }
+                },
+                onNavigate: navigate
+            ) {
+                ZStack {
+                    PhoneCameraPreview(session: camera.session, activePosition: camera.activePosition)
+                        .ignoresSafeArea()
 
-                if let image = camera.lastPhoto {
-                    VStack {
-                        Spacer()
-                        HStack {
+                    if let image = camera.lastPhoto {
+                        VStack {
                             Spacer()
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 92, height: 122)
-                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .stroke(.white.opacity(0.9), lineWidth: 2)
-                                )
-                                .shadow(radius: 8)
-                                .padding(.trailing, 20)
-                                .padding(.bottom, 128)
+                            HStack {
+                                Spacer()
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 92, height: 122)
+                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .stroke(.white.opacity(0.9), lineWidth: 2)
+                                    )
+                                    .shadow(radius: 8)
+                                    .padding(.trailing, 20)
+                                    .padding(.bottom, 128)
+                            }
                         }
                     }
-                }
 
-                if let message = camera.overlayMessage {
-                    VStack(spacing: 12) {
-                        Image(systemName: "camera.viewfinder")
-                            .font(.system(size: 44))
-                        Text(message)
-                            .font(BlackmagicCamStyle.labelFont(size: 16, weight: .heavy))
-                            .multilineTextAlignment(.center)
+                    if let message = camera.overlayMessage {
+                        VStack(spacing: 12) {
+                            BMDAssetIcon(name: "Camera", fallback: "camera.viewfinder", color: .white, size: 44)
+                            Text(message)
+                                .font(BlackmagicCamStyle.labelFont(size: 16, weight: .heavy))
+                                .multilineTextAlignment(.center)
+                        }
+                        .foregroundStyle(.white)
+                        .padding(24)
+                        .blackmagicPanel(cornerRadius: 18, borderOpacity: 0.20)
+                        .padding()
                     }
-                    .foregroundStyle(.white)
-                    .padding(24)
-                    .blackmagicPanel(cornerRadius: 18, borderOpacity: 0.20)
-                    .padding()
                 }
+            }
+
+            if let page {
+                cameraPage(page)
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                    .zIndex(20)
             }
         }
         .background(BlackmagicCamStyle.canvas)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
+            selectedSourceRaw = CameraSourceKind.phone.rawValue
             camera.start()
         }
         .onDisappear {
             camera.stop()
         }
         // Firmware/update note: if iOS camera APIs expose more per-device video properties after OS updates, populate topItems here while keeping the Blackmagic HUD shell stable.
+    }
+
+
+    private var navSelection: ShootingHUDNavItem {
+        switch page {
+        case .some(.gallery): return .media
+        case .some(.chat): return .chat
+        case .some(.controls): return .settings
+        case .none, .some(.live): return .camera
+        }
+    }
+
+    private func navigate(_ item: ShootingHUDNavItem) {
+        withAnimation(.snappy(duration: 0.20)) {
+            switch item {
+            case .camera:
+                page = nil
+            case .media:
+                page = .gallery
+            case .chat:
+                page = .chat
+            case .settings:
+                page = .controls
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func cameraPage(_ tab: WorkspaceTab) -> some View {
+        ZStack(alignment: .topTrailing) {
+            switch tab {
+            case .live:
+                EmptyView()
+            case .controls:
+                PropertyPanel()
+            case .gallery:
+                GalleryView()
+            case .chat:
+                CloudChatPanel()
+            }
+
+            Button {
+                navigate(.camera)
+            } label: {
+                Label("CAMERA", systemImage: "camera.fill")
+                    .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
+                    .tracking(1.2)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(.black.opacity(0.72), in: Capsule())
+                    .overlay(Capsule().stroke(BlackmagicCamStyle.cyan.opacity(0.38), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 16)
+            .padding(.trailing, 18)
+        }
+        .background(BlackmagicCamStyle.canvas)
+        .ignoresSafeArea()
+        // Firmware/update note: page switching mirrors the recovered pageCamera/pageMedia/pageChat/pageSettings symbols; update this mapping only if new Blackmagic pages are added.
     }
 
     private var topItems: [ShootingHUDTopItem] {

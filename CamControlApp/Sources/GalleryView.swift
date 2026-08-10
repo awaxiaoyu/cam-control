@@ -36,7 +36,7 @@ struct GalleryView: View {
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
                     .tracking(1.6)
                     .foregroundStyle(BlackmagicCamStyle.cyan)
-                Text("MediaPoolView")
+                Text("All Clips")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 18 : 22, weight: .heavy))
                     .foregroundStyle(.white)
                 Text("No project selected - All Clips")
@@ -88,8 +88,8 @@ struct GalleryView: View {
                     Spacer()
                     BMEmptyState(
                         systemImage: "photo.on.rectangle.angled",
-                        title: "No clips in MediaPoolView",
-                        subtitle: "Captured stills and clips appear here using the Blackmagic MediaPool thumbnail grid and clip detail workflow."
+                        title: "No Clips",
+                        subtitle: "Captured clips appear here. Sort, upload, export, or open clip details from the media pool."
                     )
                     .frame(maxWidth: 560)
                     Spacer()

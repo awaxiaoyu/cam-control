@@ -43,11 +43,11 @@ enum BlackmagicReverseSpec {
     static let slateFields = ["SLATE FOR", "PROJECT", "SCENE", "TAKE", "REEL", "CAMERA OPERATOR", "LENS DATA", "GOOD TAKE"]
 
     static let hudAssetNames = [
-        "Camera", "Camera_active", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
+        "Camera", "Camera_active", "Chat", "Chat_active", "Settings", "Settings_active", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
         "IconAe", "IconAe_active", "IconAf", "IconAf_active", "IconAwb", "IconAwb_active",
-        "IconLock", "IconLock_active", "IconLut", "IconLut_active", "IconStream", "IconStream_active",
+        "IconLock", "IconLock_active", "IconLut", "IconLut_active", "IconStream", "IconStream_active", "IconTimelapse", "IconTimelapse_active",
         "BatteryIndicator", "BatteryIndicatorWarning", "StorageIphone", "StorageDrive",
-        "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
+        "Exposure", "Exposure_active", "Lens", "Lens_active", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
         "Lut", "LutDisplay", "LutRecord", "LutSelector", "LutSelector_active",
         "Media", "Media_active", "UploadToCloud", "UploadToCloud_active", "Uploading", "UploadingDone",
         "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate",
@@ -58,6 +58,8 @@ enum BlackmagicReverseSpec {
     static let assetFallbackSystemImages: [String: String] = [
         "Camera": "camera.fill",
         "Camera_active": "camera.fill",
+        "Chat": "ellipsis.message.fill",
+        "Settings": "slider.horizontal.3",
         "Record": "record.circle",
         "Record_active": "record.circle.fill",
         "IconAe": "a.circle",
@@ -66,6 +68,9 @@ enum BlackmagicReverseSpec {
         "IconLock": "lock.fill",
         "IconLut": "camera.filters",
         "IconStream": "dot.radiowaves.left.and.right",
+        "IconTimelapse": "timer",
+        "Exposure": "plusminus.circle",
+        "Lens": "camera.aperture",
         "BatteryIndicator": "battery.75percent",
         "StorageIphone": "iphone",
         "StorageDrive": "externaldrive.fill",

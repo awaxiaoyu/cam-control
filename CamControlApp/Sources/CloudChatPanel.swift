@@ -31,10 +31,10 @@ struct CloudChatPanel: View {
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
                     .tracking(1.5)
                     .foregroundStyle(BlackmagicCamStyle.cyan)
-                Text("ChatViewSidebar")
+                Text("Project Chat")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 18 : 22, weight: .heavy))
                     .foregroundStyle(.white)
-                Text("Project / Members / Upload / Remote")
+                Text("Project / Members / Upload")
                     .font(BlackmagicCamStyle.labelFont(size: 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.46))
             }

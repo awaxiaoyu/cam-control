@@ -33,7 +33,7 @@ struct PropertyPanel: View {
                 Text("Blackmagic Camera")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 18 : 22, weight: .heavy))
                     .foregroundStyle(.white)
-                Text(BlackmagicReverseSpec.sourceBundle)
+                Text("Record / Camera / Monitor / Audio / LUTs")
                     .font(BlackmagicCamStyle.labelFont(size: 9, weight: .bold))
                     .foregroundStyle(.white.opacity(0.38))
                     .lineLimit(2)
@@ -111,7 +111,7 @@ struct PropertyPanel: View {
     private func livePropertyGrid(compact: Bool) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("RemoteHwSettingsOptionsPanel".uppercased())
+                Text("CAMERA CONTROLS")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
                     .tracking(1.3)
                     .foregroundStyle(BlackmagicCamStyle.cyan)
@@ -152,7 +152,7 @@ struct PropertyPanel: View {
 
     private func settingsRows(compact: Bool) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("\(selectedCategory) List Options".uppercased())
+            Text(selectedCategory.uppercased())
                 .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
                 .tracking(1.3)
                 .foregroundStyle(color(for: selectedCategory))
@@ -219,8 +219,8 @@ struct PropertyPanel: View {
         default:
             return [
                 SettingsOptionModel(title: "Blackmagic Camera", value: "3.2.00", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Reverse Source", value: "F:\\Blackmagic Cam_3.2.00.ipa", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "UI Anchors", value: "\(BlackmagicReverseSpec.hudComponentNames.count + BlackmagicReverseSpec.controlScrollerNames.count)", color: color(for: selectedCategory))
+                SettingsOptionModel(title: "App Version", value: "3.2.00", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Open Blackmagic Cam Settings", value: "iPhone Settings", color: color(for: selectedCategory))
             ]
         }
     }
@@ -279,15 +279,15 @@ struct PropertyPanel: View {
 
     private func description(for category: String) -> String {
         switch category {
-        case "Record": return "Reverse-derived Record settings including codec, resolution, frame rate and media drop behavior."
+        case "Record": return "Codec, resolution, frame rate and media drop behavior."
         case "Camera": return "Operator camera controls for lens, shutter, iris, ISO, white balance, tint and stabilization."
         case "Monitor": return "Image monitoring overlays: histogram, audio meters, storage, focus assist, guides, zebra and clean feed."
-        case "Audio": return "Audio source, gain, metering and format controls from the recovered settings strings."
-        case "LUTs": return "Built from embedded LUT families and LUT selection/import labels in the IPA."
+        case "Audio": return "Audio source, gain, metering and format controls."
+        case "LUTs": return "LUT selection, color space tags, display LUT and import controls."
         case "Media": return "Media storage, upload status and proxy/original upload behavior."
         case "Blackmagic Cloud": return "Project library, chat, upload, organization and remote camera control shell."
         case "HDMI Out": return "External monitor behavior including clean feed and mirror display."
-        default: return "Additional Blackmagic Camera settings recovered from SettingsView strings."
+        default: return "Additional Blackmagic Camera settings."
         }
     }
 

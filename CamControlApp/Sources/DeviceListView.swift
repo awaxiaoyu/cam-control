@@ -118,7 +118,7 @@ struct DeviceListView: View {
                     BMSectionHeader(
                         eyebrow: "Input",
                         title: "Remote cameras",
-                        subtitle: "Open a camera session, then enter the recovered Blackmagic HUDCameraControls surface."
+                        subtitle: "Open a camera session, then enter the Blackmagic camera HUD."
                     )
                     Spacer(minLength: 12)
                     BMStatusPill(title: "Devices", value: "\(controller.devices.count)", color: controller.devices.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
@@ -148,7 +148,7 @@ struct DeviceListView: View {
                 BMSectionHeader(
                     eyebrow: "Input",
                     title: "iPhone camera",
-                    subtitle: "Use the recovered monitor HUD, timecode, shutter, histogram, storage, LUT, and audio widgets with the built-in camera."
+                    subtitle: "Use the Blackmagic monitor HUD, timecode, shutter, histogram, storage, LUT, and audio widgets with the built-in camera."
                 )
                 PhoneReadyCard()
             }
@@ -334,7 +334,7 @@ private struct PhoneReadyCard: View {
                 Text("Internal camera selected")
                     .font(BlackmagicCamStyle.labelFont(size: 22, weight: .heavy))
                     .foregroundStyle(.white)
-                Text("The monitor opens directly into HUDCameraControls with Blackmagic readouts, record button, histogram, storage, LUT, and audio meter widgets.")
+                Text("The monitor opens directly into the Blackmagic camera HUD with readouts, record button, histogram, storage, LUT, and audio meter widgets.")
                     .font(BlackmagicCamStyle.labelFont(size: 14, weight: .medium))
                     .foregroundStyle(BlackmagicCamStyle.mutedText)
             }

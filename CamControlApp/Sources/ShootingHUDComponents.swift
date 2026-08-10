@@ -325,11 +325,11 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private var bottomControlItems: [BottomControlItem] {
         [
-            BottomControlItem(title: "LENS", value: value(for: "Lens"), asset: "Camera", scroller: .lens),
-            BottomControlItem(title: "FPS", value: value(for: "FPS"), asset: "IconStream", scroller: .fps),
-            BottomControlItem(title: "SHUTTER", value: value(for: "Shutter"), asset: "IconAe", scroller: .shutter),
-            BottomControlItem(title: "IRIS", value: value(forAny: ["Iris", "Aperture"]), asset: "IconAe", scroller: .iris),
-            BottomControlItem(title: "ISO", value: value(for: "ISO"), asset: "IconAe", scroller: .iso),
+            BottomControlItem(title: "LENS", value: value(for: "Lens"), asset: "Lens", scroller: .lens),
+            BottomControlItem(title: "FPS", value: value(for: "FPS"), asset: "IconTimelapse", scroller: .fps),
+            BottomControlItem(title: "SHUTTER", value: value(for: "Shutter"), asset: "Exposure", scroller: .shutter),
+            BottomControlItem(title: "IRIS", value: value(forAny: ["Iris", "Aperture"]), asset: "Exposure", scroller: .iris),
+            BottomControlItem(title: "ISO", value: value(for: "ISO"), asset: "Exposure", scroller: .iso),
             BottomControlItem(title: "WB", value: value(forAny: ["WB", "White Balance"]), asset: "IconAwb", scroller: .whiteBalance),
             BottomControlItem(title: "TINT", value: value(for: "Tint"), asset: "IconAwb", scroller: .tint),
             BottomControlItem(title: "LUT", value: "Rec.709", asset: "IconLut", scroller: .lut)
@@ -420,23 +420,23 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .lens: return "LensOptions"
-        case .fps: return "FpsOptions"
-        case .shutter: return "ShutterScroll"
-        case .iris: return "IrisScroll"
-        case .iso: return "IsoScroll"
-        case .whiteBalance: return "WhiteBalanceScroll"
-        case .tint: return "TintScroll"
-        case .codec: return "CodecListView"
-        case .lut: return "LutScroller"
-        case .focus: return "FocusScroll"
-        case .focusAssist: return "FocusAssistScroller"
-        case .falseColor: return "HUDFalseColor"
-        case .guides: return "FramingGuidesScroller"
-        case .zebra: return "ZebraScroller"
-        case .monitor: return "Monitor"
-        case .audio: return "HUDAudioLevelPopUp"
-        case .stabilization: return "StabilisationOptions"
+        case .lens: return "Lens"
+        case .fps: return "FPS"
+        case .shutter: return "SHUTTER"
+        case .iris: return "IRIS"
+        case .iso: return "ISO"
+        case .whiteBalance: return "WHITE BALANCE"
+        case .tint: return "TINT"
+        case .codec: return "CODEC / RESOLUTION"
+        case .lut: return "LUT SELECTION"
+        case .focus: return "FOCUS"
+        case .focusAssist: return "FOCUS ASSIST"
+        case .falseColor: return "FALSE COLOR"
+        case .guides: return "FRAMING GUIDES"
+        case .zebra: return "ZEBRA"
+        case .monitor: return "MONITOR"
+        case .audio: return "AUDIO METERS"
+        case .stabilization: return "STABILIZATION"
         }
     }
     var eyebrow: String {
@@ -490,7 +490,7 @@ private struct TopIndicatorTile: View {
                     .tracking(0.55)
                     .foregroundStyle(item.isDimmed ? .white.opacity(0.32) : .white.opacity(0.66))
                 if item.isAuto {
-                    Text("A").font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy)).foregroundStyle(.white).padding(.horizontal, 4).padding(.vertical, 1).background(BlackmagicCamStyle.activeBlue, in: RoundedRectangle(cornerRadius: 3, style: .continuous))
+                    Text("AUTO").font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 7, weight: .heavy)).foregroundStyle(.white).padding(.horizontal, 4).padding(.vertical, 1).background(BlackmagicCamStyle.activeBlue, in: RoundedRectangle(cornerRadius: 3, style: .continuous))
                 }
             }
             if item.isFormatBadge {
@@ -554,8 +554,8 @@ private struct FloatingNavPill: View {
         switch title {
         case "CAMERA": return "Camera"
         case "MEDIA": return "Media"
-        case "CHAT": return "Cloud"
-        case "SETTINGS": return "ControlIcon"
+        case "CHAT": return "Chat"
+        case "SETTINGS": return "Settings"
         case "SLATE": return "Slate"
         default: return "Camera"
         }
@@ -642,7 +642,7 @@ private struct BlackmagicScrollerPanel: View {
                     Text(scroller.title).font(BlackmagicCamStyle.labelFont(size: compact ? 17 : 22, weight: .heavy)).foregroundStyle(.white)
                 }
                 Spacer()
-                Text(BlackmagicReverseSpec.sourceBundle).font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 9, weight: .bold)).foregroundStyle(.white.opacity(0.38)).lineLimit(1)
+                Text("SWIPE TO SELECT").font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 9, weight: .heavy)).tracking(1.1).foregroundStyle(.white.opacity(0.38)).lineLimit(1)
                 Button(action: onClose) { Image(systemName: "xmark").font(.system(size: compact ? 12 : 14, weight: .heavy)).foregroundStyle(.white).frame(width: compact ? 28 : 34, height: compact ? 28 : 34).background(.white.opacity(0.10), in: Circle()) }.buttonStyle(.plain)
             }
             ScrollView(.horizontal, showsIndicators: false) {

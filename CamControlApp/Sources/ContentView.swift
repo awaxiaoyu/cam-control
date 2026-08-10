@@ -4,7 +4,8 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var controller: CameraController
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @AppStorage("camera.source.kind") private var selectedSourceRaw = CameraSourceKind.tethered.rawValue
+    @AppStorage("camera.source.kind") private var selectedSourceRaw = CameraSourceKind.phone.rawValue
+    @State private var normalizedLaunchSource = false
 
     var body: some View {
         Group {
@@ -35,15 +36,22 @@ struct ContentView: View {
             Text(controller.lastError ?? "")
         }
         .task {
+            if !normalizedLaunchSource {
+                normalizedLaunchSource = true
+                if selectedSourceRaw == CameraSourceKind.tethered.rawValue {
+                    selectedSourceRaw = CameraSourceKind.phone.rawValue
+                    return
+                }
+            }
             applySourceSelection(selectedSource)
         }
         .onChange(of: selectedSourceRaw) { _, newValue in
-            applySourceSelection(CameraSourceKind(rawValue: newValue) ?? .tethered)
+            applySourceSelection(CameraSourceKind(rawValue: newValue) ?? .phone)
         }
     }
 
     private var selectedSource: CameraSourceKind {
-        CameraSourceKind(rawValue: selectedSourceRaw) ?? .tethered
+        CameraSourceKind(rawValue: selectedSourceRaw) ?? .phone
     }
 
     private var selectedSourceBinding: Binding<CameraSourceKind> {
@@ -74,19 +82,19 @@ private struct EmptyCameraView: View {
                         .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
                         .tracking(2.1)
                         .foregroundStyle(BlackmagicCamStyle.cyan)
-                    Text("Select Camera")
+                    Text("Blackmagic Camera")
                         .font(BlackmagicCamStyle.labelFont(size: 38, weight: .heavy))
                         .foregroundStyle(.white)
                 }
                 BMEmptyState(
                     systemImage: "camera.viewfinder",
                     title: "No camera session open",
-                    subtitle: "Choose an iPhone camera feed or a remote USB body to enter the recovered HUDCameraControls, MediaPoolView, ChatView, and SettingsView surfaces."
+                    subtitle: "Open the camera HUD, then switch to Media, Chat, Settings, or Slate from the right-side Blackmagic controls."
                 )
                 HStack(spacing: 12) {
-                    BMStatusPill(title: "Source", value: "USB / PHONE")
-                    BMStatusPill(title: "HUDCameraControls", value: "STBY", color: BlackmagicCamStyle.amber)
-                    BMStatusPill(title: "Reverse", value: "3.2.00", color: BlackmagicCamStyle.cyan)
+                    BMStatusPill(title: "Source", value: "PHONE / USB")
+                    BMStatusPill(title: "Record", value: "STBY", color: BlackmagicCamStyle.amber)
+                    BMStatusPill(title: "Version", value: "3.2.00", color: BlackmagicCamStyle.cyan)
                 }
             }
             .padding(24)
