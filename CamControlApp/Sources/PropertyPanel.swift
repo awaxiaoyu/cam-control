@@ -78,7 +78,7 @@ struct PropertyPanel: View {
             VStack(alignment: .leading, spacing: compact ? 16 : 22) {
                 HStack(alignment: .top, spacing: 16) {
                     VStack(alignment: .leading, spacing: 7) {
-                        Text("SettingsOptionsPanel".uppercased())
+                        Text("SETTINGS")
                             .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
                             .tracking(1.5)
                             .foregroundStyle(color(for: selectedCategory))
@@ -373,7 +373,7 @@ private struct SettingsOptionRow: View {
                 Text(row.title)
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 16, weight: .heavy))
                     .foregroundStyle(.white)
-                Text("Settings > \(row.title) > List Option")
+                Text("Tap to select \(row.title)")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.38))
                     .lineLimit(1)
@@ -406,7 +406,7 @@ private struct SlateMetadataPanel: View {
                     .tracking(1.4)
                     .foregroundStyle(BlackmagicCamStyle.amber)
                 Spacer()
-                Text("SlateViewProjectInfo / SlateViewClipInfo / SlateViewLensInfo")
+                Text("Project / Clip / Lens Info")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
                     .tracking(1.1)
                     .foregroundStyle(.white.opacity(0.42))

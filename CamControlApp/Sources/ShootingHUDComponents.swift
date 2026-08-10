@@ -316,7 +316,7 @@ struct ShootingHUDLayout<Preview: View>: View {
             Button(action: onCapture) { RecordButtonView(active: isCaptureActive, enabled: canCapture, compact: compact) }
                 .buttonStyle(.plain).disabled(!canCapture)
         }
-        .padding(.horizontal, compact ? 8 : 12)
+        .padding(.horizontal, compact ? 6 : 10)
         .padding(.vertical, compact ? 7 : 10)
         .background(.black.opacity(0.66), in: RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous).stroke(.white.opacity(0.14), lineWidth: 1))
@@ -566,17 +566,52 @@ private struct CameraControlCell: View {
     let item: BottomControlItem
     let compact: Bool
     let active: Bool
+
+    private var autoLabel: String? {
+        item.value.caseInsensitiveCompare("auto") == .orderedSame || item.value.hasPrefix("A ") ? "AUTO" : nil
+    }
+
     var body: some View {
-        VStack(spacing: compact ? 2 : 4) {
-            BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.56), size: compact ? 12 : 15)
-            Text(item.title).font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).tracking(0.8).foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.56))
-            Text(item.value)
-                .font(item.title == "FPS" || item.title == "ISO" || item.title == "TINT" ? BlackmagicCamStyle.readoutFont(size: compact ? 15 : 21, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 15 : 21, weight: .heavy))
-                .foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.55)
+        VStack(spacing: compact ? 3 : 5) {
+            ZStack {
+                Circle()
+                    .stroke(.white.opacity(0.13), lineWidth: compact ? 4 : 5)
+                Circle()
+                    .trim(from: 0.08, to: active ? 0.88 : 0.66)
+                    .stroke(active ? BlackmagicCamStyle.cyan : .white.opacity(0.50), style: StrokeStyle(lineWidth: compact ? 4 : 5, lineCap: .round))
+                    .rotationEffect(.degrees(118))
+                Circle()
+                    .fill(active ? BlackmagicCamStyle.activeBlue.opacity(0.20) : .black.opacity(0.42))
+                    .padding(compact ? 8 : 10)
+                BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.72), size: compact ? 12 : 15)
+                    .offset(y: compact ? -9 : -12)
+                Text(item.value)
+                    .font(item.title == "FPS" || item.title == "ISO" || item.title == "TINT" ? BlackmagicCamStyle.readoutFont(size: compact ? 13 : 18, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 13 : 18, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.46)
+                    .offset(y: compact ? 7 : 10)
+                if let autoLabel {
+                    Text(autoLabel)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
+                        .tracking(0.5)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(BlackmagicCamStyle.activeBlue, in: Capsule())
+                        .offset(x: compact ? 22 : 29, y: compact ? -20 : -27)
+                }
+            }
+            .frame(width: compact ? 54 : 72, height: compact ? 54 : 72)
+            Text(item.title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                .tracking(0.8)
+                .foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.62))
         }
-        .frame(width: compact ? 62 : 88, height: compact ? 42 : 58)
-        .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.20) : .white.opacity(0.055), in: RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.48) : .white.opacity(0.10), lineWidth: 1))
+        .frame(width: compact ? 62 : 88, height: compact ? 74 : 96)
+        .contentShape(Rectangle())
+        .accessibilityLabel("Camera HUD \(item.title) \(item.value)")
+        // Firmware/update note: dial shell is derived from CameraAppToolbox BmdAdjustmentDial and Camera HUD Lens/Fps/shutter/Iris/ISO/white balance/Tint strings; update only if those symbols change in a new IPA.
     }
 }
 

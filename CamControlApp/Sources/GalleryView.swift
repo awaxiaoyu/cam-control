@@ -117,7 +117,7 @@ struct GalleryView: View {
     private func mediaToolbar(compact: Bool) -> some View {
         HStack(spacing: compact ? 8 : 12) {
             VStack(alignment: .leading, spacing: 3) {
-                Text("MediaViewToolbar".uppercased())
+                Text("MEDIA")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
                     .tracking(1.4)
                     .foregroundStyle(BlackmagicCamStyle.cyan)

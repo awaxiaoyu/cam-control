@@ -19,6 +19,22 @@ enum BlackmagicReverseSpec {
         "SafeAreaScroller", "FocusAssistScroller"
     ]
 
+    static let layoutComponentNames = [
+        "MainUIView", "MainUIViewController", "BmdTabView", "BmdVTabView", "SinglePanelBackground",
+        "DualPanelBackground", "SingleDualPanelBackground", "BmdAdjustmentDial", "BmdPopover",
+        "BmdIndicatorIconButton", "BmdTextButton", "MainControlRecordTimer", "LHUDFooterElements",
+        "PHUDFooterElements", "PLHUDFooterElements", "SHUDFooterElements", "PHUDSidebarOptions",
+        "PSHUDSidebarOptions", "HUDTallyIndicator", "HUDTimelapseIndicator"
+    ]
+
+    static let pageComponentNames = [
+        "pageCamera", "pageMedia", "pageChat", "pageSettings", "MediaTab", "MediaViewSidebar",
+        "MediaSortPanel", "MediaUploadToCloudPanel", "MediaClipDetailsLandscapePanel", "MediaClipDetailsPortraitPanel",
+        "ChatViewSidebar", "ChatTableView", "BmdCloudWebPage", "SettingsCategoryPanel", "SettingsOptionsPanel",
+        "RemoteSettingsCategoryPanel", "RemoteSettingsOptionsPanel", "OptionListView", "OptionStringListView",
+        "SlateView", "LSlateView", "PSlateView", "SlateViewProjectInfo", "SlateViewClipInfo", "SlateViewLensInfo"
+    ]
+
     static let settingsCategories = [
         "Record", "Camera", "Monitor", "Audio", "LUTs", "Media", "Blackmagic Cloud", "HDMI Out", "Preset", "Accessories", "About"
     ]

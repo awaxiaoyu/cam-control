@@ -83,7 +83,7 @@ struct CloudChatPanel: View {
     private func chatToolbar(compact: Bool) -> some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
-                Text("ChatViewToolbar".uppercased())
+                Text("PROJECT CHAT")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
                     .tracking(1.4)
                     .foregroundStyle(BlackmagicCamStyle.cyan)
@@ -156,7 +156,7 @@ struct CloudChatPanel: View {
 
                 Divider().overlay(.white.opacity(0.12))
 
-                Text("CloudLoginView".uppercased())
+                Text("BLACKMAGIC CLOUD")
                     .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
                     .tracking(1.4)
                     .foregroundStyle(BlackmagicCamStyle.cyan)

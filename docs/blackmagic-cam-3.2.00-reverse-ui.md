@@ -1,4 +1,4 @@
-﻿# Blackmagic Cam 3.2.00 UI Reverse Notes
+# Blackmagic Cam 3.2.00 UI Reverse Notes
 
 Source IPA: `F:\Blackmagic Cam_3.2.00.ipa`
 Bundle: `com.blackmagic-design.DaVinciCamera`
@@ -72,6 +72,17 @@ Camera/record/monitor labels from `CameraAppToolbox.framework/en.lproj/Localizab
 - Monitor: `Display Histogram`, `Display Audio Meters`, `Display Storage Status`, `Display Battery Indicator`, `Display Upload Status`, `Focus Assist`, `Focus Assist Color`, `Guides Color`, `Guides Opacity`, `Clean Feed`
 - Cloud/Media: `Blackmagic Cloud`, `No project selected - All Clips`, `Chat`, `Media`, `Upload`, `Proxy uploaded`, `Uploading proxy...`
 - Slate: `SLATE FOR`, `CAMERA OPERATOR`, `Lens Data`, `Scene`, `Take`, `Reel`, `Good Take`
+
+## Additional binary layout anchors
+
+A second pass over `BlackmagicCam` and `CameraAppToolbox` binary strings exposed the concrete SwiftUI shell names behind the camera surface:
+
+- Layout primitives: `MainUIView`, `MainUIViewController`, `BmdTabView`, `BmdVTabView`, `SinglePanelBackground`, `DualPanelBackground`, `SingleDualPanelBackground`.
+- Camera control material: `BmdAdjustmentDial`, `BmdPopover`, `BmdIndicatorIconButton`, `BmdTextButton`, plus literal accessibility strings `Camera HUD Lens`, `Camera HUD Fps`, `Camera HUD shutter`, `Camera HUD Iris`, `Camera HUD ISO`, `Camera HUD white balance`, `Camera HUD Tint`.
+- Footer/sidebar variants: `LHUDFooterElements`, `PHUDFooterElements`, `PLHUDFooterElements`, `SHUDFooterElements`, `PHUDSidebarOptions`, `PSHUDSidebarOptions`.
+- Page shells: `pageCamera`, `pageMedia`, `pageChat`, `pageSettings`, `MediaTab`, `MediaViewSidebar`, `MediaSortPanel`, `MediaUploadToCloudPanel`, `ChatViewSidebar`, `SettingsCategoryPanel`, `SettingsOptionsPanel`, `SlateViewProjectInfo`, `SlateViewClipInfo`, `SlateViewLensInfo`.
+
+Implementation impact: bottom camera controls are now dial-shaped instead of rectangular app cards, page navigation stays inside the Blackmagic camera shell, and visible UI labels avoid exposing recovered class names.
 
 ## Implementation mapping
 
