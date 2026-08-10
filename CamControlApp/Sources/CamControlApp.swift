@@ -9,9 +9,6 @@ struct CamControlApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(controller)
-                .task {
-                    controller.startBrowsing()
-                }
         }
     }
 }

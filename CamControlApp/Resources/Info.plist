@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
-	<string>CamControl uses tethered camera access to control connected Nikon and Canon cameras.</string>
+	<string>CamControl uses the built-in camera for phone-camera mode and tethered access to control connected Nikon and Canon cameras.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>CamControl saves selected captured images to your photo library.</string>
 	<key>UISupportedInterfaceOrientations</key>

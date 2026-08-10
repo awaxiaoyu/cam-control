@@ -4,22 +4,27 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var controller: CameraController
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @AppStorage("camera.source.kind") private var selectedSourceRaw = CameraSourceKind.tethered.rawValue
 
     var body: some View {
         Group {
             if horizontalSizeClass == .compact {
                 NavigationStack {
-                    if case .connected = controller.status {
+                    if selectedSource == .phone {
+                        PhoneCameraWorkspaceView()
+                    } else if case .connected = controller.status {
                         CameraWorkspaceView()
                     } else {
-                        DeviceListView()
+                        DeviceListView(source: selectedSourceBinding)
                     }
                 }
             } else {
                 NavigationSplitView {
-                    DeviceListView()
+                    DeviceListView(source: selectedSourceBinding)
                 } detail: {
-                    if case .connected = controller.status {
+                    if selectedSource == .phone {
+                        PhoneCameraWorkspaceView()
+                    } else if case .connected = controller.status {
                         CameraWorkspaceView()
                     } else {
                         EmptyCameraView()
@@ -35,6 +40,33 @@ struct ContentView: View {
         } message: {
             Text(controller.lastError ?? "")
         }
+        .task {
+            applySourceSelection(selectedSource)
+        }
+        .onChange(of: selectedSourceRaw) { _, newValue in
+            applySourceSelection(CameraSourceKind(rawValue: newValue) ?? .tethered)
+        }
+    }
+
+    private var selectedSource: CameraSourceKind {
+        CameraSourceKind(rawValue: selectedSourceRaw) ?? .tethered
+    }
+
+    private var selectedSourceBinding: Binding<CameraSourceKind> {
+        Binding(
+            get: { selectedSource },
+            set: { selectedSourceRaw = $0.rawValue }
+        )
+    }
+
+    private func applySourceSelection(_ source: CameraSourceKind) {
+        switch source {
+        case .tethered:
+            controller.startBrowsing()
+        case .phone:
+            controller.stopBrowsing()
+            Task { await controller.disconnect() }
+        }
     }
 }
 
@@ -46,7 +78,7 @@ private struct EmptyCameraView: View {
                 .foregroundStyle(.secondary)
             Text("Connect a Nikon or Canon camera")
                 .font(.title3.weight(.semibold))
-            Text("Use USB tethering, then pick it from the sidebar.")
+            Text("Choose Connected camera from the sidebar, or switch to Phone camera.")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

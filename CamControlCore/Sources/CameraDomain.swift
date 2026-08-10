@@ -22,6 +22,34 @@ public struct CameraDevice: Identifiable, Equatable, Sendable {
     }
 }
 
+public enum CameraSourceKind: String, CaseIterable, Identifiable, Sendable, Codable {
+    case tethered
+    case phone
+
+    public var id: String { rawValue }
+
+    public var title: String {
+        switch self {
+        case .tethered: return "Connected camera"
+        case .phone: return "Phone camera"
+        }
+    }
+
+    public var subtitle: String {
+        switch self {
+        case .tethered: return "Use USB/ImageCaptureCore control for Nikon and Canon cameras."
+        case .phone: return "Use the built-in iPhone or iPad camera preview and shutter."
+        }
+    }
+
+    public var systemImage: String {
+        switch self {
+        case .tethered: return "cable.connector"
+        case .phone: return "iphone.gen3"
+        }
+    }
+}
+
 public enum CameraTransportEvent: Equatable, Sendable {
     case deviceAdded(CameraDevice)
     case deviceRemoved(String)

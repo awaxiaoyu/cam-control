@@ -11,6 +11,7 @@ This project keeps the original Apache 2.0 license and rewrites the Android USB 
 ## Features
 
 - Device discovery: find USB/tethered cameras via ImageCaptureCore.
+- Phone camera mode: switch to the built-in iPhone/iPad camera for preview and shutter capture.
 - Live view: stream camera live view to the app when the camera provides a live view feed.
 - Remote capture: trigger still captures (shutter release) from the app.
 - Camera properties: read and change common camera settings exposed by the camera (exposure, ISO, shutter, aperture when supported).
@@ -59,7 +60,7 @@ The included workflow builds and tests on GitHub's macOS runner without code sig
 ## Project structure
 
 - CamControlCore: PTP packet encoding/parsing, Nikon/Canon drivers, ImageCaptureCore transport, and a mockable CameraController abstraction.
-- CamControlApp: SwiftUI application providing device discovery, live view, camera properties UI, gallery, preview, and saving/exporting.
+- CamControlApp: SwiftUI application providing connected-camera vs phone-camera source selection, device discovery, live view, camera properties UI, gallery, preview, and saving/exporting.
 
 ## Troubleshooting
 
@@ -75,3 +76,4 @@ If you add or verify support for a specific camera model, include the model and 
 ## License
 
 This project retains the original Apache 2.0 license from Remote Your Cam USB. See the LICENSE file for details.
+

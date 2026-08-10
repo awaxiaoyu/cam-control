@@ -30,6 +30,7 @@ targets:
       - path: CamControlApp/Resources
     dependencies:
       - target: CamControlCore
+      - sdk: AVFoundation.framework
       - sdk: ImageCaptureCore.framework
       - sdk: ImageIO.framework
     info:
@@ -43,7 +44,7 @@ targets:
         CFBundlePackageType: "$(PRODUCT_BUNDLE_PACKAGE_TYPE)"
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
-        NSCameraUsageDescription: "CamControl uses tethered camera access to control connected Nikon and Canon cameras."
+        NSCameraUsageDescription: "CamControl uses the built-in camera for phone-camera mode and tethered access to control connected Nikon and Canon cameras."
         NSPhotoLibraryAddUsageDescription: "CamControl saves selected captured images to your photo library."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
