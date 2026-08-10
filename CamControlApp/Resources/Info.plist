@@ -41,11 +41,17 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Fonts/BMD-Lato-Regular.ttf</string>
+		<string>Fonts/BMD-Lato-Bold-Italic.ttf</string>
 		<string>Fonts/BMD-Lato-Bold.ttf</string>
 		<string>Fonts/BMD-Lato-Heavy.ttf</string>
-		<string>Fonts/BMD-Lato-Timecode-Heavy.ttf</string>
+		<string>Fonts/BMD-Lato-HeavyItalic.ttf</string>
+		<string>Fonts/BMD-Lato-Italic.ttf</string>
+		<string>Fonts/BMD-Lato-Light-Italic.ttf</string>
 		<string>Fonts/BMD-Lato-Light.ttf</string>
+		<string>Fonts/BMD-Lato-Regular.ttf</string>
+		<string>Fonts/BMD-Lato-Timecode-Heavy.ttf</string>
+		<string>Fonts/BMD-Lato-WP.ttf</string>
+		<string>Fonts/BMD-Lato-WPAC.ttf</string>
 	</array>
 </dict>
 </plist>

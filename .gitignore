@@ -6,3 +6,6 @@ DerivedData/
 *.xcuserdata
 *.ipa
 *.xcarchive
+
+artifacts/
+ipatool-*.exe
