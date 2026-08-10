@@ -195,7 +195,12 @@ struct LiveViewPanel: View {
     }
 
     private var bottomCards: [ShootingHUDBottomCard] {
-        let histogram = controller.liveViewFrame?.histogram.map(histogramBars(from:)) ?? ShootingHUDFixtures.histogramBars
+        let histogram: [CGFloat]
+        if let histogramData = controller.liveViewFrame?.histogram {
+            histogram = histogramBars(from: histogramData)
+        } else {
+            histogram = ShootingHUDFixtures.histogramBars
+        }
         let battery = property(.batteryLevel)?.value ?? 0
         let progress = battery > 0 ? min(1, Double(battery) / 100.0) : 0.01
         let shots = property(.availableShots).map { "\($0.value) shots" } ?? "Ready"
