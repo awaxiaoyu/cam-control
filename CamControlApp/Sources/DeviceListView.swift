@@ -11,6 +11,7 @@ struct DeviceListView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
                     heroHeader
+                    permissionOnboardingStrip
                     sourceSwitcher(isWide: proxy.size.width > 760)
                     deviceStage
                 }
@@ -65,6 +66,30 @@ struct DeviceListView: View {
 
             BMStatusPill(title: "Status", value: statusText, color: statusColor)
         }
+    }
+
+    private var permissionOnboardingStrip: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: "checklist.checked")
+                    .foregroundStyle(BlackmagicCamStyle.cyan)
+                Text("TO GET STARTED, BLACKMAGIC CAMERA NEEDS ACCESS TO:")
+                    .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
+                    .tracking(1.2)
+                    .foregroundStyle(BlackmagicCamStyle.mutedText)
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+                PermissionChip(title: "Camera", subtitle: "Preview / Capture", icon: "camera.fill", color: BlackmagicCamStyle.activeBlue)
+                PermissionChip(title: "Microphone", subtitle: "Audio Meters", icon: "mic.fill", color: BlackmagicCamStyle.okGreen)
+                PermissionChip(title: "Photo Library", subtitle: "Save / View", icon: "photo.fill", color: BlackmagicCamStyle.cyan)
+                PermissionChip(title: "Location", subtitle: "Clip Metadata", icon: "location.fill", color: BlackmagicCamStyle.amber)
+                PermissionChip(title: "Local Network", subtitle: "Remote Control", icon: "network", color: BlackmagicCamStyle.recordRed)
+            }
+        }
+        .padding(16)
+        .blackmagicPanel(cornerRadius: 22)
+        // Firmware/update note: onboarding permissions mirror the reversed Blackmagic strings; add new rows only if platform/firmware features require new capabilities.
     }
 
     @ViewBuilder
@@ -166,6 +191,36 @@ struct DeviceListView: View {
         case .canon: return BlackmagicCamStyle.recordRed
         case .unknown: return BlackmagicCamStyle.cyan
         }
+    }
+}
+
+private struct PermissionChip: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(color)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                    .tracking(0.8)
+                    .foregroundStyle(.white)
+                Text(subtitle)
+                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .medium))
+                    .foregroundStyle(BlackmagicCamStyle.mutedText)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(10)
+        .background(Color.black.opacity(0.25), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.10), lineWidth: 1))
     }
 }
 

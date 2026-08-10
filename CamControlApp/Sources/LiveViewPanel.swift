@@ -233,6 +233,7 @@ struct LiveViewPanel: View {
         case .live: return .camera
         case .controls: return .settings
         case .gallery: return .media
+        case .chat: return .chat
         }
     }
 
@@ -274,7 +275,7 @@ struct LiveViewPanel: View {
         case .media:
             selectedTab = .gallery
         case .chat:
-            break
+            selectedTab = .chat
         case .settings:
             selectedTab = .controls
         }

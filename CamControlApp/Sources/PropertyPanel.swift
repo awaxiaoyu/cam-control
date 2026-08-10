@@ -19,6 +19,7 @@ struct PropertyPanel: View {
                 }
 
                 reversedSettingsRail
+                SlateMetadataPanel()
 
                 if controller.snapshot.properties.isEmpty {
                     BMEmptyState(
@@ -88,6 +89,62 @@ private struct SettingsSectionChip: View {
         .padding(14)
         .frame(width: 214, alignment: .leading)
         .blackmagicButtonShell(cornerRadius: 18, active: active)
+    }
+}
+
+private struct SlateMetadataPanel: View {
+    private let rows = [
+        ("SCENE", "Scene, Shot"),
+        ("TAKE", "Take"),
+        ("DAY/NIGHT", "Day"),
+        ("ENVIRONMENT", "Interior"),
+        ("DIRECTOR", "Director"),
+        ("CAMERA OPERATOR", "Camera Operator"),
+        ("LENS DATA", "Lens Type · Aperture · Focal Length"),
+        ("LOOK", "LUTName · Rec.709")
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                HStack(spacing: 10) {
+                    Image(systemName: "clapperboard.fill")
+                        .foregroundStyle(BlackmagicCamStyle.amber)
+                    Text("SLATE FOR")
+                        .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
+                        .tracking(1.4)
+                        .foregroundStyle(BlackmagicCamStyle.amber)
+                }
+                Spacer()
+                Text("QUICKTIME METADATA")
+                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                    .tracking(1.3)
+                    .foregroundStyle(BlackmagicCamStyle.mutedText)
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 10)], spacing: 10) {
+                ForEach(rows, id: \.0) { row in
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(row.0)
+                            .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                            .tracking(1.1)
+                            .foregroundStyle(BlackmagicCamStyle.mutedText)
+                        Text(row.1)
+                            .font(BlackmagicCamStyle.labelFont(size: 14, weight: .bold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.black.opacity(0.30), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.10), lineWidth: 1))
+                }
+            }
+        }
+        .padding(18)
+        .blackmagicPanel(cornerRadius: 22)
+        // Firmware/update note: slate labels are mirrored from reversed QuickTimeMetadata/design.camera.* fields; when device firmware exposes more metadata, add rows here and bind values from the capture model.
     }
 }
 

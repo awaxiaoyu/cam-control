@@ -33,7 +33,7 @@ struct PhoneCameraWorkspaceView: View {
                 }
             },
             onNavigate: { item in
-                if item == .settings || item == .media {
+                if item == .settings || item == .media || item == .chat {
                     selectedSourceRaw = CameraSourceKind.tethered.rawValue
                 }
             }

@@ -105,6 +105,11 @@ private struct CameraWorkspaceView: View {
                     workspaceHeader(title: "Media", systemImage: "photo.on.rectangle")
                     GalleryView()
                 }
+            case .chat:
+                VStack(spacing: 0) {
+                    workspaceHeader(title: "Chat", systemImage: "ellipsis.message")
+                    CloudChatPanel()
+                }
             }
         }
         .background {
@@ -215,5 +220,6 @@ enum WorkspaceTab: Hashable {
     case live
     case controls
     case gallery
+    case chat
 }
 
