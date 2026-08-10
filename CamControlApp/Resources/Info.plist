@@ -39,5 +39,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/BMD-Lato-Regular.ttf</string>
+		<string>Fonts/BMD-Lato-Bold.ttf</string>
+		<string>Fonts/BMD-Lato-Heavy.ttf</string>
+		<string>Fonts/BMD-Lato-Timecode-Heavy.ttf</string>
+		<string>Fonts/BMD-Lato-Light.ttf</string>
+	</array>
 </dict>
 </plist>

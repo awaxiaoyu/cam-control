@@ -18,6 +18,8 @@ struct PropertyPanel: View {
                     BMStatusPill(title: "Props", value: "\(controller.snapshot.properties.count)", color: controller.snapshot.properties.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
                 }
 
+                reversedSettingsRail
+
                 if controller.snapshot.properties.isEmpty {
                     BMEmptyState(
                         systemImage: "slider.horizontal.3",
@@ -41,6 +43,51 @@ struct PropertyPanel: View {
             await controller.refreshProperties()
         }
         // Firmware/update note: new firmware-specific PTP properties should be added to CameraPropertyKey first; this panel automatically renders new mapped properties.
+    }
+
+    private var reversedSettingsRail: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                SettingsSectionChip(title: "CAMERA", subtitle: "Codec · Resolution · FPS", systemImage: "camera.fill", color: BlackmagicCamStyle.activeBlue, active: true)
+                SettingsSectionChip(title: "AUDIO", subtitle: "Gain · Source · Meters", systemImage: "waveform", color: BlackmagicCamStyle.okGreen)
+                SettingsSectionChip(title: "MONITOR", subtitle: "LUT · Guides · False Color", systemImage: "rectangle.inset.filled", color: BlackmagicCamStyle.cyan)
+                SettingsSectionChip(title: "LUTs", subtitle: "Rec.709 · Apple Log", systemImage: "camera.filters", color: BlackmagicCamStyle.amber)
+                SettingsSectionChip(title: "PRESETS", subtitle: "Import · Export · Sync", systemImage: "tray.full.fill", color: .white.opacity(0.74))
+                SettingsSectionChip(title: "REMOTE", subtitle: "Camera Control · Cloud", systemImage: "dot.radiowaves.left.and.right", color: BlackmagicCamStyle.recordRed)
+            }
+            .padding(.vertical, 2)
+        }
+        // Firmware/update note: this rail mirrors reversed settings strings; when future firmware adds sections, add a chip here and bind controls below via CameraPropertyKey.
+    }
+}
+
+private struct SettingsSectionChip: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let color: Color
+    var active = false
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(color)
+                .frame(width: 34, height: 34)
+                .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
+                    .tracking(1.1)
+                    .foregroundStyle(.white)
+                Text(subtitle)
+                    .font(BlackmagicCamStyle.labelFont(size: 11, weight: .medium))
+                    .foregroundStyle(BlackmagicCamStyle.mutedText)
+            }
+        }
+        .padding(14)
+        .frame(width: 214, alignment: .leading)
+        .blackmagicButtonShell(cornerRadius: 18, active: active)
     }
 }
 

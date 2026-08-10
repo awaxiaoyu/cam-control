@@ -108,7 +108,11 @@ struct ShootingHUDLayout<Preview: View>: View {
                 topStatusBar(compact: compact)
                     .padding(.horizontal, compact ? 10 : 20)
                     .padding(.top, compact ? 8 : 18)
+                hudMicroStatusStrip(compact: compact)
+                    .padding(.top, compact ? 7 : 10)
                 Spacer(minLength: 0)
+                monitorToolStrip(compact: compact)
+                    .padding(.bottom, compact ? 8 : 12)
                 bottomMonitorDeck(compact: compact)
                     .padding(.horizontal, compact ? 10 : 20)
                     .padding(.bottom, compact ? 10 : 18)
@@ -135,7 +139,7 @@ struct ShootingHUDLayout<Preview: View>: View {
 
             VStack(spacing: compact ? 2 : 4) {
                 Text(timecode)
-                    .font(BlackmagicCamStyle.readoutFont(size: compact ? 30 : 50, weight: .semibold))
+                    .font(BlackmagicCamStyle.timecodeFont(size: compact ? 31 : 54))
                     .foregroundStyle(.white)
                     .shadow(color: .black.opacity(0.65), radius: 2, x: 0, y: 1)
                     .lineLimit(1)
@@ -206,6 +210,55 @@ struct ShootingHUDLayout<Preview: View>: View {
         // Firmware/update note: add new camera firmware-specific readouts by mapping new CameraPropertyKey values into ShootingHUDTopItem here, not by hardcoding vendor strings in the view body.
     }
 
+    private func hudMicroStatusStrip(compact: Bool) -> some View {
+        HStack(spacing: compact ? 7 : 10) {
+            Text(title.uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                .tracking(1.5)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .padding(.horizontal, compact ? 9 : 12)
+                .padding(.vertical, compact ? 6 : 8)
+                .background(Color.black.opacity(0.46), in: Capsule())
+                .overlay(Capsule().stroke(Color.white.opacity(0.14), lineWidth: 1))
+
+            Text(subtitle.uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .bold))
+                .tracking(1.1)
+                .foregroundStyle(BlackmagicCamStyle.mutedText)
+                .lineLimit(1)
+
+            Spacer(minLength: 8)
+
+            ForEach(hudStatusBadges, id: \.0) { badge in
+                HStack(spacing: 5) {
+                    Image(systemName: badge.1)
+                    Text(badge.0)
+                }
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                .foregroundStyle(badge.2)
+                .padding(.horizontal, compact ? 7 : 10)
+                .padding(.vertical, compact ? 5 : 7)
+                .background(Color.black.opacity(0.42), in: Capsule())
+                .overlay(Capsule().stroke(badge.2.opacity(0.26), lineWidth: 1))
+            }
+        }
+        .padding(.horizontal, compact ? 10 : 20)
+        // Firmware/update note: these badges mirror reversed IconAe/IconAf/IconAwb/IconLock/IconLut/IconStream/IconTimelapse asset families; keep them capability-driven as new firmware exposes state flags.
+    }
+
+    private var hudStatusBadges: [(String, String, Color)] {
+        [
+            ("AE", "a.circle.fill", BlackmagicCamStyle.activeBlue),
+            ("AF", "scope", canFocus ? BlackmagicCamStyle.activeBlue : BlackmagicCamStyle.mutedText),
+            ("AWB", "sun.max.fill", BlackmagicCamStyle.amber),
+            ("LOCK", "lock.fill", BlackmagicCamStyle.mutedText),
+            ("LUT", "camera.filters", BlackmagicCamStyle.cyan),
+            ("STRM", "dot.radiowaves.left.and.right", isLiveActive ? BlackmagicCamStyle.okGreen : BlackmagicCamStyle.mutedText),
+            ("TL", "timer", BlackmagicCamStyle.mutedText)
+        ]
+    }
+
     private func bottomMonitorDeck(compact: Bool) -> some View {
         HStack(alignment: .bottom, spacing: compact ? 10 : 16) {
             if bottomCards.indices.contains(0) {
@@ -221,6 +274,20 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private func monitorToolStrip(compact: Bool) -> some View {
+        HStack(spacing: compact ? 8 : 12) {
+            MonitorToolChip(title: "FALSE COLOR", systemImage: "circle.lefthalf.filled", color: BlackmagicCamStyle.amber, compact: compact)
+            MonitorToolChip(title: "FOCUS ASSIST", systemImage: "scope", color: BlackmagicCamStyle.cyan, compact: compact, active: canFocus)
+            MonitorToolChip(title: "GUIDES", systemImage: "square.grid.3x3", color: .white.opacity(0.74), compact: compact, active: true)
+            MonitorToolChip(title: "DISPLAY LUT", systemImage: "camera.filters", color: BlackmagicCamStyle.cyan, compact: compact, active: true)
+            MonitorToolChip(title: "CLEAN FEED", systemImage: "rectangle.dashed", color: .white.opacity(0.68), compact: compact)
+            MonitorToolChip(title: "HDMI", systemImage: "display", color: .white.opacity(0.58), compact: compact)
+        }
+        .padding(.horizontal, compact ? 10 : 20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        // Firmware/update note: monitor tools are UI mirrors for reversed Display Histogram/Audio/Storage/LUT/Focus Assist/Guides/False Color strings; wire live camera support through capabilities later.
     }
 
     @ViewBuilder
@@ -521,6 +588,33 @@ private struct DragHandleDots: View {
         .padding(.vertical, 7)
         .background(.black.opacity(0.45), in: Capsule())
         .accessibilityHidden(true)
+    }
+}
+
+private struct MonitorToolChip: View {
+    let title: String
+    let systemImage: String
+    let color: Color
+    let compact: Bool
+    var active = false
+
+    var body: some View {
+        HStack(spacing: compact ? 5 : 7) {
+            Image(systemName: systemImage)
+                .font(.system(size: compact ? 11 : 14, weight: .bold))
+            Text(title)
+                .lineLimit(1)
+        }
+        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+        .tracking(0.7)
+        .foregroundStyle(active ? .white : color)
+        .padding(.horizontal, compact ? 8 : 11)
+        .padding(.vertical, compact ? 6 : 8)
+        .background((active ? color.opacity(0.22) : Color.black.opacity(0.46)), in: RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous)
+                .stroke((active ? color : Color.white).opacity(active ? 0.48 : 0.12), lineWidth: 1)
+        )
     }
 }
 

@@ -27,11 +27,24 @@ enum BlackmagicCamStyle {
     )
 
     static func labelFont(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
-        .system(size: size, weight: weight, design: .rounded)
+        if weight == .heavy || weight == .black {
+            return .custom("Lato-Heavy", size: size)
+        }
+        if weight == .bold || weight == .semibold {
+            return .custom("Lato-Bold", size: size)
+        }
+        if weight == .light {
+            return .custom("Lato-Light", size: size)
+        }
+        return .custom("Lato-Regular", size: size)
     }
 
     static func readoutFont(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
-        .system(size: size, weight: weight, design: .monospaced)
+        weight == .heavy ? .custom("Lato-Timecode-Heavy", size: size) : .custom("Lato-Bold", size: size)
+    }
+
+    static func timecodeFont(size: CGFloat) -> Font {
+        .custom("Lato-Timecode-Heavy", size: size)
     }
 }
 
