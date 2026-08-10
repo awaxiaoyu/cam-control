@@ -259,7 +259,7 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
             .buttonStyle(.plain)
         }
-        // Firmware/update note: trailing indicators replace the old app sidebars and map reversed HUDLeftNavMenuIndicator/HUDRightNavMenuIndicator plus SlateView.
+        // Firmware/update note: trailing indicators map reversed HUDLeftNavMenuIndicator/HUDRightNavMenuIndicator plus SlateView.
     }
 
     private func monitorTools(compact: Bool) -> some View {
@@ -760,7 +760,7 @@ private struct SlateOverlay: View {
         case "SCENE": return "001"
         case "TAKE": return "1"
         case "REEL": return "A"
-        case "CAMERA OPERATOR": return "CamControl"
+        case "CAMERA OPERATOR": return "Blackmagic Camera"
         case "LENS DATA": return "24mm / f1.8"
         case "GOOD TAKE": return "OFF"
         default: return "--"

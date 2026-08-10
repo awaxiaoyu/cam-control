@@ -69,20 +69,30 @@ private struct EmptyCameraView: View {
         ZStack {
             BlackmagicCamStyle.studioGradient.ignoresSafeArea()
             VStack(spacing: 24) {
+                VStack(spacing: 8) {
+                    Text("BLACKMAGIC CAMERA")
+                        .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
+                        .tracking(2.1)
+                        .foregroundStyle(BlackmagicCamStyle.cyan)
+                    Text("Select Camera")
+                        .font(BlackmagicCamStyle.labelFont(size: 38, weight: .heavy))
+                        .foregroundStyle(.white)
+                }
                 BMEmptyState(
                     systemImage: "camera.viewfinder",
-                    title: "Connect a camera",
-                    subtitle: "Choose a tethered Nikon, Canon, or Sony body from the input bay, or switch to the Phone camera source."
+                    title: "No camera session open",
+                    subtitle: "Choose an iPhone camera feed or a remote USB body to enter the recovered HUDCameraControls, MediaPoolView, ChatView, and SettingsView surfaces."
                 )
                 HStack(spacing: 12) {
-                    BMStatusPill(title: "Mode", value: "USB / PHONE")
-                    BMStatusPill(title: "HUD", value: "STBY", color: BlackmagicCamStyle.amber)
+                    BMStatusPill(title: "Source", value: "USB / PHONE")
+                    BMStatusPill(title: "HUDCameraControls", value: "STBY", color: BlackmagicCamStyle.amber)
+                    BMStatusPill(title: "Reverse", value: "3.2.00", color: BlackmagicCamStyle.cyan)
                 }
             }
             .padding(24)
-            .frame(maxWidth: 620)
+            .frame(maxWidth: 760)
         }
-        // Firmware/update note: empty state copy should stay vendor-neutral; add new supported camera families in CameraSourceKind/CameraVendor instead of hardcoding here.
+        // Firmware/update note: entry copy is reverse-derived from Blackmagic Camera permission/launch strings; update CameraSourceKind/CameraVendor when new camera families are supported.
     }
 }
 

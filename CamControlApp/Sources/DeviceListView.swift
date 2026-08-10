@@ -21,7 +21,7 @@ struct DeviceListView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(BlackmagicCamStyle.studioGradient.ignoresSafeArea())
         }
-        .navigationTitle("CamControl")
+        .navigationTitle("Blackmagic Camera")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbarBackground(.hidden, for: .navigationBar)
@@ -41,7 +41,7 @@ struct DeviceListView: View {
         HStack(alignment: .top, spacing: 18) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
-                    Text("CAMCONTROL")
+                    Text("BLACKMAGIC CAMERA")
                         .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
                         .tracking(2.2)
                         .foregroundStyle(BlackmagicCamStyle.cyan)
@@ -53,10 +53,10 @@ struct DeviceListView: View {
                         .padding(.vertical, 5)
                         .background(Color.white.opacity(0.08), in: Capsule())
                 }
-                Text("Camera control room")
+                Text("Select Camera")
                     .font(BlackmagicCamStyle.labelFont(size: 36, weight: .heavy))
                     .foregroundStyle(.white)
-                Text("A Blackmagic Cam inspired control surface for tethered still cameras and the built-in iPhone camera.")
+                Text("Choose a local iPhone camera feed or a remote USB body before entering the camera HUD, media pool, cloud chat, and settings surfaces.")
                     .font(BlackmagicCamStyle.labelFont(size: 14, weight: .medium))
                     .foregroundStyle(BlackmagicCamStyle.mutedText)
                     .fixedSize(horizontal: false, vertical: true)
@@ -117,8 +117,8 @@ struct DeviceListView: View {
                 HStack {
                     BMSectionHeader(
                         eyebrow: "Input",
-                        title: "Connected cameras",
-                        subtitle: "ImageCaptureCore discovery mirrors Blackmagic's camera-first launch flow."
+                        title: "Remote cameras",
+                        subtitle: "Open a camera session, then enter the recovered Blackmagic HUDCameraControls surface."
                     )
                     Spacer(minLength: 12)
                     BMStatusPill(title: "Devices", value: "\(controller.devices.count)", color: controller.devices.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
@@ -127,8 +127,8 @@ struct DeviceListView: View {
                 if controller.devices.isEmpty {
                     BMEmptyState(
                         systemImage: "cable.connector",
-                        title: "No camera detected",
-                        subtitle: "Connect a Nikon, Canon, or Sony body in USB remote mode, then refresh discovery."
+                        title: "No remote camera detected",
+                        subtitle: "Connect a supported USB body in remote mode, then refresh discovery."
                     )
                 } else {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 270), spacing: 14)], spacing: 14) {
@@ -147,8 +147,8 @@ struct DeviceListView: View {
             VStack(alignment: .leading, spacing: 14) {
                 BMSectionHeader(
                     eyebrow: "Input",
-                    title: "Phone camera",
-                    subtitle: "Use the same monitor HUD and shutter controls with the built-in camera."
+                    title: "iPhone camera",
+                    subtitle: "Use the recovered monitor HUD, timecode, shutter, histogram, storage, LUT, and audio widgets with the built-in camera."
                 )
                 PhoneReadyCard()
             }
@@ -328,10 +328,10 @@ private struct PhoneReadyCard: View {
             .frame(width: 92, height: 108)
 
             VStack(alignment: .leading, spacing: 9) {
-                Text("Internal capture selected")
+                Text("Internal camera selected")
                     .font(BlackmagicCamStyle.labelFont(size: 22, weight: .heavy))
                     .foregroundStyle(.white)
-                Text("Tap through to the monitor to use Blackmagic-style readouts, capture rail, histogram, storage, and audio meter widgets.")
+                Text("The monitor opens directly into HUDCameraControls with Blackmagic readouts, record button, histogram, storage, LUT, and audio meter widgets.")
                     .font(BlackmagicCamStyle.labelFont(size: 14, weight: .medium))
                     .foregroundStyle(BlackmagicCamStyle.mutedText)
             }

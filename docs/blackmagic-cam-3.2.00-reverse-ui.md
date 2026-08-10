@@ -60,7 +60,7 @@ Camera/record/monitor labels from `CameraAppToolbox.framework/en.lproj/Localizab
 
 `ShootingHUDComponents.swift` is now rewritten as a full-screen camera HUD instead of the previous side-rail app shell:
 
-- Full-screen preview with Blackmagic-style edge vignette.
+- Full-screen preview with Blackmagic edge vignette.
 - Top indicator groups and center timecode/tally mirror `HUDTopIndicators` and `RecordTimerTextIndicator`.
 - Floating leading/trailing indicators replace fixed app sidebars and map to `HUDLeadingIndicators`/`HUDTrailingIndicators`.
 - Bottom horizontal `HUDCameraControls` strip maps lens/FPS/shutter/iris/ISO/WB/tint/LUT plus live/AF/record controls.

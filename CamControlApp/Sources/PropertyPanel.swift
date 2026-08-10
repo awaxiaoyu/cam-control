@@ -444,7 +444,7 @@ private struct SlateMetadataPanel: View {
         case "SCENE": return "001"
         case "TAKE": return "1"
         case "REEL": return "A"
-        case "CAMERA OPERATOR": return "CamControl"
+        case "CAMERA OPERATOR": return "Blackmagic Camera"
         case "LENS DATA": return "Lens Type / Aperture / Focal Length"
         case "GOOD TAKE": return "Off"
         default: return "--"

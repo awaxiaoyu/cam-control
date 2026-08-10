@@ -86,7 +86,7 @@ struct PhoneCameraWorkspaceView: View {
         .onDisappear {
             camera.stop()
         }
-        // Firmware/update note: if iOS camera APIs expose more per-device video properties after OS updates, populate topItems here while keeping the Blackmagic-style HUD shell stable.
+        // Firmware/update note: if iOS camera APIs expose more per-device video properties after OS updates, populate topItems here while keeping the Blackmagic HUD shell stable.
     }
 
     private var topItems: [ShootingHUDTopItem] {
@@ -375,4 +375,3 @@ private final class PreviewView: UIView {
         }
     }
 }
-
