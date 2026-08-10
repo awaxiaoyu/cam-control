@@ -19,6 +19,7 @@ struct ShootingHUDLayout<Preview: View>: View {
     let canCapture: Bool
     let canFocus: Bool
     let canToggleLive: Bool
+    @State private var controlDrawer: CameraControlDrawer?
 
     init(
         title: String,
@@ -116,6 +117,17 @@ struct ShootingHUDLayout<Preview: View>: View {
                 bottomMonitorDeck(compact: compact)
                     .padding(.horizontal, compact ? 10 : 20)
                     .padding(.bottom, compact ? 10 : 18)
+            }
+
+            if let controlDrawer {
+                CameraUIControlsDrawer(drawer: controlDrawer, compact: compact) {
+                    withAnimation(.snappy(duration: 0.18)) {
+                        self.controlDrawer = nil
+                    }
+                }
+                .padding(.trailing, compact ? 10 : 18)
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+                .zIndex(4)
             }
         }
         .overlay(Rectangle().stroke(Color.white.opacity(0.10), lineWidth: 1))
@@ -278,13 +290,38 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private func monitorToolStrip(compact: Bool) -> some View {
         HStack(spacing: compact ? 8 : 12) {
-            MonitorToolChip(title: "FALSE COLOR", systemImage: "circle.lefthalf.filled", color: BlackmagicCamStyle.amber, compact: compact)
-            MonitorToolChip(title: "FOCUS ASSIST", systemImage: "scope", color: BlackmagicCamStyle.cyan, compact: compact, active: canFocus)
-            MonitorToolChip(title: "GUIDES", systemImage: "square.grid.3x3", color: .white.opacity(0.74), compact: compact, active: true)
-            MonitorToolChip(title: "DISPLAY LUT", systemImage: "camera.filters", color: BlackmagicCamStyle.cyan, compact: compact, active: true)
-            MonitorToolChip(title: "CLEAN FEED", systemImage: "rectangle.dashed", color: .white.opacity(0.68), compact: compact)
-            MonitorToolChip(title: "HDMI", systemImage: "display", color: .white.opacity(0.58), compact: compact)
+            Button {
+                openDrawer(.monitor)
+            } label: {
+                MonitorToolChip(title: "FALSE COLOR", systemImage: "circle.lefthalf.filled", color: BlackmagicCamStyle.amber, compact: compact)
+            }
+            Button {
+                openDrawer(.focus)
+            } label: {
+                MonitorToolChip(title: "FOCUS ASSIST", systemImage: "scope", color: BlackmagicCamStyle.cyan, compact: compact, active: canFocus)
+            }
+            Button {
+                openDrawer(.monitor)
+            } label: {
+                MonitorToolChip(title: "GUIDES", systemImage: "square.grid.3x3", color: .white.opacity(0.74), compact: compact, active: true)
+            }
+            Button {
+                openDrawer(.lut)
+            } label: {
+                MonitorToolChip(title: "DISPLAY LUT", systemImage: "camera.filters", color: BlackmagicCamStyle.cyan, compact: compact, active: true)
+            }
+            Button {
+                openDrawer(.monitor)
+            } label: {
+                MonitorToolChip(title: "CLEAN FEED", systemImage: "rectangle.dashed", color: .white.opacity(0.68), compact: compact)
+            }
+            Button {
+                openDrawer(.monitor)
+            } label: {
+                MonitorToolChip(title: "HDMI", systemImage: "display", color: .white.opacity(0.58), compact: compact)
+            }
         }
+        .buttonStyle(.plain)
         .padding(.horizontal, compact ? 10 : 20)
         .frame(maxWidth: .infinity, alignment: .leading)
         // Firmware/update note: monitor tools are UI mirrors for reversed Display Histogram/Audio/Storage/LUT/Focus Assist/Guides/False Color strings; wire live camera support through capabilities later.
@@ -371,7 +408,10 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private func controlRail(compact: Bool) -> some View {
         VStack(spacing: compact ? 12 : 18) {
-            railButton(icon: "viewfinder", label: "HUD", compact: compact, action: onRefresh)
+            railButton(icon: "viewfinder", label: "HUD", compact: compact, active: controlDrawer == .monitor) {
+                openDrawer(.monitor)
+                onRefresh()
+            }
 
             railButton(
                 icon: isLiveActive ? "pause.viewfinder" : "camera.viewfinder",
@@ -382,7 +422,10 @@ struct ShootingHUDLayout<Preview: View>: View {
                 action: onToggleLive
             )
 
-            railButton(icon: "plus.forwardslash.minus", label: "AF", compact: compact, enabled: canFocus, action: onFocus)
+            railButton(icon: "plus.forwardslash.minus", label: "AF", compact: compact, active: controlDrawer == .focus, enabled: canFocus) {
+                openDrawer(.focus)
+                onFocus()
+            }
 
             Button(action: onCapture) {
                 recordButton(compact: compact)
@@ -392,9 +435,11 @@ struct ShootingHUDLayout<Preview: View>: View {
             .opacity(canCapture ? 1 : 0.4)
             .accessibilityLabel(isCaptureActive ? "Stop capture" : "Capture")
 
-            railButton(icon: "camera.macro", label: "LENS", compact: compact, active: false, enabled: false, action: {})
+            railButton(icon: "camera.macro", label: "LENS", compact: compact, active: controlDrawer == .focus, enabled: canFocus) {
+                openDrawer(.focus)
+            }
 
-            Button(action: {}) {
+            Button(action: { openDrawer(.lut) }) {
                 VStack(spacing: 5) {
                     Text("LUT")
                         .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 15, weight: .heavy))
@@ -403,11 +448,9 @@ struct ShootingHUDLayout<Preview: View>: View {
                 }
                 .foregroundStyle(.white)
                 .frame(width: compact ? 62 : 78, height: compact ? 50 : 62)
-                .blackmagicButtonShell(cornerRadius: 14)
+                .blackmagicButtonShell(cornerRadius: 14, active: controlDrawer == .lut)
             }
             .buttonStyle(.plain)
-            .disabled(true)
-            .opacity(0.55)
 
             Spacer(minLength: 0)
 
@@ -512,6 +555,12 @@ struct ShootingHUDLayout<Preview: View>: View {
         }
         .frame(width: compact ? 72 : 92, height: compact ? 72 : 96)
     }
+
+    private func openDrawer(_ drawer: CameraControlDrawer) {
+        withAnimation(.snappy(duration: 0.18)) {
+            controlDrawer = controlDrawer == drawer ? nil : drawer
+        }
+    }
 }
 
 struct ShootingHUDTopItem: Identifiable, Equatable {
@@ -545,6 +594,42 @@ struct ShootingHUDBottomCard: Identifiable {
         case histogram([CGFloat])
         case storage(primary: String, progress: Double, trailing: String)
         case audio([Double])
+    }
+}
+
+private enum CameraControlDrawer: String, Identifiable {
+    case focus
+    case exposure
+    case lut
+    case monitor
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .focus: return "Focus"
+        case .exposure: return "Exposure"
+        case .lut: return "LUTs"
+        case .monitor: return "Monitor"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .focus: return "focusSlider · focusPeakToggle"
+        case .exposure: return "ExposureFocusOverlay · falseColorToggle"
+        case .lut: return "lutPicker · lutListCache"
+        case .monitor: return "Guides · False Color · Clean Feed"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .focus: return BlackmagicCamStyle.cyan
+        case .exposure: return BlackmagicCamStyle.amber
+        case .lut: return BlackmagicCamStyle.activeBlue
+        case .monitor: return .white.opacity(0.82)
+        }
     }
 }
 
@@ -615,6 +700,245 @@ private struct MonitorToolChip: View {
             RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous)
                 .stroke((active ? color : Color.white).opacity(active ? 0.48 : 0.12), lineWidth: 1)
         )
+    }
+}
+
+private struct CameraUIControlsDrawer: View {
+    let drawer: CameraControlDrawer
+    let compact: Bool
+    let onClose: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 12 : 16) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(drawer.title.uppercased())
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 15, weight: .heavy))
+                        .tracking(1.4)
+                        .foregroundStyle(drawer.color)
+                    Text(drawer.subtitle)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .bold))
+                        .foregroundStyle(BlackmagicCamStyle.mutedText)
+                }
+                Spacer()
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: compact ? 12 : 14, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .frame(width: compact ? 28 : 32, height: compact ? 28 : 32)
+                        .background(Color.white.opacity(0.10), in: Circle())
+                }
+                .buttonStyle(.plain)
+            }
+
+            Divider().overlay(Color.white.opacity(0.18))
+
+            switch drawer {
+            case .focus:
+                focusControls
+            case .exposure:
+                exposureControls
+            case .lut:
+                lutControls
+            case .monitor:
+                monitorControls
+            }
+        }
+        .padding(compact ? 14 : 18)
+        .frame(width: compact ? 286 : 358, alignment: .topLeading)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0.018, green: 0.034, blue: 0.055).opacity(0.96),
+                    Color.black.opacity(0.94)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous)
+                .stroke(drawer.color.opacity(0.38), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.45), radius: 22, x: 0, y: 12)
+        // Firmware/update note: this drawer is derived from reversed CameraUIControls/focusSlider/focusPeakToggle/falseColorToggle/lutPicker symbols; when real camera support is added, bind rows to CameraUIData.
+    }
+
+    private var focusControls: some View {
+        VStack(alignment: .leading, spacing: compact ? 10 : 13) {
+            DrawerSlider(title: "FOCUS", value: 0.58, left: "NEAR", right: "FAR", color: BlackmagicCamStyle.cyan, compact: compact)
+            DrawerToggle(title: "FOCUS PEAK", value: "ON", color: BlackmagicCamStyle.cyan, compact: compact)
+            DrawerToggle(title: "FOCUS ASSIST COLOR", value: "BLUE", color: BlackmagicCamStyle.activeBlue, compact: compact)
+            DrawerSegment(title: "AF MODE", values: ["AF-S", "AF-C", "FACE"], selected: 1, compact: compact)
+            DrawerInfoGrid(items: [("POINT", "CENTER"), ("MARKER", "1"), ("LOCK", "READY")], compact: compact)
+        }
+    }
+
+    private var exposureControls: some View {
+        VStack(alignment: .leading, spacing: compact ? 10 : 13) {
+            DrawerSlider(title: "IRIS", value: 0.44, left: "f1.8", right: "f16", color: BlackmagicCamStyle.amber, compact: compact)
+            DrawerSlider(title: "SHUTTER", value: 0.35, left: "1/24", right: "1/8000", color: BlackmagicCamStyle.amber, compact: compact)
+            DrawerSlider(title: "ISO", value: 0.62, left: "100", right: "6400", color: BlackmagicCamStyle.amber, compact: compact)
+            DrawerToggle(title: "FALSE COLOR", value: "OFF", color: BlackmagicCamStyle.recordRed, compact: compact)
+            DrawerSegment(title: "AUTO EXPOSURE", values: ["OFF", "AE", "LOCK"], selected: 0, compact: compact)
+        }
+    }
+
+    private var lutControls: some View {
+        VStack(alignment: .leading, spacing: compact ? 10 : 13) {
+            DrawerToggle(title: "DISPLAY LUT", value: "ON", color: BlackmagicCamStyle.cyan, compact: compact)
+            DrawerToggle(title: "RECORD LUT TO CLIP", value: "OFF", color: BlackmagicCamStyle.amber, compact: compact)
+            DrawerSegment(title: "COLOR SPACE", values: ["REC.709", "P3 D65", "LOG"], selected: 0, compact: compact)
+            ForEach(["Rec 709 Neutral", "Cinema Teal", "Day Night", "Dusty", "Monochrome", "Warm Fade"], id: \.self) { name in
+                HStack {
+                    Text(name)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 11 : 13, weight: name == "Rec 709 Neutral" ? .heavy : .bold))
+                    Spacer()
+                    if name == "Rec 709 Neutral" {
+                        Image(systemName: "checkmark.circle.fill")
+                    }
+                }
+                .foregroundStyle(name == "Rec 709 Neutral" ? BlackmagicCamStyle.cyan : .white.opacity(0.86))
+                .padding(.horizontal, 10)
+                .padding(.vertical, compact ? 6 : 8)
+                .background(Color.black.opacity(0.25), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+        }
+    }
+
+    private var monitorControls: some View {
+        VStack(alignment: .leading, spacing: compact ? 10 : 13) {
+            DrawerToggle(title: "DISPLAY HISTOGRAM", value: "ON", color: BlackmagicCamStyle.cyan, compact: compact)
+            DrawerToggle(title: "DISPLAY AUDIO METERS", value: "ON", color: BlackmagicCamStyle.okGreen, compact: compact)
+            DrawerToggle(title: "DISPLAY STORAGE STATUS", value: "ON", color: BlackmagicCamStyle.okGreen, compact: compact)
+            DrawerToggle(title: "DISPLAY BATTERY INDICATOR", value: "ON", color: BlackmagicCamStyle.amber, compact: compact)
+            DrawerSegment(title: "GUIDES", values: ["OFF", "THIRDS", "SAFE"], selected: 1, compact: compact)
+            DrawerSegment(title: "ANAMORPHIC", values: ["OFF", "1.33x", "1.55x"], selected: 0, compact: compact)
+            DrawerToggle(title: "CLEAN FEED", value: "OFF", color: .white.opacity(0.74), compact: compact)
+        }
+    }
+}
+
+private struct DrawerSlider: View {
+    let title: String
+    let value: Double
+    let left: String
+    let right: String
+    let color: Color
+    let compact: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack {
+                Text(title)
+                Spacer()
+                Text("\(Int(value * 100))")
+                    .font(BlackmagicCamStyle.readoutFont(size: compact ? 10 : 12, weight: .heavy))
+            }
+            .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+            .tracking(1.0)
+            .foregroundStyle(.white)
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.white.opacity(0.12))
+                    Capsule().fill(color).frame(width: proxy.size.width * value)
+                    Circle()
+                        .fill(.white)
+                        .frame(width: compact ? 14 : 18, height: compact ? 14 : 18)
+                        .shadow(color: color.opacity(0.8), radius: 5)
+                        .offset(x: max(0, proxy.size.width * value - (compact ? 7 : 9)))
+                }
+            }
+            .frame(height: compact ? 14 : 18)
+            HStack {
+                Text(left)
+                Spacer()
+                Text(right)
+            }
+            .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 10, weight: .bold))
+            .foregroundStyle(BlackmagicCamStyle.mutedText)
+        }
+        .padding(12)
+        .background(Color.black.opacity(0.28), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+private struct DrawerToggle: View {
+    let title: String
+    let value: String
+    let color: Color
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                .tracking(1.0)
+                .foregroundStyle(.white)
+            Spacer()
+            Text(value)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 11, weight: .heavy))
+                .tracking(0.8)
+                .foregroundStyle(color)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(color.opacity(0.13), in: Capsule())
+        }
+        .padding(12)
+        .background(Color.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+private struct DrawerSegment: View {
+    let title: String
+    let values: [String]
+    let selected: Int
+    let compact: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                .tracking(1.0)
+                .foregroundStyle(BlackmagicCamStyle.mutedText)
+            HStack(spacing: 6) {
+                ForEach(Array(values.enumerated()), id: \.offset) { index, value in
+                    Text(value)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 10, weight: .heavy))
+                        .foregroundStyle(index == selected ? .white : BlackmagicCamStyle.mutedText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 7)
+                        .background(index == selected ? BlackmagicCamStyle.activeBlue.opacity(0.45) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                }
+            }
+        }
+        .padding(12)
+        .background(Color.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+private struct DrawerInfoGrid: View {
+    let items: [(String, String)]
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(items, id: \.0) { item in
+                VStack(spacing: 4) {
+                    Text(item.0)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 9, weight: .heavy))
+                        .tracking(0.9)
+                        .foregroundStyle(BlackmagicCamStyle.mutedText)
+                    Text(item.1)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 11 : 12, weight: .heavy))
+                        .foregroundStyle(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(Color.black.opacity(0.26), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+        }
     }
 }
 
