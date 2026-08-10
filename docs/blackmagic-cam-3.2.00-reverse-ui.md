@@ -82,7 +82,7 @@ A second pass over `BlackmagicCam` and `CameraAppToolbox` binary strings exposed
 - Footer/sidebar variants: `LHUDFooterElements`, `PHUDFooterElements`, `PLHUDFooterElements`, `SHUDFooterElements`, `PHUDSidebarOptions`, `PSHUDSidebarOptions`.
 - Page shells: `pageCamera`, `pageMedia`, `pageChat`, `pageSettings`, `MediaTab`, `MediaViewSidebar`, `MediaSortPanel`, `MediaUploadToCloudPanel`, `ChatViewSidebar`, `SettingsCategoryPanel`, `SettingsOptionsPanel`, `SlateViewProjectInfo`, `SlateViewClipInfo`, `SlateViewLensInfo`.
 
-Implementation impact: bottom camera controls are now dial-shaped instead of rectangular app cards, page navigation stays inside the Blackmagic camera shell, and visible UI labels avoid exposing recovered class names.
+Implementation impact: bottom camera controls are now dial-shaped instead of rectangular app cards, top camera controls are no longer duplicated as parameter tiles, page navigation stays inside the Blackmagic camera shell, and visible UI labels avoid exposing recovered class names. The latest HUD mapping separates `HUDTopLeftIndicators` / `RecordTimerTextIndicator` / `StorageStatusHUD` / `UploadStatusHUD` at the top from scrollable `LHUDFooterElements` / `PHUDFooterElements` dials and the persistent `RecordButton` at the bottom.
 
 ## Implementation mapping
 

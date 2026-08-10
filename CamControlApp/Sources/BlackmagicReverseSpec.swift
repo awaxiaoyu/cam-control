@@ -24,7 +24,9 @@ enum BlackmagicReverseSpec {
         "DualPanelBackground", "SingleDualPanelBackground", "BmdAdjustmentDial", "BmdPopover",
         "BmdIndicatorIconButton", "BmdTextButton", "MainControlRecordTimer", "LHUDFooterElements",
         "PHUDFooterElements", "PLHUDFooterElements", "SHUDFooterElements", "PHUDSidebarOptions",
-        "PSHUDSidebarOptions", "HUDTallyIndicator", "HUDTimelapseIndicator"
+        "PSHUDSidebarOptions", "HUDTallyIndicator", "HUDTimelapseIndicator", "HUDFullscreenItems",
+        "HUDSafeAreas", "StorageStatusHUD", "UploadStatusHUD", "HUDHistogramPopUp", "HUDPresetPopUp",
+        "LutScrollPanel", "MainControlsPersistenceController"
     ]
 
     static let pageComponentNames = [

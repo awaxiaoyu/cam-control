@@ -156,49 +156,75 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func topHUD(compact: Bool) -> some View {
-        HStack(alignment: .top, spacing: compact ? 6 : 10) {
-            topGroup(Array(topItems.prefix(4)), compact: compact)
+        HStack(alignment: .top, spacing: compact ? 8 : 12) {
+            topLeftIndicators(compact: compact)
             Spacer(minLength: 8)
-            VStack(spacing: compact ? 2 : 3) {
-                Text(timecode)
-                    .font(BlackmagicCamStyle.timecodeFont(size: compact ? 34 : 58))
-                    .foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.85), radius: 2, x: 0, y: 1)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.58)
-                HStack(spacing: 8) {
-                    Circle().fill(isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.38)).frame(width: 7, height: 7)
-                    Text(isCaptureActive ? "RECORDING" : "STBY")
-                    Text("| REC RUN").foregroundStyle(.white.opacity(0.42))
-                }
-                .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                .tracking(1.55)
-                .foregroundStyle(isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.74))
-            }
-            .padding(.horizontal, compact ? 10 : 18)
-            .padding(.vertical, compact ? 4 : 7)
-            .background(.black.opacity(0.30), in: Capsule())
-            .overlay(Capsule().stroke(.white.opacity(0.08), lineWidth: 1))
+            recordTimerBar(compact: compact)
             Spacer(minLength: 8)
-            topGroup(Array(topItems.dropFirst(4).prefix(4)), compact: compact)
+            topRightIndicators(compact: compact)
         }
     }
 
-    private func topGroup(_ items: [ShootingHUDTopItem], compact: Bool) -> some View {
-        HStack(spacing: compact ? 5 : 7) {
-            ForEach(items) { item in
-                Button {
-                    withAnimation(.snappy(duration: 0.18)) { activeScroller = scroller(for: item) }
-                } label: {
-                    TopIndicatorTile(item: item, compact: compact)
-                }
-                .buttonStyle(.plain)
+    private func topLeftIndicators(compact: Bool) -> some View {
+        HStack(spacing: compact ? 6 : 8) {
+            BMDAssetIcon(name: "Camera", activeName: "Camera_active", active: navSelection == .camera, fallback: "camera.fill", color: .white, size: compact ? 15 : 18)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("BLACKMAGIC CAMERA")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.72))
+                Text(subtitle.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
             }
+            HUDStatusChip(title: "LUT", value: "Rec.709", asset: "IconLut", color: BlackmagicCamStyle.activeBlue, compact: compact)
+            HUDStatusChip(title: "TC", value: "TOD", asset: "IconLock", color: .white.opacity(0.74), compact: compact)
         }
-        .padding(.horizontal, compact ? 6 : 8)
-        .padding(.vertical, compact ? 5 : 7)
-        .background(.black.opacity(0.42), in: RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
+        .padding(.horizontal, compact ? 8 : 11)
+        .padding(.vertical, compact ? 6 : 8)
+        .background(.black.opacity(0.38), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
+        // Firmware/update note: top-left cluster follows recovered HUDTopLeftIndicators, HUDLutIndicator and RecordTimerTextIndicator anchors; future versions should only change values/assets.
+    }
+
+    private func recordTimerBar(compact: Bool) -> some View {
+        VStack(spacing: compact ? 2 : 3) {
+            Text(timecode)
+                .font(BlackmagicCamStyle.timecodeFont(size: compact ? 34 : 58))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.85), radius: 2, x: 0, y: 1)
+                .lineLimit(1)
+                .minimumScaleFactor(0.58)
+            HStack(spacing: 8) {
+                HUDTallyDot(active: isCaptureActive, compact: compact)
+                Text(isCaptureActive ? "REC" : "STBY")
+                Text("REC RUN").foregroundStyle(.white.opacity(0.42))
+                Text("24 FPS").foregroundStyle(.white.opacity(0.42))
+            }
+            .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+            .tracking(1.55)
+            .foregroundStyle(isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.74))
+        }
+        .padding(.horizontal, compact ? 12 : 20)
+        .padding(.vertical, compact ? 5 : 8)
+        .background(.black.opacity(0.34), in: Capsule())
+        .overlay(Capsule().stroke(.white.opacity(0.09), lineWidth: 1))
+        // Firmware/update note: this is the visible MainControlRecordTimer/RecordTimerTextIndicator mapping; bind to real recording state before changing layout.
+    }
+
+    private func topRightIndicators(compact: Bool) -> some View {
+        HStack(spacing: compact ? 6 : 8) {
+            HUDStatusChip(title: "BAT", value: "82%", asset: "BatteryIndicator", color: BlackmagicCamStyle.okGreen, compact: compact)
+            HUDStatusChip(title: "STOR", value: "09:00", asset: "StorageIphone", color: .white.opacity(0.80), compact: compact)
+            HUDStatusChip(title: "UP", value: "WAIT", asset: "UploadToCloud", color: BlackmagicCamStyle.amber, compact: compact)
+        }
+        .padding(.horizontal, compact ? 8 : 11)
+        .padding(.vertical, compact ? 6 : 8)
+        .background(.black.opacity(0.38), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
+        // Firmware/update note: right cluster follows StorageStatusHUD, UploadStatusHUD and BatteryIndicator assets recovered from the IPA.
     }
 
     private func guideLayer(compact: Bool) -> some View {
@@ -299,16 +325,24 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func bottomControls(compact: Bool) -> some View {
-        HStack(alignment: .center, spacing: compact ? 6 : 10) {
-            ForEach(bottomControlItems) { item in
-                Button {
-                    withAnimation(.snappy(duration: 0.18)) { activeScroller = item.scroller }
-                } label: {
-                    CameraControlCell(item: item, compact: compact, active: activeScroller == item.scroller)
+        HStack(alignment: .center, spacing: compact ? 7 : 11) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .center, spacing: compact ? 6 : 10) {
+                    ForEach(bottomControlItems) { item in
+                        Button {
+                            withAnimation(.snappy(duration: 0.18)) { activeScroller = item.scroller }
+                        } label: {
+                            CameraControlCell(item: item, compact: compact, active: activeScroller == item.scroller)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .buttonStyle(.plain)
+                .padding(.horizontal, compact ? 2 : 4)
             }
-            Spacer(minLength: compact ? 4 : 8)
+            .frame(maxWidth: compact ? 560 : 760)
+
+            Divider().overlay(.white.opacity(0.14)).frame(height: compact ? 52 : 76)
+
             Button(action: onToggleLive) { LiveToggleButton(active: isLiveActive, enabled: canToggleLive, compact: compact) }
                 .buttonStyle(.plain).disabled(!canToggleLive)
             Button(action: onFocus) { FocusAutoButton(enabled: canFocus, compact: compact) }
@@ -316,11 +350,12 @@ struct ShootingHUDLayout<Preview: View>: View {
             Button(action: onCapture) { RecordButtonView(active: isCaptureActive, enabled: canCapture, compact: compact) }
                 .buttonStyle(.plain).disabled(!canCapture)
         }
-        .padding(.horizontal, compact ? 6 : 10)
+        .padding(.horizontal, compact ? 8 : 12)
         .padding(.vertical, compact ? 7 : 10)
-        .background(.black.opacity(0.66), in: RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous))
+        .background(.black.opacity(0.70), in: RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous).stroke(.white.opacity(0.14), lineWidth: 1))
         .shadow(color: .black.opacity(0.45), radius: 20, x: 0, y: 10)
+        // Firmware/update note: footer split maps L/PHUD footer elements plus persistent RecordButton; keep record/live/focus fixed while control dials scroll.
     }
 
     private var bottomControlItems: [BottomControlItem] {
@@ -479,33 +514,50 @@ private struct BottomControlItem: Identifiable, Equatable {
     var id: String { title }
 }
 
-private struct TopIndicatorTile: View {
-    let item: ShootingHUDTopItem
+private struct HUDStatusChip: View {
+    let title: String
+    let value: String
+    let asset: String
+    let color: Color
     let compact: Bool
+
     var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 1 : 3) {
-            HStack(spacing: 4) {
-                Text(item.title.uppercased())
+        HStack(spacing: compact ? 4 : 6) {
+            BMDAssetIcon(name: asset, active: true, fallback: nil, color: color, size: compact ? 11 : 13)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(title)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 7, weight: .heavy))
+                    .tracking(0.7)
+                    .foregroundStyle(.white.opacity(0.45))
+                Text(value)
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
-                    .tracking(0.55)
-                    .foregroundStyle(item.isDimmed ? .white.opacity(0.32) : .white.opacity(0.66))
-                if item.isAuto {
-                    Text("AUTO").font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 7, weight: .heavy)).foregroundStyle(.white).padding(.horizontal, 4).padding(.vertical, 1).background(BlackmagicCamStyle.activeBlue, in: RoundedRectangle(cornerRadius: 3, style: .continuous))
-                }
-            }
-            if item.isFormatBadge {
-                Text(item.primaryFormatLine.uppercased()).font(BlackmagicCamStyle.labelFont(size: compact ? 16 : 22, weight: .heavy)).foregroundStyle(.white)
-                Text(item.secondaryFormatLine.uppercased()).font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .heavy)).foregroundStyle(BlackmagicCamStyle.cyan)
-            } else {
-                Text(item.value)
-                    .font(item.isMonospaced ? BlackmagicCamStyle.readoutFont(size: compact ? 17 : 25, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 17 : 25, weight: .heavy))
-                    .foregroundStyle(item.isDimmed ? .white.opacity(0.34) : .white)
+                    .foregroundStyle(.white.opacity(0.88))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.58)
+                    .minimumScaleFactor(0.65)
             }
         }
-        .frame(minWidth: compact ? 52 : 78, alignment: .leading)
-        .contentShape(Rectangle())
+        .padding(.horizontal, compact ? 6 : 8)
+        .padding(.vertical, compact ? 4 : 5)
+        .background(.white.opacity(0.055), in: Capsule())
+        .overlay(Capsule().stroke(color.opacity(0.20), lineWidth: 1))
+    }
+}
+
+private struct HUDTallyDot: View {
+    let active: Bool
+    let compact: Bool
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(active ? BlackmagicCamStyle.recordRed.opacity(0.22) : .white.opacity(0.08))
+                .frame(width: compact ? 13 : 16, height: compact ? 13 : 16)
+            Circle()
+                .fill(active ? BlackmagicCamStyle.recordRed : .white.opacity(0.38))
+                .frame(width: compact ? 7 : 8, height: compact ? 7 : 8)
+        }
+        .shadow(color: active ? BlackmagicCamStyle.recordRed.opacity(0.8) : .clear, radius: 5)
+        // Firmware/update note: visual state maps recovered HUDTallyIndicator; change only when recording-state semantics change.
     }
 }
 
