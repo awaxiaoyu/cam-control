@@ -8,10 +8,39 @@ struct PhoneCameraWorkspaceView: View {
     @StateObject private var camera = PhoneCameraViewModel()
 
     var body: some View {
-        VStack(spacing: 0) {
+        ShootingHUDLayout(
+            title: "Phone Camera",
+            subtitle: camera.activePosition == .front ? "Front camera" : "Back camera",
+            timecode: "00:00:00:00",
+            topItems: topItems,
+            bottomCards: bottomCards,
+            navSelection: .camera,
+            isCaptureActive: false,
+            isLiveActive: camera.isSessionRunning,
+            canCapture: camera.isReady,
+            canFocus: false,
+            canToggleLive: false,
+            onCapture: {
+                camera.capturePhoto()
+            },
+            onToggleLive: {},
+            onFocus: {},
+            onRefresh: {
+                if camera.canSwitchCamera {
+                    camera.switchCamera()
+                } else {
+                    camera.start()
+                }
+            },
+            onNavigate: { item in
+                if item == .settings || item == .media {
+                    selectedSourceRaw = CameraSourceKind.tethered.rawValue
+                }
+            }
+        ) {
             ZStack {
                 PhoneCameraPreview(session: camera.session)
-                    .ignoresSafeArea(edges: .bottom)
+                    .ignoresSafeArea()
 
                 if let image = camera.lastPhoto {
                     VStack {
@@ -28,7 +57,8 @@ struct PhoneCameraWorkspaceView: View {
                                         .stroke(.white.opacity(0.9), lineWidth: 2)
                                 )
                                 .shadow(radius: 8)
-                                .padding()
+                                .padding(.trailing, 20)
+                                .padding(.bottom, 128)
                         }
                     }
                 }
@@ -47,8 +77,6 @@ struct PhoneCameraWorkspaceView: View {
                     .padding()
                 }
             }
-
-            controls
         }
         .background(Color.black)
         .navigationTitle("Phone Camera")
@@ -64,50 +92,30 @@ struct PhoneCameraWorkspaceView: View {
         .onDisappear {
             camera.stop()
         }
+        // Firmware/update note: if iOS camera APIs expose more per-device video properties after OS updates, populate topItems here while keeping the Blackmagic-style HUD shell stable.
     }
 
-    private var controls: some View {
-        HStack(spacing: 28) {
-            Button {
-                camera.switchCamera()
-            } label: {
-                Image(systemName: "arrow.triangle.2.circlepath.camera")
-                    .font(.title2)
-                    .frame(width: 54, height: 54)
-            }
-            .disabled(!camera.canSwitchCamera)
+    private var topItems: [ShootingHUDTopItem] {
+        [
+            ShootingHUDTopItem(title: "Lens", value: camera.activePosition == .front ? "Front" : "24mm"),
+            ShootingHUDTopItem(title: "FPS", value: "24"),
+            ShootingHUDTopItem(title: "Shutter", value: "Auto", isAuto: true),
+            ShootingHUDTopItem(title: "Aperture", value: "--", isDimmed: true),
+            ShootingHUDTopItem(title: "ISO", value: "Auto", isAuto: true),
+            ShootingHUDTopItem(title: "WB", value: "Auto", isAuto: true),
+            ShootingHUDTopItem(title: "Tint", value: "0"),
+            ShootingHUDTopItem(title: "Format", value: "Photo")
+        ]
+    }
 
-            Button {
-                camera.capturePhoto()
-            } label: {
-                ZStack {
-                    Circle()
-                        .stroke(.white, lineWidth: 4)
-                        .frame(width: 74, height: 74)
-                    Circle()
-                        .fill(.white)
-                        .frame(width: 58, height: 58)
-                }
-            }
-            .disabled(!camera.isReady)
-            .accessibilityLabel("Shoot with phone camera")
-
-            Button {
-                camera.start()
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.title2)
-                    .frame(width: 54, height: 54)
-            }
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(.white)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
-        .background(.black)
+    private var bottomCards: [ShootingHUDBottomCard] {
+        [
+            ShootingHUDBottomCard(title: "Rec.709", kind: .histogram(ShootingHUDFixtures.histogramBars)),
+            ShootingHUDBottomCard(title: "Storage", kind: .storage(primary: camera.isReady ? "Ready" : "Starting", progress: camera.isReady ? 0.35 : 0.02, trailing: camera.lastPhoto == nil ? "--" : "1 shot")),
+            ShootingHUDBottomCard(title: "iPhone mic", kind: .audio([0.24, 0.21]))
+        ]
     }
 }
-
 private final class PhoneCameraViewModel: NSObject, ObservableObject {
     let session = AVCaptureSession()
 
@@ -332,3 +340,4 @@ private final class PreviewView: UIView {
         layer as! AVCaptureVideoPreviewLayer
     }
 }
+

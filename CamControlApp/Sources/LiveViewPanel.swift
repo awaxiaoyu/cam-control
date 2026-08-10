@@ -1,4 +1,5 @@
 import CamControlCore
+import Foundation
 import SwiftUI
 
 private struct ReviewDurationOption: Identifiable {
@@ -23,6 +24,7 @@ private let streamLimitOptions = [0, 2, 4, 6, 8, 10, 15, 20]
 
 struct LiveViewPanel: View {
     @EnvironmentObject private var controller: CameraController
+    @Binding var selectedTab: WorkspaceTab
     @AppStorage("liveview.captured_picture_duration") private var capturedPictureDuration = -1
     @AppStorage("picturestream.num_pictures") private var pictureStreamLimit = 6
     @AppStorage("picturestream.show_filename") private var showStreamFilename = true
@@ -32,11 +34,46 @@ struct LiveViewPanel: View {
     @State private var streamExpanded = true
 
     var body: some View {
-        VStack(spacing: 12) {
-            liveViewStage
-            liveControls
-            pictureStream
+        VStack(spacing: 0) {
+            ShootingHUDLayout(
+                title: deviceName,
+                subtitle: controller.snapshot.deviceInfo?.manufacturer ?? "Recording image display",
+                timecode: timecodeText,
+                topItems: topItems,
+                bottomCards: bottomCards,
+                navSelection: navSelection,
+                isCaptureActive: controller.isBulbActive,
+                isLiveActive: controller.isLiveViewActive,
+                canCapture: true,
+                canFocus: controller.snapshot.capabilities.autofocus,
+                canToggleLive: controller.snapshot.capabilities.liveView,
+                onCapture: {
+                    if capturedReviewItem != nil {
+                        dismissCapturedReview()
+                    } else {
+                        Task { await controller.capture() }
+                    }
+                },
+                onToggleLive: {
+                    Task { await controller.toggleLiveView() }
+                },
+                onFocus: {
+                    Task { await controller.focus() }
+                },
+                onRefresh: {
+                    Task { await controller.refreshProperties() }
+                },
+                onNavigate: navigate
+            ) {
+                liveViewContent
+            }
+
+            if selectedTab == .live {
+                compactControlStrip
+                pictureStream
+            }
         }
+        .background(Color.black)
         .onChange(of: controller.pictureStreamItems.first?.id) { _, _ in
             guard let item = controller.pictureStreamItems.first else { return }
             presentCapturedReview(item, obeyNever: true)
@@ -48,46 +85,46 @@ struct LiveViewPanel: View {
         .onDisappear {
             reviewTask?.cancel()
         }
+        // Firmware/update note: camera firmware updates usually alter property availability/encoding; update topItems/propertyDisplay mappings before changing HUD layout.
     }
 
-    private var liveViewStage: some View {
+    private var liveViewContent: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.black)
             if let capturedReviewItem {
                 capturedReview(for: capturedReviewItem)
             } else if let frame = controller.liveViewFrame {
                 liveFrame(frame)
             } else {
-                Image(systemName: "viewfinder")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.white.opacity(0.45))
+                LinearGradient(
+                    colors: [Color.gray.opacity(0.76), Color.gray.opacity(0.62)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                VStack(spacing: 12) {
+                    Image(systemName: controller.snapshot.capabilities.liveView ? "viewfinder" : "camera.viewfinder")
+                        .font(.system(size: 48, weight: .medium))
+                    Text(controller.snapshot.capabilities.liveView ? "Start live view from the right rail" : "Live view is not exposed by this camera")
+                        .font(.headline)
+                }
+                .foregroundStyle(.white.opacity(0.72))
             }
         }
-        .aspectRatio(16 / 9, contentMode: .fit)
-        .padding(.horizontal)
     }
 
-    private var liveControls: some View {
+    private var compactControlStrip: some View {
         HStack(spacing: 10) {
             Button {
-                if capturedReviewItem != nil {
-                    dismissCapturedReview()
-                } else {
-                    Task { await controller.toggleLiveView() }
-                }
+                Task { await controller.toggleLiveView() }
             } label: {
                 Label(controller.isLiveViewActive ? "Stop" : "Live", systemImage: controller.isLiveViewActive ? "pause.fill" : "play.fill")
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(!controller.snapshot.capabilities.liveView && capturedReviewItem == nil)
+            .disabled(!controller.snapshot.capabilities.liveView)
 
             Button {
                 Task { await controller.focus() }
             } label: {
                 Label("AF", systemImage: "scope")
             }
-            .buttonStyle(.bordered)
             .disabled(!controller.snapshot.capabilities.autofocus)
 
             lensMenu(direction: .near, icon: "minus.magnifyingglass")
@@ -95,7 +132,12 @@ struct LiveViewPanel: View {
             reviewMenu
             streamMenu
         }
+        .buttonStyle(.bordered)
+        .controlSize(.small)
+        .foregroundStyle(.white)
         .padding(.horizontal)
+        .padding(.vertical, 10)
+        .background(Color.black)
     }
 
     @ViewBuilder
@@ -116,7 +158,7 @@ struct LiveViewPanel: View {
 
                     Text("Picture stream")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.7))
                     Spacer()
                 }
                 .padding(.horizontal)
@@ -135,6 +177,85 @@ struct LiveViewPanel: View {
                     }
                 }
             }
+            .background(Color.black)
+        }
+    }
+
+    private var topItems: [ShootingHUDTopItem] {
+        [
+            ShootingHUDTopItem(title: "Lens", value: lensValue),
+            ShootingHUDTopItem(title: "FPS", value: frameRateValue),
+            ShootingHUDTopItem(title: "Shutter", value: propertyDisplay(.shutterSpeed), isAuto: isReadOnly(.shutterSpeed), isMonospaced: true),
+            ShootingHUDTopItem(title: "Aperture", value: propertyDisplay(.aperture), isDimmed: property(.aperture) == nil, isMonospaced: true),
+            ShootingHUDTopItem(title: "ISO", value: propertyDisplay(.iso), isAuto: isReadOnly(.iso), isMonospaced: true),
+            ShootingHUDTopItem(title: "WB", value: whiteBalanceValue, isAuto: isReadOnly(.whiteBalance) || isReadOnly(.colorTemperature)),
+            ShootingHUDTopItem(title: "Tint", value: propertyDisplay(.exposureCompensation), isMonospaced: true),
+            ShootingHUDTopItem(title: "Format", value: "4K 16:9")
+        ]
+    }
+
+    private var bottomCards: [ShootingHUDBottomCard] {
+        let histogram = controller.liveViewFrame?.histogram.map(histogramBars(from:)) ?? ShootingHUDFixtures.histogramBars
+        let battery = property(.batteryLevel)?.value ?? 0
+        let progress = battery > 0 ? min(1, Double(battery) / 100.0) : 0.01
+        let shots = property(.availableShots).map { "\($0.value) shots" } ?? "Ready"
+        let trailing = battery > 0 ? "\(battery)%" : "--"
+        return [
+            ShootingHUDBottomCard(title: "Rec.709", kind: .histogram(histogram)),
+            ShootingHUDBottomCard(title: "Storage", kind: .storage(primary: shots, progress: progress, trailing: trailing)),
+            ShootingHUDBottomCard(title: "Audio", kind: .audio([0.18, 0.16]))
+        ]
+    }
+
+    private var navSelection: ShootingHUDNavItem {
+        switch selectedTab {
+        case .live: return .camera
+        case .controls: return .settings
+        case .gallery: return .media
+        }
+    }
+
+    private var deviceName: String {
+        if case .connected(let device) = controller.status {
+            return device.name
+        }
+        return "Camera"
+    }
+
+    private var timecodeText: String {
+        let seconds = controller.isBulbActive ? controller.bulbElapsedSeconds : 0
+        let hours = seconds / 3600
+        let minutes = (seconds % 3600) / 60
+        let secs = seconds % 60
+        return String(format: "%02d:%02d:%02d:00", hours, minutes, secs)
+    }
+
+    private var lensValue: String {
+        controller.snapshot.deviceInfo?.model ?? "--"
+    }
+
+    private var frameRateValue: String {
+        if controller.isLiveViewActive { return "Live" }
+        return "--"
+    }
+
+    private var whiteBalanceValue: String {
+        if let colorTemp = property(.colorTemperature) {
+            return "\(colorTemp.value)K"
+        }
+        return propertyDisplay(.whiteBalance)
+    }
+
+    private func navigate(_ item: ShootingHUDNavItem) {
+        switch item {
+        case .camera:
+            selectedTab = .live
+        case .media:
+            selectedTab = .gallery
+        case .chat:
+            break
+        case .settings:
+            selectedTab = .controls
         }
     }
 
@@ -145,12 +266,6 @@ struct LiveViewPanel: View {
             ZStack {
                 LiveImage(data: frame.jpegData)
                 AutofocusOverlay(frame: frame)
-            }
-        }
-        .overlay(alignment: .bottomTrailing) {
-            if controller.snapshot.capabilities.histogram, let histogram = frame.histogram {
-                HistogramOverlay(histogram: histogram)
-                    .padding(10)
             }
         }
     }
@@ -207,7 +322,6 @@ struct LiveViewPanel: View {
         } label: {
             Image(systemName: icon)
         }
-        .buttonStyle(.bordered)
         .disabled(!controller.snapshot.capabilities.driveLens)
     }
 
@@ -221,7 +335,6 @@ struct LiveViewPanel: View {
         } label: {
             Image(systemName: "timer")
         }
-        .buttonStyle(.bordered)
     }
 
     private var streamMenu: some View {
@@ -235,7 +348,6 @@ struct LiveViewPanel: View {
         } label: {
             Image(systemName: "film.stack")
         }
-        .buttonStyle(.bordered)
     }
 
     private func presentCapturedReview(_ item: GalleryItem, obeyNever: Bool) {
@@ -282,6 +394,60 @@ struct LiveViewPanel: View {
         capturedReviewItem = nil
         capturedReviewURL = nil
     }
+
+    private func property(_ key: CameraPropertyKey) -> CameraPropertyState? {
+        controller.snapshot.properties.first { $0.key == key }
+    }
+
+    private func isReadOnly(_ key: CameraPropertyKey) -> Bool {
+        guard let prop = property(key) else { return false }
+        return prop.descriptor?.isSettable != true
+    }
+
+    private func propertyDisplay(_ key: CameraPropertyKey) -> String {
+        guard let prop = property(key) else { return "--" }
+        switch key {
+        case .batteryLevel:
+            return "\(prop.value)%"
+        case .colorTemperature:
+            return "\(prop.value)K"
+        case .availableShots:
+            return "\(prop.value)"
+        case .exposureCompensation:
+            return prop.value == 0 ? "0" : String(format: "%.1f", Double(prop.value) / 100.0)
+        case .iso:
+            return "\(prop.value)"
+        case .aperture:
+            if prop.value > 0, prop.value < 1_000 {
+                return String(format: "f%.1f", Double(prop.value) / 100.0)
+            }
+            return rawDisplay(prop.value)
+        case .shutterSpeed:
+            if prop.value > 0, prop.value <= 8_000 {
+                return "1/\(prop.value)"
+            }
+            return rawDisplay(prop.value)
+        default:
+            return rawDisplay(prop.value)
+        }
+    }
+
+    private func rawDisplay(_ value: Int64) -> String {
+        "0x\(String(UInt64(bitPattern: value), radix: 16))"
+    }
+
+    private func histogramBars(from data: Data, count: Int = 32) -> [CGFloat] {
+        let bytes = [UInt8](data)
+        guard !bytes.isEmpty else { return ShootingHUDFixtures.histogramBars }
+        let bucketSize = max(1, bytes.count / count)
+        return (0..<count).map { bucket in
+            let start = bucket * bucketSize
+            let end = min(bytes.count, start + bucketSize)
+            guard start < end else { return 0 }
+            let sum = bytes[start..<end].reduce(0) { $0 + Int($1) }
+            return CGFloat(sum) / CGFloat((end - start) * 255)
+        }
+    }
 }
 
 private struct LiveImage: View {
@@ -322,6 +488,7 @@ private struct PictureStreamThumbnail: View {
                 if showFilename {
                     Text(item.filename)
                         .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.82))
                         .lineLimit(1)
                         .frame(width: 90, alignment: .leading)
                 }
@@ -352,40 +519,3 @@ private struct AutofocusOverlay: View {
     }
 }
 
-private struct HistogramOverlay: View {
-    let histogram: Data
-
-    var body: some View {
-        let bars = barHeights()
-        HStack(alignment: .bottom, spacing: 1) {
-            ForEach(Array(bars.enumerated()), id: \.offset) { _, value in
-                Capsule()
-                    .fill(Color.white.opacity(0.85))
-                    .frame(width: 2, height: max(2, 44 * value))
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 7)
-        .frame(width: 150, height: 64, alignment: .bottom)
-        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))
-    }
-
-    private func barHeights(count: Int = 48) -> [CGFloat] {
-        let bytes = [UInt8](histogram)
-        guard !bytes.isEmpty else { return [] }
-        let bucketSize = max(1, bytes.count / count)
-        var values: [CGFloat] = []
-        values.reserveCapacity(count)
-        for bucket in 0..<count {
-            let start = bucket * bucketSize
-            let end = min(bytes.count, start + bucketSize)
-            guard start < end else {
-                values.append(0)
-                continue
-            }
-            let sum = bytes[start..<end].reduce(0) { $0 + Int($1) }
-            values.append(CGFloat(sum) / CGFloat((end - start) * 255))
-        }
-        return values
-    }
-}

@@ -91,36 +91,38 @@ private struct CameraWorkspaceView: View {
     @State private var selection: WorkspaceTab = .live
 
     var body: some View {
-        VStack(spacing: 0) {
-            toolbar
-            Picker("View", selection: $selection) {
-                Label("Live", systemImage: "viewfinder").tag(WorkspaceTab.live)
-                Label("Controls", systemImage: "slider.horizontal.3").tag(WorkspaceTab.controls)
-                Label("Gallery", systemImage: "photo.on.rectangle").tag(WorkspaceTab.gallery)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-
-            Group {
-                switch selection {
-                case .live:
-                    LiveViewPanel()
-                case .controls:
+        Group {
+            switch selection {
+            case .live:
+                LiveViewPanel(selectedTab: $selection)
+            case .controls:
+                VStack(spacing: 0) {
+                    workspaceHeader(title: "Camera settings", systemImage: "slider.horizontal.3")
                     PropertyPanel()
-                case .gallery:
+                }
+            case .gallery:
+                VStack(spacing: 0) {
+                    workspaceHeader(title: "Media", systemImage: "photo.on.rectangle")
                     GalleryView()
                 }
             }
         }
-        .background(Color(.systemGroupedBackground))
+        .background(selection == .live ? Color.black : Color(.systemGroupedBackground))
     }
 
-    private var toolbar: some View {
+    private func workspaceHeader(title: String, systemImage: String) -> some View {
         HStack(spacing: 12) {
+            Button {
+                selection = .live
+            } label: {
+                Label("Camera", systemImage: "video")
+            }
+            .buttonStyle(.bordered)
+
             VStack(alignment: .leading, spacing: 2) {
-                Text(deviceName)
+                Label(title, systemImage: systemImage)
                     .font(.headline)
-                Text(controller.snapshot.deviceInfo?.model ?? "Ready")
+                Text(deviceName + " · " + (controller.snapshot.deviceInfo?.model ?? "Ready"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -165,8 +167,9 @@ private struct CameraWorkspaceView: View {
     }
 }
 
-private enum WorkspaceTab {
+enum WorkspaceTab: Hashable {
     case live
     case controls
     case gallery
 }
+
