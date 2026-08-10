@@ -22,6 +22,10 @@
 	<string>CamControl uses the built-in camera for phone-camera mode and tethered access to control connected Nikon and Canon cameras.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>CamControl saves selected captured images to your photo library.</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

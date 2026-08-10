@@ -46,6 +46,8 @@ targets:
         CFBundleVersion: "1"
         NSCameraUsageDescription: "CamControl uses the built-in camera for phone-camera mode and tethered access to control connected Nikon and Canon cameras."
         NSPhotoLibraryAddUsageDescription: "CamControl saves selected captured images to your photo library."
+        UIStatusBarHidden: true
+        UIViewControllerBasedStatusBarAppearance: false
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft

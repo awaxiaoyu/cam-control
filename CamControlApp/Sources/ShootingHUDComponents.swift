@@ -60,28 +60,27 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let compact = proxy.size.width < 760
-            let primaryRailWidth = compact ? CGFloat(86) : min(CGFloat(138), max(CGFloat(118), proxy.size.width * 0.066))
-            let navRailWidth = compact ? CGFloat(92) : min(CGFloat(156), max(CGFloat(128), proxy.size.width * 0.074))
+            let compact = proxy.size.width < 1_200 || proxy.size.height < 700
+            let primaryRailWidth = compact ? CGFloat(88) : min(CGFloat(138), max(CGFloat(118), proxy.size.width * 0.066))
+            let navRailWidth = compact ? CGFloat(104) : min(CGFloat(156), max(CGFloat(128), proxy.size.width * 0.074))
             let availableViewportWidth = max(CGFloat(1), proxy.size.width - primaryRailWidth - navRailWidth)
-            let viewportWidth = min(availableViewportWidth, proxy.size.height * 16.0 / 9.0)
-            let viewportHeight = min(proxy.size.height, viewportWidth * 9.0 / 16.0)
             HStack(spacing: 0) {
                 ZStack {
                     Color.black
                     recordingViewport(compact: compact)
-                        .frame(width: viewportWidth, height: viewportHeight)
+                        .frame(width: availableViewportWidth, height: proxy.size.height)
                     edgeHandles
-                        .frame(width: viewportWidth, height: viewportHeight)
+                        .frame(width: availableViewportWidth, height: proxy.size.height)
                 }
                 .frame(width: availableViewportWidth, height: proxy.size.height)
 
                 controlRail(compact: compact)
-                    .frame(width: primaryRailWidth)
+                    .frame(width: primaryRailWidth, height: proxy.size.height)
 
                 navRail(compact: compact)
-                    .frame(width: navRailWidth)
+                    .frame(width: navRailWidth, height: proxy.size.height)
             }
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
             .background(Color.black)
         }
         .background(Color.black)
