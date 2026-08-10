@@ -170,9 +170,7 @@ private struct MediaSidebarRow: View {
 
     var body: some View {
         HStack(spacing: compact ? 8 : 11) {
-            Image(systemName: icon)
-                .font(.system(size: compact ? 14 : 17, weight: .bold))
-                .foregroundStyle(active ? .white : BlackmagicCamStyle.cyan)
+            BMDAssetIcon(name: assetName, active: active, fallback: icon, color: active ? .white : BlackmagicCamStyle.cyan, size: compact ? 15 : 18)
                 .frame(width: compact ? 30 : 36, height: compact ? 30 : 36)
                 .background((active ? BlackmagicCamStyle.activeBlue : BlackmagicCamStyle.cyan.opacity(0.14)), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             VStack(alignment: .leading, spacing: 3) {
@@ -191,6 +189,17 @@ private struct MediaSidebarRow: View {
         .padding(.vertical, compact ? 9 : 12)
         .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.22) : .white.opacity(0.045), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.45) : .white.opacity(0.08), lineWidth: 1))
+    }
+
+    private var assetName: String {
+        switch title {
+        case "All Clips": return "Media"
+        case "Project": return "ProjectUpload"
+        case "External Drive": return "StorageDrive"
+        case "Upload Queue": return "UploadToCloud"
+        case "Clip Details": return "Slate"
+        default: return "Media"
+        }
     }
 }
 

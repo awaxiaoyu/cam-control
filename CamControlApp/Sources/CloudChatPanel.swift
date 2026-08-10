@@ -206,9 +206,7 @@ private struct CloudSidebarRoom: View {
 
     var body: some View {
         HStack(spacing: compact ? 8 : 11) {
-            Image(systemName: room.icon)
-                .font(.system(size: compact ? 14 : 17, weight: .bold))
-                .foregroundStyle(active ? .white : room.color)
+            BMDAssetIcon(name: assetName, active: active, fallback: room.icon, color: active ? .white : room.color, size: compact ? 15 : 18)
                 .frame(width: compact ? 30 : 36, height: compact ? 30 : 36)
                 .background((active ? room.color : room.color.opacity(0.14)), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             VStack(alignment: .leading, spacing: 3) {
@@ -227,6 +225,16 @@ private struct CloudSidebarRoom: View {
         .padding(.vertical, compact ? 9 : 12)
         .background(active ? room.color.opacity(0.22) : .white.opacity(0.045), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(active ? room.color.opacity(0.55) : .white.opacity(0.08), lineWidth: 1))
+    }
+
+    private var assetName: String {
+        switch room.title {
+        case "Project": return "ProjectUpload"
+        case "Blackmagic Cloud": return "BmdCloudSidebar"
+        case "Upload Status": return "UploadToCloud"
+        case "Remote Cam Control": return "CameraLinked"
+        default: return "Cloud"
+        }
     }
 }
 

@@ -33,6 +33,23 @@ The IPA includes LUT resources across these families:
 - `Rec.709`, `Rec.2020`, `P3 D65`, `Apple Log`, `Apple Log 2`
 - `Rec 709 Neutral`, `Cinema Teal`, `Day Night`, `Dusty`, `Monochrome`, `Nature`, `Nostalgic`, `Paloma`, `Rift`, `Vivid`, `Warm Fade`
 
+
+## Recovered asset catalog names
+
+`CameraAppToolbox.framework/Assets.car` is now copied into `CamControlApp/Resources/Assets.car` so SwiftUI can attempt `UIImage(named:)` against recovered Blackmagic asset names before falling back to SF Symbols.
+
+Generated asset-name report: `docs/blackmagic-cam-3.2.00-assets-car-ui-names.txt`.
+
+Key runtime-mapped asset names include:
+
+- Camera/session: `Camera`, `Camera_active`, `CameraConnected`, `CameraLinked`, `CameraLinkedSlate`, `ControlIcon`, `ControlIconNotConnected`
+- Record/HUD: `Record`, `Record_active`, `Record_disabled`, `RecordOffSpeed`, `RecordTimelapse`, `HudStream`, `AutoHud`, `LockHud`
+- Exposure/focus/WB/LUT: `IconAe`, `IconAe_active`, `IconAf`, `IconAf_active`, `IconAwb`, `IconAwb_active`, `Focus`, `FocusAssist`, `FalseColor`, `FalseColorLegend`, `Lut`, `LutDisplay`, `LutRecord`, `LutSelector_active`
+- Monitor/media/cloud: `Guides`, `Grids`, `Zebra`, `BatteryIndicator`, `StorageIphone`, `StorageDrive`, `Media`, `Media_active`, `UploadToCloud`, `Uploading`, `UploadingDone`, `Cloud`, `BmdCloudLogo`, `BmdCloudSidebar`, `Slate`, `Slate_active`
+- HDMI: `HdmiRecord`, `HdmiRecord_active`, `HdmiPlay`, `HdmiPlay_active`, `HdmiHistogramRgb`, `HdmiStorageIphone`, `HdmiStorageDrive`, `HdmiFalseColorLegend`
+
+Implementation file: `CamControlApp/Sources/BMDAssetIcon.swift`.
+
 ## Recovered SwiftUI component anchors
 
 Recovered strings include the camera HUD surface and popover components used as implementation anchors:

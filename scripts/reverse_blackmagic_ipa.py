@@ -14,7 +14,8 @@ TERMS = [
     'stabil','lens','exposure','iris','wb','angle','off speed','quality','proxy','clip','remote',
     'monitor','meter','battery','media','blackmagic','davinci','safe area','color space',
     'dynamic range','focus assist','peak','zoom','aperture','nd','look','preset','duration',
-    'trigger','scene','take','reel','roll','metadata','gyro','tilt','overlay','clean feed'
+    'trigger','scene','take','reel','roll','metadata','gyro','tilt','overlay','clean feed',
+    'icon','ae','af','awb','hdmi','bmdcloud','grids','control','play','lock'
 ]
 
 def keep(s):
@@ -22,6 +23,18 @@ def keep(s):
         return False
     low = s.lower()
     return any(t in low for t in TERMS)
+
+def asset_ui_keep(name):
+    low = name.lower()
+    if any(x in low for x in ('renditions', 'metadata', 'coreui', 'coretheme')):
+        return False
+    terms = (
+        'appicon', 'apple watch', 'autoae', 'autoaf', 'autolock', 'battery', 'bmdcloud',
+        'camera', 'cloud', 'control', 'exposure', 'false', 'focus', 'grids', 'guides',
+        'hdmi', 'hud', 'icon', 'lock', 'lut', 'media', 'project', 'receiving', 'record',
+        'remote', 'slate', 'sort', 'storage', 'sync', 'timelapse', 'upload', 'wb', 'zebra'
+    )
+    return any(term in low for term in terms)
 
 def ascii_strings(data):
     return [m.group().decode('utf-8', 'ignore') for m in re.finditer(rb'[\x20-\x7e]{4,}', data)]
@@ -98,6 +111,33 @@ def parse_macho(path):
                                   'analysis': parse_macho_slice(full[offset:offset + min(size, 262144)])})
         return res
     return {'fat': False, **parse_macho_slice(full_head)}
+
+def extract_assets_car_names(app, resources):
+    result = {}
+    pattern = re.compile(rb'[A-Za-z0-9_@./+\- ]{3,120}')
+    for rel, _size, ext in resources:
+        if os.path.basename(rel) != 'Assets.car':
+            continue
+        p = os.path.join(app, rel)
+        try:
+            data = open(p, 'rb').read()
+        except Exception:
+            continue
+        names = []
+        used = set()
+        for match in pattern.finditer(data):
+            name = match.group().decode('utf-8', 'ignore').strip('\x00 ')
+            if not name or len(name) < 3:
+                continue
+            if any(x in name for x in ('@(#)PROGRAM', 'CoreUI', 'CoreTheme', 'Rendition', '/System/Library')):
+                continue
+            if not re.search(r'[A-Za-z]', name):
+                continue
+            if name not in used:
+                used.add(name)
+                names.append(name)
+        result[rel] = names
+    return result
 
 def main():
     ap = argparse.ArgumentParser()
@@ -184,12 +224,23 @@ def main():
         f.write('relpath\tsize\text\n')
         for rel, size, ext in sorted(resources):
             f.write(f'{rel}\t{size}\t{ext}\n')
+    asset_names = extract_assets_car_names(app, resources)
+    with open(os.path.join(args.out, 'assets_car_strings.json'), 'w', encoding='utf-8') as f:
+        json.dump(asset_names, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(args.out, 'assets_car_ui_names.txt'), 'w', encoding='utf-8') as f:
+        for rel, names in asset_names.items():
+            for name in names:
+                if rel == 'Assets.car' and not name.lower().startswith('appicon'):
+                    continue
+                if asset_ui_keep(name):
+                    f.write(f'{rel}\t{name}\n')
     print(json.dumps({
         'out': args.out,
         'app': app,
         'exe': exe_path,
         'ui_strings': len(ui_strings),
         'file_terms': len(file_terms),
+        'assets_car_files': len(asset_names),
         'macho': summary['macho'],
         'largest': summary['largest_files'][:12],
     }, ensure_ascii=False, indent=2))

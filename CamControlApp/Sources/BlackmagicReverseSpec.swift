@@ -41,4 +41,49 @@ enum BlackmagicReverseSpec {
     static let lutNames = ["Rec 709 Neutral", "Cinema Teal", "Day Night", "Dusty", "Monochrome", "Nature", "Nostalgic", "Paloma", "Rift", "Vivid", "Warm Fade"]
     static let audioLabels = ["AUDIO GAIN", "Audio Source", "Audio Metering", "Audio Format", "Sample Rate"]
     static let slateFields = ["SLATE FOR", "PROJECT", "SCENE", "TAKE", "REEL", "CAMERA OPERATOR", "LENS DATA", "GOOD TAKE"]
+
+    static let hudAssetNames = [
+        "Camera", "Camera_active", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
+        "IconAe", "IconAe_active", "IconAf", "IconAf_active", "IconAwb", "IconAwb_active",
+        "IconLock", "IconLock_active", "IconLut", "IconLut_active", "IconStream", "IconStream_active",
+        "BatteryIndicator", "BatteryIndicatorWarning", "StorageIphone", "StorageDrive",
+        "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
+        "Lut", "LutDisplay", "LutRecord", "LutSelector", "LutSelector_active",
+        "Media", "Media_active", "UploadToCloud", "UploadToCloud_active", "Uploading", "UploadingDone",
+        "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate",
+        "HdmiRecord", "HdmiRecord_active", "HdmiPlay", "HdmiPlay_active", "HdmiHistogramRgb",
+        "HdmiStorageIphone", "HdmiStorageDrive", "HdmiFalseColorLegend", "HudStream"
+    ]
+
+    static let assetFallbackSystemImages: [String: String] = [
+        "Camera": "camera.fill",
+        "Camera_active": "camera.fill",
+        "Record": "record.circle",
+        "Record_active": "record.circle.fill",
+        "IconAe": "a.circle",
+        "IconAf": "scope",
+        "IconAwb": "sun.max.fill",
+        "IconLock": "lock.fill",
+        "IconLut": "camera.filters",
+        "IconStream": "dot.radiowaves.left.and.right",
+        "BatteryIndicator": "battery.75percent",
+        "StorageIphone": "iphone",
+        "StorageDrive": "externaldrive.fill",
+        "FalseColor": "circle.lefthalf.filled",
+        "FalseColorLegend": "circle.lefthalf.filled",
+        "Focus": "scope",
+        "FocusAssist": "scope",
+        "Grids": "square.grid.3x3",
+        "Guides": "rectangle.dashed",
+        "Zebra": "line.diagonal",
+        "Lut": "camera.filters",
+        "Media": "photo.on.rectangle",
+        "UploadToCloud": "arrow.up.circle.fill",
+        "Cloud": "cloud.fill",
+        "Slate": "rectangle.and.pencil.and.ellipsis",
+        "HdmiRecord": "record.circle",
+        "HdmiPlay": "play.fill",
+        "HdmiHistogramRgb": "waveform.path.ecg",
+        "HudStream": "film.stack"
+    ]
 }

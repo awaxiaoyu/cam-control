@@ -202,9 +202,7 @@ private struct PermissionChip: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(color)
+            BMDAssetIcon(name: assetName, fallback: icon, color: color, size: 17)
                 .frame(width: 28, height: 28)
                 .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
@@ -222,6 +220,17 @@ private struct PermissionChip: View {
         .background(Color.black.opacity(0.25), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.10), lineWidth: 1))
     }
+
+    private var assetName: String {
+        switch title {
+        case "Camera": return "Camera"
+        case "Microphone": return "IconStream"
+        case "Photo Library": return "Media"
+        case "Location": return "Slate"
+        case "Local Network": return "CameraLinked"
+        default: return "Camera"
+        }
+    }
 }
 
 private struct SourceCard: View {
@@ -233,9 +242,7 @@ private struct SourceCard: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(isSelected ? BlackmagicCamStyle.activeBlue.opacity(0.18) : Color.white.opacity(0.08))
-                Image(systemName: source.systemImage)
-                    .font(.system(size: 30, weight: .semibold))
-                    .foregroundStyle(isSelected ? BlackmagicCamStyle.cyan : .white.opacity(0.82))
+                BMDAssetIcon(name: source.title.localizedCaseInsensitiveContains("phone") ? "StorageIphone" : "Camera", active: isSelected, fallback: source.systemImage, color: isSelected ? BlackmagicCamStyle.cyan : .white.opacity(0.82), size: 32)
             }
             .frame(width: 66, height: 66)
 
@@ -271,9 +278,7 @@ private struct DeviceCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .top) {
-                Image(systemName: icon)
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundStyle(color)
+                BMDAssetIcon(name: "CameraConnected", fallback: icon, color: color, size: 36)
                 Spacer()
                 Text(device.vendor.rawValue.uppercased())
                     .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
@@ -321,9 +326,7 @@ private struct PhoneReadyCard: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .fill(BlackmagicCamStyle.activeBlue.opacity(0.16))
-                Image(systemName: "iphone.gen3.radiowaves.left.and.right")
-                    .font(.system(size: 44, weight: .semibold))
-                    .foregroundStyle(BlackmagicCamStyle.cyan)
+                BMDAssetIcon(name: "StorageIphone", fallback: "iphone.gen3.radiowaves.left.and.right", color: BlackmagicCamStyle.cyan, size: 46)
             }
             .frame(width: 92, height: 108)
 

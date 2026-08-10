@@ -264,12 +264,12 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private func monitorTools(compact: Bool) -> some View {
         HStack(spacing: compact ? 6 : 8) {
-            monitorTool("FALSE COLOR", icon: "circle.lefthalf.filled", color: BlackmagicCamStyle.amber, scroller: .falseColor, compact: compact)
-            monitorTool("FOCUS ASSIST", icon: "scope", color: BlackmagicCamStyle.cyan, scroller: .focusAssist, compact: compact)
-            monitorTool("GUIDES", icon: "square.grid.3x3", color: .white.opacity(0.82), scroller: .guides, compact: compact)
-            monitorTool("ZEBRA", icon: "line.diagonal", color: .white.opacity(0.86), scroller: .zebra, compact: compact)
-            monitorTool("DISPLAY LUT", icon: "camera.filters", color: BlackmagicCamStyle.activeBlue, scroller: .lut, compact: compact)
-            monitorTool("CLEAN FEED", icon: "rectangle.dashed", color: .white.opacity(0.72), scroller: .monitor, compact: compact)
+            monitorTool("FALSE COLOR", asset: "FalseColor", color: BlackmagicCamStyle.amber, scroller: .falseColor, compact: compact)
+            monitorTool("FOCUS ASSIST", asset: "FocusAssist", color: BlackmagicCamStyle.cyan, scroller: .focusAssist, compact: compact)
+            monitorTool("GUIDES", asset: "Guides", color: .white.opacity(0.82), scroller: .guides, compact: compact)
+            monitorTool("ZEBRA", asset: "Zebra", color: .white.opacity(0.86), scroller: .zebra, compact: compact)
+            monitorTool("DISPLAY LUT", asset: "IconLut", color: BlackmagicCamStyle.activeBlue, scroller: .lut, compact: compact)
+            monitorTool("CLEAN FEED", asset: "HdmiPlay", color: .white.opacity(0.72), scroller: .monitor, compact: compact)
             Spacer(minLength: 6)
             ForEach(0..<3, id: \.self) { index in
                 if bottomCards.indices.contains(index) {
@@ -279,12 +279,12 @@ struct ShootingHUDLayout<Preview: View>: View {
         }
     }
 
-    private func monitorTool(_ title: String, icon: String, color: Color, scroller: BlackmagicHUDScroller, compact: Bool) -> some View {
+    private func monitorTool(_ title: String, asset: String, color: Color, scroller: BlackmagicHUDScroller, compact: Bool) -> some View {
         Button {
             withAnimation(.snappy(duration: 0.18)) { activeScroller = scroller }
         } label: {
             HStack(spacing: compact ? 5 : 7) {
-                Image(systemName: icon)
+                BMDAssetIcon(name: asset, active: activeScroller == scroller, color: color, size: compact ? 13 : 15)
                 Text(title)
             }
             .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 10, weight: .heavy))
@@ -325,14 +325,14 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private var bottomControlItems: [BottomControlItem] {
         [
-            BottomControlItem(title: "LENS", value: value(for: "Lens"), scroller: .lens),
-            BottomControlItem(title: "FPS", value: value(for: "FPS"), scroller: .fps),
-            BottomControlItem(title: "SHUTTER", value: value(for: "Shutter"), scroller: .shutter),
-            BottomControlItem(title: "IRIS", value: value(forAny: ["Iris", "Aperture"]), scroller: .iris),
-            BottomControlItem(title: "ISO", value: value(for: "ISO"), scroller: .iso),
-            BottomControlItem(title: "WB", value: value(forAny: ["WB", "White Balance"]), scroller: .whiteBalance),
-            BottomControlItem(title: "TINT", value: value(for: "Tint"), scroller: .tint),
-            BottomControlItem(title: "LUT", value: "Rec.709", scroller: .lut)
+            BottomControlItem(title: "LENS", value: value(for: "Lens"), asset: "Camera", scroller: .lens),
+            BottomControlItem(title: "FPS", value: value(for: "FPS"), asset: "IconStream", scroller: .fps),
+            BottomControlItem(title: "SHUTTER", value: value(for: "Shutter"), asset: "IconAe", scroller: .shutter),
+            BottomControlItem(title: "IRIS", value: value(forAny: ["Iris", "Aperture"]), asset: "IconAe", scroller: .iris),
+            BottomControlItem(title: "ISO", value: value(for: "ISO"), asset: "IconAe", scroller: .iso),
+            BottomControlItem(title: "WB", value: value(forAny: ["WB", "White Balance"]), asset: "IconAwb", scroller: .whiteBalance),
+            BottomControlItem(title: "TINT", value: value(for: "Tint"), asset: "IconAwb", scroller: .tint),
+            BottomControlItem(title: "LUT", value: "Rec.709", asset: "IconLut", scroller: .lut)
         ]
     }
 
@@ -474,6 +474,7 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
 private struct BottomControlItem: Identifiable, Equatable {
     let title: String
     let value: String
+    let asset: String
     let scroller: BlackmagicHUDScroller
     var id: String { title }
 }
@@ -541,12 +542,23 @@ private struct FloatingNavPill: View {
     var body: some View {
         HStack(spacing: compact ? 5 : 7) {
             Text(title).font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).tracking(0.9)
-            Image(systemName: systemImage).font(.system(size: compact ? 12 : 15, weight: .bold))
+            BMDAssetIcon(name: assetName, active: selected, fallback: systemImage, color: selected ? .white : .white.opacity(0.70), size: compact ? 13 : 16)
         }
         .foregroundStyle(selected ? .white : .white.opacity(0.70))
         .padding(.leading, compact ? 9 : 12).padding(.trailing, compact ? 8 : 10).padding(.vertical, compact ? 7 : 9)
         .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.52) : .black.opacity(0.45), in: Capsule())
         .overlay(Capsule().stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.58) : .white.opacity(0.12), lineWidth: 1))
+    }
+
+    private var assetName: String {
+        switch title {
+        case "CAMERA": return "Camera"
+        case "MEDIA": return "Media"
+        case "CHAT": return "Cloud"
+        case "SETTINGS": return "ControlIcon"
+        case "SLATE": return "Slate"
+        default: return "Camera"
+        }
     }
 }
 
@@ -556,6 +568,7 @@ private struct CameraControlCell: View {
     let active: Bool
     var body: some View {
         VStack(spacing: compact ? 2 : 4) {
+            BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.56), size: compact ? 12 : 15)
             Text(item.title).font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).tracking(0.8).foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.56))
             Text(item.value)
                 .font(item.title == "FPS" || item.title == "ISO" || item.title == "TINT" ? BlackmagicCamStyle.readoutFont(size: compact ? 15 : 21, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 15 : 21, weight: .heavy))
@@ -573,7 +586,7 @@ private struct LiveToggleButton: View {
     let compact: Bool
     var body: some View {
         VStack(spacing: compact ? 2 : 4) {
-            Image(systemName: active ? "pause.fill" : "play.fill").font(.system(size: compact ? 13 : 17, weight: .heavy))
+            BMDAssetIcon(name: "HdmiPlay", activeName: "HdmiPlay_active", active: active, fallback: active ? "pause.fill" : "play.fill", color: .white, size: compact ? 14 : 18)
             Text(active ? "LIVE" : "VIEW").font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).tracking(0.8)
         }
         .foregroundStyle(enabled ? .white : .white.opacity(0.34))
@@ -588,7 +601,7 @@ private struct FocusAutoButton: View {
     let compact: Bool
     var body: some View {
         VStack(spacing: compact ? 2 : 4) {
-            Image(systemName: "scope").font(.system(size: compact ? 13 : 17, weight: .heavy))
+            BMDAssetIcon(name: "IconAf", activeName: "IconAf_active", active: enabled, fallback: "scope", color: enabled ? BlackmagicCamStyle.cyan : .white.opacity(0.34), size: compact ? 14 : 18)
             Text("AF").font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).tracking(0.8)
         }
         .foregroundStyle(enabled ? BlackmagicCamStyle.cyan : .white.opacity(0.34))
@@ -606,7 +619,11 @@ private struct RecordButtonView: View {
         ZStack {
             Circle().stroke(.white.opacity(0.82), lineWidth: compact ? 3 : 4).frame(width: compact ? 54 : 78, height: compact ? 54 : 78)
             Circle().fill(active ? BlackmagicCamStyle.recordRed : BlackmagicCamStyle.recordRed.opacity(enabled ? 0.90 : 0.35)).frame(width: compact ? 40 : 58, height: compact ? 40 : 58).shadow(color: active ? BlackmagicCamStyle.recordRed.opacity(0.70) : .clear, radius: 13)
-            if active { RoundedRectangle(cornerRadius: 5).fill(.white.opacity(0.95)).frame(width: compact ? 16 : 22, height: compact ? 16 : 22) }
+            if active {
+                RoundedRectangle(cornerRadius: 5).fill(.white.opacity(0.95)).frame(width: compact ? 16 : 22, height: compact ? 16 : 22)
+            } else {
+                BMDAssetIcon(name: "Record", activeName: "Record_active", active: active, fallback: "record.circle", color: .white.opacity(0.86), size: compact ? 18 : 24)
+            }
         }
         .accessibilityLabel(active ? "Stop Recording" : "Start Recording")
     }
