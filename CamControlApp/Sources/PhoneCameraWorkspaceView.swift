@@ -39,7 +39,7 @@ struct PhoneCameraWorkspaceView: View {
             }
         ) {
             ZStack {
-                PhoneCameraPreview(session: camera.session)
+                PhoneCameraPreview(session: camera.session, activePosition: camera.activePosition)
                     .ignoresSafeArea()
 
                 if let image = camera.lastPhoto {
@@ -79,13 +79,7 @@ struct PhoneCameraWorkspaceView: View {
             }
         }
         .background(Color.black)
-        .navigationTitle("Phone Camera")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            Button("Connected Camera") {
-                selectedSourceRaw = CameraSourceKind.tethered.rawValue
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             camera.start()
         }
@@ -97,22 +91,22 @@ struct PhoneCameraWorkspaceView: View {
 
     private var topItems: [ShootingHUDTopItem] {
         [
-            ShootingHUDTopItem(title: "Lens", value: camera.activePosition == .front ? "Front" : "24mm"),
-            ShootingHUDTopItem(title: "FPS", value: "24"),
-            ShootingHUDTopItem(title: "Shutter", value: "Auto", isAuto: true),
-            ShootingHUDTopItem(title: "Aperture", value: "--", isDimmed: true),
+            ShootingHUDTopItem(title: "镜头", value: camera.activePosition == .front ? "前置" : "24mm"),
+            ShootingHUDTopItem(title: "帧率", value: "24"),
+            ShootingHUDTopItem(title: "快门", value: "1/24", isAuto: true),
+            ShootingHUDTopItem(title: "光圈", value: "f1.8", isDimmed: true),
             ShootingHUDTopItem(title: "ISO", value: "Auto", isAuto: true),
-            ShootingHUDTopItem(title: "WB", value: "Auto", isAuto: true),
-            ShootingHUDTopItem(title: "Tint", value: "0"),
-            ShootingHUDTopItem(title: "Format", value: "Photo")
+            ShootingHUDTopItem(title: "白平衡", value: "4700K", isAuto: true),
+            ShootingHUDTopItem(title: "色调", value: "0"),
+            ShootingHUDTopItem(title: "格式", value: "4K 16:9")
         ]
     }
 
     private var bottomCards: [ShootingHUDBottomCard] {
         [
             ShootingHUDBottomCard(title: "Rec.709", kind: .histogram(ShootingHUDFixtures.histogramBars)),
-            ShootingHUDBottomCard(title: "Storage", kind: .storage(primary: camera.isReady ? "Ready" : "Starting", progress: camera.isReady ? 0.35 : 0.02, trailing: camera.lastPhoto == nil ? "--" : "1 shot")),
-            ShootingHUDBottomCard(title: "iPhone mic", kind: .audio([0.24, 0.21]))
+            ShootingHUDBottomCard(title: "Storage", kind: .storage(primary: "09:00", progress: camera.isReady ? 0.35 : 0.02, trailing: camera.lastPhoto == nil ? "3GB" : "1 shot")),
+            ShootingHUDBottomCard(title: "iPhone麦克风", kind: .audio([0.24, 0.21]))
         ]
     }
 }
@@ -316,11 +310,13 @@ extension PhoneCameraViewModel: AVCapturePhotoCaptureDelegate {
 
 private struct PhoneCameraPreview: UIViewRepresentable {
     let session: AVCaptureSession
+    let activePosition: AVCaptureDevice.Position
 
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
         view.videoPreviewLayer.session = session
         view.videoPreviewLayer.videoGravity = .resizeAspectFill
+        view.configure(position: activePosition)
         return view
     }
 
@@ -328,6 +324,7 @@ private struct PhoneCameraPreview: UIViewRepresentable {
         if uiView.videoPreviewLayer.session !== session {
             uiView.videoPreviewLayer.session = session
         }
+        uiView.configure(position: activePosition)
     }
 }
 
@@ -338,6 +335,44 @@ private final class PreviewView: UIView {
 
     var videoPreviewLayer: AVCaptureVideoPreviewLayer {
         layer as! AVCaptureVideoPreviewLayer
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        configure(position: nil)
+    }
+
+    func configure(position: AVCaptureDevice.Position?) {
+        videoPreviewLayer.videoGravity = .resizeAspectFill
+        guard let connection = videoPreviewLayer.connection else { return }
+
+        if connection.isVideoOrientationSupported {
+            connection.videoOrientation = currentVideoOrientation
+        }
+
+        if let position, connection.isVideoMirroringSupported {
+            connection.automaticallyAdjustsVideoMirroring = false
+            connection.isVideoMirrored = position == .front
+        }
+        // Firmware/update note: if future iOS camera orientation APIs replace AVCaptureConnection rotation/mirroring, update this adapter only; keep HUD layout coordinates unchanged.
+    }
+
+    private var currentVideoOrientation: AVCaptureVideoOrientation {
+        guard let orientation = window?.windowScene?.interfaceOrientation else {
+            return .landscapeRight
+        }
+        switch orientation {
+        case .portrait:
+            return .portrait
+        case .portraitUpsideDown:
+            return .portraitUpsideDown
+        case .landscapeLeft:
+            return .landscapeLeft
+        case .landscapeRight:
+            return .landscapeRight
+        default:
+            return .landscapeRight
+        }
     }
 }
 

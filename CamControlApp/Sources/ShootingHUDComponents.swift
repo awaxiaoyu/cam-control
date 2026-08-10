@@ -61,24 +61,33 @@ struct ShootingHUDLayout<Preview: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let compact = proxy.size.width < 760
+            let primaryRailWidth = compact ? CGFloat(86) : min(CGFloat(138), max(CGFloat(118), proxy.size.width * 0.066))
+            let navRailWidth = compact ? CGFloat(92) : min(CGFloat(156), max(CGFloat(128), proxy.size.width * 0.074))
+            let availableViewportWidth = max(CGFloat(1), proxy.size.width - primaryRailWidth - navRailWidth)
+            let viewportWidth = min(availableViewportWidth, proxy.size.height * 16.0 / 9.0)
+            let viewportHeight = min(proxy.size.height, viewportWidth * 9.0 / 16.0)
             HStack(spacing: 0) {
                 ZStack {
                     Color.black
                     recordingViewport(compact: compact)
-                        .padding(.leading, compact ? 0 : 10)
+                        .frame(width: viewportWidth, height: viewportHeight)
                     edgeHandles
+                        .frame(width: viewportWidth, height: viewportHeight)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(width: availableViewportWidth, height: proxy.size.height)
 
                 controlRail(compact: compact)
-                    .frame(width: compact ? 88 : 118)
+                    .frame(width: primaryRailWidth)
 
                 navRail(compact: compact)
-                    .frame(width: compact ? 92 : 124)
+                    .frame(width: navRailWidth)
             }
             .background(Color.black)
         }
         .background(Color.black)
+        .ignoresSafeArea()
+        .statusBarHidden(true)
+        .persistentSystemOverlays(.hidden)
     }
 
     private func recordingViewport(compact: Bool) -> some View {
@@ -91,26 +100,11 @@ struct ShootingHUDLayout<Preview: View>: View {
             VStack(spacing: 0) {
                 topStatusBar(compact: compact)
                     .padding(.horizontal, compact ? 10 : 22)
-                    .padding(.top, compact ? 8 : 18)
+                    .padding(.top, compact ? 8 : 24)
                 Spacer(minLength: 0)
                 bottomMonitorDeck(compact: compact)
                     .padding(.horizontal, compact ? 10 : 22)
-                    .padding(.bottom, compact ? 10 : 18)
-            }
-
-            VStack {
-                HStack {
-                    Text(title)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.62))
-                    Text(subtitle)
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.42))
-                    Spacer()
-                }
-                .padding(.horizontal, compact ? 12 : 24)
-                .padding(.top, compact ? 54 : 72)
-                Spacer()
+                    .padding(.bottom, compact ? 10 : 22)
             }
         }
         .background(Color.gray.opacity(0.65))
@@ -142,36 +136,64 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func topReadout(_ item: ShootingHUDTopItem, compact: Bool) -> some View {
-        VStack(alignment: .leading, spacing: compact ? 2 : 4) {
-            HStack(spacing: 4) {
-                Text(item.title)
-                    .font(.system(size: compact ? 11 : 15, weight: .semibold))
-                    .foregroundStyle(item.isDimmed ? .black.opacity(0.45) : .white.opacity(0.94))
-                if item.isAuto {
-                    Text("A")
-                        .font(.system(size: compact ? 9 : 12, weight: .bold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, compact ? 4 : 5)
-                        .padding(.vertical, 1)
-                        .background(Color.blue, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+        Group {
+            if item.isFormatBadge {
+                VStack(spacing: compact ? 1 : 2) {
+                    Text(item.primaryFormatLine)
+                        .font(.system(size: compact ? 17 : 24, weight: .heavy))
+                    Text(item.secondaryFormatLine)
+                        .font(.system(size: compact ? 8 : 12, weight: .heavy))
                 }
+                .foregroundStyle(.white)
+                .padding(.horizontal, compact ? 11 : 17)
+                .padding(.vertical, compact ? 5 : 8)
+                .background(.black.opacity(0.84), in: RoundedRectangle(cornerRadius: compact ? 5 : 7, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: compact ? 5 : 7, style: .continuous)
+                        .stroke(.white.opacity(0.92), lineWidth: compact ? 1 : 1.5)
+                )
+            } else {
+                VStack(alignment: .leading, spacing: compact ? 2 : 4) {
+                    HStack(spacing: 4) {
+                        Text(item.title)
+                            .font(.system(size: compact ? 11 : 15, weight: .semibold))
+                            .foregroundStyle(item.isDimmed ? .black.opacity(0.45) : .white.opacity(0.94))
+                        if item.isAuto {
+                            Text("A")
+                                .font(.system(size: compact ? 9 : 12, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, compact ? 4 : 5)
+                                .padding(.vertical, 1)
+                                .background(Color.blue, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        }
+                    }
+                    Text(item.value)
+                        .font(.system(size: compact ? 18 : 30, weight: .medium, design: item.isMonospaced ? .monospaced : .default))
+                        .foregroundStyle(item.isDimmed ? .black.opacity(0.45) : .white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.55)
+                }
+                .frame(minWidth: compact ? 44 : 82, alignment: .leading)
             }
-            Text(item.value)
-                .font(.system(size: compact ? 18 : 30, weight: .medium, design: item.isMonospaced ? .monospaced : .default))
-                .foregroundStyle(item.isDimmed ? .black.opacity(0.45) : .white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.55)
         }
-        .frame(minWidth: compact ? 44 : 82, alignment: .leading)
         // Firmware/update note: add new camera firmware-specific readouts by mapping new CameraPropertyKey values into ShootingHUDTopItem here, not by hardcoding vendor strings in the view body.
     }
 
     private func bottomMonitorDeck(compact: Bool) -> some View {
-        HStack(alignment: .bottom, spacing: compact ? 10 : 24) {
-            ForEach(bottomCards) { card in
-                bottomCard(card, compact: compact)
+        HStack(alignment: .bottom, spacing: compact ? 10 : 16) {
+            if bottomCards.indices.contains(0) {
+                bottomCard(bottomCards[0], compact: compact)
+            }
+            Spacer(minLength: compact ? 10 : 48)
+            if bottomCards.indices.contains(1) {
+                bottomCard(bottomCards[1], compact: compact)
+            }
+            Spacer(minLength: compact ? 10 : 48)
+            if bottomCards.indices.contains(2) {
+                bottomCard(bottomCards[2], compact: compact)
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder
@@ -186,11 +208,11 @@ struct ShootingHUDLayout<Preview: View>: View {
                     .frame(height: compact ? 42 : 68)
             }
             .padding(compact ? 8 : 11)
-            .frame(width: compact ? 150 : 214, height: compact ? 78 : 116)
+            .frame(width: compact ? 150 : 300, height: compact ? 78 : 120)
             .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         case .storage(let primary, let progress, let trailing):
             HStack(spacing: compact ? 8 : 14) {
-                Image(systemName: "internaldrive")
+                Image(systemName: "iphone")
                     .font(.system(size: compact ? 25 : 36, weight: .medium))
                     .foregroundStyle(.white.opacity(0.9))
                     .frame(width: compact ? 38 : 56)
@@ -210,7 +232,7 @@ struct ShootingHUDLayout<Preview: View>: View {
                 }
             }
             .padding(compact ? 8 : 12)
-            .frame(width: compact ? 176 : 248, height: compact ? 78 : 116)
+            .frame(width: compact ? 176 : 330, height: compact ? 78 : 120)
             .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         case .audio(let levels):
             VStack(alignment: .leading, spacing: 8) {
@@ -232,7 +254,7 @@ struct ShootingHUDLayout<Preview: View>: View {
                 .foregroundStyle(.white.opacity(0.84))
             }
             .padding(compact ? 8 : 11)
-            .frame(width: compact ? 184 : 246, height: compact ? 78 : 116)
+            .frame(width: compact ? 184 : 300, height: compact ? 78 : 120)
             .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
     }
@@ -358,6 +380,19 @@ struct ShootingHUDTopItem: Identifiable, Equatable {
     var isAuto = false
     var isDimmed = false
     var isMonospaced = false
+
+    var isFormatBadge: Bool {
+        title == "格式" || title == "Format"
+    }
+
+    var primaryFormatLine: String {
+        value.split(separator: " ").first.map(String.init) ?? value
+    }
+
+    var secondaryFormatLine: String {
+        let parts = value.split(separator: " ")
+        return parts.dropFirst().first.map(String.init) ?? "16:9"
+    }
 }
 
 struct ShootingHUDBottomCard: Identifiable {
@@ -382,10 +417,10 @@ enum ShootingHUDNavItem: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .camera: return "Camera"
-        case .media: return "Media"
-        case .chat: return "Chat"
-        case .settings: return "Settings"
+        case .camera: return "摄影机"
+        case .media: return "媒体"
+        case .chat: return "聊天"
+        case .settings: return "设置"
         }
     }
 

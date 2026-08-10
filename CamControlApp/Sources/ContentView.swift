@@ -8,27 +8,21 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if horizontalSizeClass == .compact {
+            if selectedSource == .phone {
+                PhoneCameraWorkspaceView()
+                    .ignoresSafeArea()
+            } else if case .connected = controller.status {
+                CameraWorkspaceView()
+                    .ignoresSafeArea()
+            } else if horizontalSizeClass == .compact {
                 NavigationStack {
-                    if selectedSource == .phone {
-                        PhoneCameraWorkspaceView()
-                    } else if case .connected = controller.status {
-                        CameraWorkspaceView()
-                    } else {
-                        DeviceListView(source: selectedSourceBinding)
-                    }
+                    DeviceListView(source: selectedSourceBinding)
                 }
             } else {
                 NavigationSplitView {
                     DeviceListView(source: selectedSourceBinding)
                 } detail: {
-                    if selectedSource == .phone {
-                        PhoneCameraWorkspaceView()
-                    } else if case .connected = controller.status {
-                        CameraWorkspaceView()
-                    } else {
-                        EmptyCameraView()
-                    }
+                    EmptyCameraView()
                 }
             }
         }
