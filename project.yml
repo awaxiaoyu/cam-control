@@ -26,8 +26,9 @@ targets:
     platform: iOS
     sources:
       - path: CamControlApp/Sources
-    resources:
       - path: CamControlApp/Resources
+        excludes:
+          - Info.plist
     dependencies:
       - target: CamControlCore
       - sdk: AVFoundation.framework
