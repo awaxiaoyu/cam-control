@@ -61,12 +61,12 @@ struct ShootingHUDLayout<Preview: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let compact = proxy.size.width < 1_200 || proxy.size.height < 700
-            let primaryRailWidth = compact ? CGFloat(88) : min(CGFloat(138), max(CGFloat(118), proxy.size.width * 0.066))
-            let navRailWidth = compact ? CGFloat(104) : min(CGFloat(156), max(CGFloat(128), proxy.size.width * 0.074))
+            let primaryRailWidth = compact ? CGFloat(92) : min(CGFloat(132), max(CGFloat(118), proxy.size.width * 0.064))
+            let navRailWidth = compact ? CGFloat(98) : min(CGFloat(148), max(CGFloat(124), proxy.size.width * 0.072))
             let availableViewportWidth = max(CGFloat(1), proxy.size.width - primaryRailWidth - navRailWidth)
             HStack(spacing: 0) {
                 ZStack {
-                    Color.black
+                    BlackmagicCamStyle.canvas
                     recordingViewport(compact: compact)
                         .frame(width: availableViewportWidth, height: proxy.size.height)
                     edgeHandles
@@ -81,9 +81,9 @@ struct ShootingHUDLayout<Preview: View>: View {
                     .frame(width: navRailWidth, height: proxy.size.height)
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
-            .background(Color.black)
+            .background(BlackmagicCamStyle.canvas)
         }
-        .background(Color.black)
+        .background(BlackmagicCamStyle.canvas)
         .ignoresSafeArea()
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
@@ -93,44 +93,71 @@ struct ShootingHUDLayout<Preview: View>: View {
         ZStack {
             preview
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(LinearGradient(colors: [Color.gray.opacity(0.72), Color.gray.opacity(0.58)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .background(
+                    LinearGradient(
+                        colors: [Color.gray.opacity(0.72), Color.gray.opacity(0.58), Color.black.opacity(0.72)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .clipShape(Rectangle())
+
+            monitorGuides(compact: compact)
 
             VStack(spacing: 0) {
                 topStatusBar(compact: compact)
-                    .padding(.horizontal, compact ? 10 : 22)
-                    .padding(.top, compact ? 8 : 24)
+                    .padding(.horizontal, compact ? 10 : 20)
+                    .padding(.top, compact ? 8 : 18)
                 Spacer(minLength: 0)
                 bottomMonitorDeck(compact: compact)
-                    .padding(.horizontal, compact ? 10 : 22)
-                    .padding(.bottom, compact ? 10 : 22)
+                    .padding(.horizontal, compact ? 10 : 20)
+                    .padding(.bottom, compact ? 10 : 18)
             }
         }
-        .background(Color.gray.opacity(0.65))
+        .overlay(Rectangle().stroke(Color.white.opacity(0.10), lineWidth: 1))
+        .background(BlackmagicCamStyle.monitor)
         .accessibilityLabel("Recording image display area")
     }
 
     private func topStatusBar(compact: Bool) -> some View {
-        HStack(alignment: .top, spacing: compact ? 9 : 20) {
-            ForEach(Array(topItems.prefix(4))) { item in
-                topReadout(item, compact: compact)
+        HStack(alignment: .top, spacing: compact ? 8 : 12) {
+            HStack(spacing: compact ? 8 : 12) {
+                ForEach(Array(topItems.prefix(4))) { item in
+                    topReadout(item, compact: compact)
+                }
             }
+            .padding(.horizontal, compact ? 10 : 14)
+            .padding(.vertical, compact ? 7 : 10)
+            .background(Color.black.opacity(0.50), in: RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous).stroke(Color.white.opacity(0.10), lineWidth: 1))
 
             Spacer(minLength: compact ? 6 : 18)
 
-            Text(timecode)
-                .font(.system(size: compact ? 30 : 52, weight: .semibold, design: .monospaced))
-                .foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.55), radius: 2, x: 0, y: 1)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-                .frame(minWidth: compact ? 170 : 360)
+            VStack(spacing: compact ? 2 : 4) {
+                Text(timecode)
+                    .font(BlackmagicCamStyle.readoutFont(size: compact ? 30 : 50, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.65), radius: 2, x: 0, y: 1)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                Text(isCaptureActive ? "REC ACTIVE" : "STBY")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                    .tracking(1.6)
+                    .foregroundStyle(isCaptureActive ? BlackmagicCamStyle.recordRed : BlackmagicCamStyle.mutedText)
+            }
+            .frame(minWidth: compact ? 170 : 330)
 
             Spacer(minLength: compact ? 6 : 18)
 
-            ForEach(Array(topItems.dropFirst(4).prefix(compact ? 2 : 4))) { item in
-                topReadout(item, compact: compact)
+            HStack(spacing: compact ? 8 : 12) {
+                ForEach(Array(topItems.dropFirst(4).prefix(compact ? 2 : 4))) { item in
+                    topReadout(item, compact: compact)
+                }
             }
+            .padding(.horizontal, compact ? 10 : 14)
+            .padding(.vertical, compact ? 7 : 10)
+            .background(Color.black.opacity(0.50), in: RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous).stroke(Color.white.opacity(0.10), lineWidth: 1))
         }
     }
 
@@ -139,36 +166,37 @@ struct ShootingHUDLayout<Preview: View>: View {
             if item.isFormatBadge {
                 VStack(spacing: compact ? 1 : 2) {
                     Text(item.primaryFormatLine)
-                        .font(.system(size: compact ? 17 : 24, weight: .heavy))
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 17 : 24, weight: .heavy))
                     Text(item.secondaryFormatLine)
-                        .font(.system(size: compact ? 8 : 12, weight: .heavy))
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 12, weight: .heavy))
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, compact ? 11 : 17)
                 .padding(.vertical, compact ? 5 : 8)
-                .background(.black.opacity(0.84), in: RoundedRectangle(cornerRadius: compact ? 5 : 7, style: .continuous))
+                .background(BlackmagicCamStyle.activeBlue.opacity(0.32), in: RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: compact ? 5 : 7, style: .continuous)
-                        .stroke(.white.opacity(0.92), lineWidth: compact ? 1 : 1.5)
+                    RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous)
+                        .stroke(BlackmagicCamStyle.cyan.opacity(0.72), lineWidth: compact ? 1 : 1.5)
                 )
             } else {
                 VStack(alignment: .leading, spacing: compact ? 2 : 4) {
                     HStack(spacing: 4) {
                         Text(item.title)
-                            .font(.system(size: compact ? 11 : 15, weight: .semibold))
-                            .foregroundStyle(item.isDimmed ? .black.opacity(0.45) : .white.opacity(0.94))
+                            .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
+                            .tracking(0.5)
+                            .foregroundStyle(item.isDimmed ? .white.opacity(0.28) : BlackmagicCamStyle.mutedText)
                         if item.isAuto {
                             Text("A")
-                                .font(.system(size: compact ? 9 : 12, weight: .bold))
+                                .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, compact ? 4 : 5)
                                 .padding(.vertical, 1)
-                                .background(Color.blue, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                                .background(BlackmagicCamStyle.activeBlue, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
                         }
                     }
                     Text(item.value)
-                        .font(.system(size: compact ? 18 : 30, weight: .medium, design: item.isMonospaced ? .monospaced : .default))
-                        .foregroundStyle(item.isDimmed ? .black.opacity(0.45) : .white)
+                        .font(item.isMonospaced ? BlackmagicCamStyle.readoutFont(size: compact ? 18 : 28, weight: .medium) : BlackmagicCamStyle.labelFont(size: compact ? 18 : 28, weight: .semibold))
+                        .foregroundStyle(item.isDimmed ? .white.opacity(0.28) : .white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.55)
                 }
@@ -200,44 +228,50 @@ struct ShootingHUDLayout<Preview: View>: View {
         switch card.kind {
         case .histogram(let bars):
             VStack(alignment: .leading, spacing: 5) {
-                Text(card.title)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.9))
+                HStack {
+                    Text(card.title.uppercased())
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                        .foregroundStyle(BlackmagicCamStyle.mutedText)
+                    Spacer()
+                    Text("RGB")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                        .foregroundStyle(BlackmagicCamStyle.cyan)
+                }
                 HistogramBars(bars: bars)
                     .frame(height: compact ? 42 : 68)
             }
             .padding(compact ? 8 : 11)
             .frame(width: compact ? 150 : 300, height: compact ? 78 : 120)
-            .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .blackmagicPanel(cornerRadius: 12, borderOpacity: 0.18)
         case .storage(let primary, let progress, let trailing):
             HStack(spacing: compact ? 8 : 14) {
-                Image(systemName: "iphone")
+                Image(systemName: "externaldrive.fill")
                     .font(.system(size: compact ? 25 : 36, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(BlackmagicCamStyle.okGreen)
                     .frame(width: compact ? 38 : 56)
                 VStack(alignment: .leading, spacing: compact ? 5 : 8) {
                     Text(primary)
-                        .font(.system(size: compact ? 18 : 30, weight: .semibold, design: .monospaced))
+                        .font(BlackmagicCamStyle.readoutFont(size: compact ? 18 : 30, weight: .semibold))
                         .foregroundStyle(.white)
                     ProgressView(value: progress)
-                        .tint(.blue)
+                        .tint(BlackmagicCamStyle.okGreen)
                     HStack {
-                        Text("Battery")
+                        Text("Storage")
                         Spacer()
                         Text(trailing)
                     }
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                    .foregroundStyle(BlackmagicCamStyle.mutedText)
                 }
             }
             .padding(compact ? 8 : 12)
             .frame(width: compact ? 176 : 330, height: compact ? 78 : 120)
-            .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .blackmagicPanel(cornerRadius: 12, borderOpacity: 0.18)
         case .audio(let levels):
             VStack(alignment: .leading, spacing: 8) {
-                Text(card.title)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.9))
+                Text(card.title.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                    .foregroundStyle(BlackmagicCamStyle.mutedText)
                 VStack(spacing: compact ? 4 : 7) {
                     ForEach(Array(levels.enumerated()), id: \.offset) { index, level in
                         AudioMeterRow(channel: index + 1, level: level)
@@ -249,12 +283,12 @@ struct ShootingHUDLayout<Preview: View>: View {
                         Spacer(minLength: 0)
                     }
                 }
-                .font(.system(size: compact ? 8 : 11, weight: .semibold, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.84))
+                .font(BlackmagicCamStyle.readoutFont(size: compact ? 8 : 11, weight: .semibold))
+                .foregroundStyle(BlackmagicCamStyle.mutedText)
             }
             .padding(compact ? 8 : 11)
             .frame(width: compact ? 184 : 300, height: compact ? 78 : 120)
-            .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .blackmagicPanel(cornerRadius: 12, borderOpacity: 0.18)
         }
     }
 
@@ -269,68 +303,40 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func controlRail(compact: Bool) -> some View {
-        VStack(spacing: compact ? 18 : 28) {
-            Button(action: onRefresh) {
-                Image(systemName: "viewfinder")
-                    .hudRailIcon(size: compact ? 32 : 42)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Refresh camera state")
+        VStack(spacing: compact ? 12 : 18) {
+            railButton(icon: "viewfinder", label: "HUD", compact: compact, action: onRefresh)
 
-            Button(action: onToggleLive) {
-                Image(systemName: isLiveActive ? "pause.viewfinder" : "camera.viewfinder")
-                    .hudRailIcon(size: compact ? 34 : 46)
-                Text("A")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
-            .disabled(!canToggleLive)
-            .opacity(canToggleLive ? 1 : 0.35)
-            .accessibilityLabel(isLiveActive ? "Stop live view" : "Start live view")
+            railButton(
+                icon: isLiveActive ? "pause.viewfinder" : "camera.viewfinder",
+                label: isLiveActive ? "LIVE" : "VIEW",
+                compact: compact,
+                active: isLiveActive,
+                enabled: canToggleLive,
+                action: onToggleLive
+            )
 
-            Button(action: onFocus) {
-                Image(systemName: "plus.forwardslash.minus")
-                    .hudRailIcon(size: compact ? 32 : 42)
-                Text("A")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white)
-            }
-            .buttonStyle(.plain)
-            .disabled(!canFocus)
-            .opacity(canFocus ? 1 : 0.35)
-            .accessibilityLabel("Autofocus")
+            railButton(icon: "plus.forwardslash.minus", label: "AF", compact: compact, enabled: canFocus, action: onFocus)
 
             Button(action: onCapture) {
-                ZStack {
-                    Circle()
-                        .stroke(.white, lineWidth: compact ? 4 : 6)
-                        .frame(width: compact ? 60 : 88, height: compact ? 60 : 88)
-                    Circle()
-                        .fill(isCaptureActive ? Color.red.opacity(0.95) : Color.red.opacity(0.55))
-                        .frame(width: compact ? 36 : 50, height: compact ? 36 : 50)
-                }
+                recordButton(compact: compact)
             }
             .buttonStyle(.plain)
             .disabled(!canCapture)
             .opacity(canCapture ? 1 : 0.4)
             .accessibilityLabel(isCaptureActive ? "Stop capture" : "Capture")
 
-            Button(action: {}) {
-                Image(systemName: "camera.macro")
-                    .hudRailIcon(size: compact ? 31 : 40)
-            }
-            .buttonStyle(.plain)
-            .disabled(true)
-            .opacity(0.55)
+            railButton(icon: "camera.macro", label: "LENS", compact: compact, active: false, enabled: false, action: {})
 
             Button(action: {}) {
-                Text("LUT")
-                    .font(.caption.weight(.heavy))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.9), lineWidth: 2))
+                VStack(spacing: 5) {
+                    Text("LUT")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 15, weight: .heavy))
+                    Text("709")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                }
+                .foregroundStyle(.white)
+                .frame(width: compact ? 62 : 78, height: compact ? 50 : 62)
+                .blackmagicButtonShell(cornerRadius: 14)
             }
             .buttonStyle(.plain)
             .disabled(true)
@@ -338,37 +344,106 @@ struct ShootingHUDLayout<Preview: View>: View {
 
             Spacer(minLength: 0)
 
-            Image(systemName: "scope")
-                .hudRailIcon(size: compact ? 34 : 44)
+            VStack(spacing: compact ? 5 : 7) {
+                Image(systemName: "scope")
+                    .font(.system(size: compact ? 25 : 32, weight: .medium))
+                Text("TOOLS")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                    .tracking(1.1)
+            }
+            .foregroundStyle(BlackmagicCamStyle.cyan)
+            .frame(width: compact ? 62 : 78, height: compact ? 54 : 68)
+            .blackmagicButtonShell(cornerRadius: 14, active: true)
         }
         .padding(.top, compact ? 16 : 22)
         .padding(.bottom, compact ? 16 : 24)
-        .background(Color(red: 0.02, green: 0.045, blue: 0.075))
+        .frame(maxWidth: .infinity)
+        .background(BlackmagicCamStyle.rail)
+        .overlay(Rectangle().fill(Color.white.opacity(0.10)).frame(width: 1), alignment: .leading)
+        .overlay(Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1), alignment: .trailing)
         // Firmware/update note: keep vendor-specific controls optional and capability-gated so future camera firmware changes only require capability/property mapping updates.
     }
 
     private func navRail(compact: Bool) -> some View {
-        VStack(spacing: compact ? 18 : 34) {
+        VStack(spacing: compact ? 12 : 22) {
             ForEach(ShootingHUDNavItem.allCases) { item in
                 Button {
                     onNavigate(item)
                 } label: {
-                    VStack(spacing: compact ? 5 : 9) {
+                    VStack(spacing: compact ? 6 : 9) {
                         Image(systemName: item.systemImage)
-                            .font(.system(size: compact ? 22 : 31, weight: .medium))
+                            .font(.system(size: compact ? 21 : 28, weight: .semibold))
                         Text(item.title)
-                            .font(.system(size: compact ? 11 : 16, weight: .semibold))
+                            .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
                     }
-                    .foregroundStyle(navSelection == item ? .blue : Color(red: 0.45, green: 0.66, blue: 0.94))
-                    .frame(width: compact ? 72 : 96, height: compact ? 70 : 106)
-                    .background(navSelection == item ? Color.blue.opacity(0.16) : Color.clear, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .foregroundStyle(navSelection == item ? .white : BlackmagicCamStyle.cyan.opacity(0.74))
+                    .frame(width: compact ? 72 : 94, height: compact ? 68 : 94)
+                    .blackmagicButtonShell(cornerRadius: 14, active: navSelection == item)
                 }
                 .buttonStyle(.plain)
             }
             Spacer(minLength: 0)
         }
         .padding(.top, compact ? 18 : 28)
+        .frame(maxWidth: .infinity)
         .background(Color.black)
+    }
+
+    private func monitorGuides(compact: Bool) -> some View {
+        ZStack {
+            Rectangle()
+                .stroke(Color.white.opacity(0.16), lineWidth: compact ? 1 : 1.5)
+                .padding(.horizontal, compact ? 46 : 72)
+                .padding(.vertical, compact ? 28 : 44)
+            Rectangle()
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                .padding(.horizontal, compact ? 78 : 122)
+                .padding(.vertical, compact ? 48 : 76)
+            RuleOfThirds()
+                .stroke(Color.white.opacity(0.10), style: StrokeStyle(lineWidth: 1, dash: [6, 8]))
+                .padding(.horizontal, compact ? 46 : 72)
+                .padding(.vertical, compact ? 28 : 44)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    private func railButton(
+        icon: String,
+        label: String,
+        compact: Bool,
+        active: Bool = false,
+        enabled: Bool = true,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: compact ? 4 : 7) {
+                Image(systemName: icon)
+                    .font(.system(size: compact ? 24 : 32, weight: .semibold))
+                Text(label)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                    .tracking(1.0)
+            }
+            .foregroundStyle(active ? .white : BlackmagicCamStyle.strongText)
+            .frame(width: compact ? 62 : 78, height: compact ? 54 : 70)
+            .blackmagicButtonShell(cornerRadius: 14, active: active)
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.35)
+    }
+
+    private func recordButton(compact: Bool) -> some View {
+        ZStack {
+            Circle()
+                .stroke(.white.opacity(0.96), lineWidth: compact ? 3.5 : 5)
+                .frame(width: compact ? 66 : 86, height: compact ? 66 : 86)
+            Circle()
+                .fill(isCaptureActive ? BlackmagicCamStyle.recordRed : BlackmagicCamStyle.recordRed.opacity(0.62))
+                .frame(width: compact ? 38 : 50, height: compact ? 38 : 50)
+                .shadow(color: BlackmagicCamStyle.recordRed.opacity(isCaptureActive ? 0.85 : 0.35), radius: isCaptureActive ? 12 : 5)
+        }
+        .frame(width: compact ? 72 : 92, height: compact ? 72 : 96)
     }
 }
 
@@ -416,10 +491,10 @@ enum ShootingHUDNavItem: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .camera: return "摄影机"
-        case .media: return "媒体"
-        case .chat: return "聊天"
-        case .settings: return "设置"
+        case .camera: return "Camera"
+        case .media: return "Media"
+        case .chat: return "Chat"
+        case .settings: return "Settings"
         }
     }
 
@@ -446,6 +521,26 @@ private struct DragHandleDots: View {
         .padding(.vertical, 7)
         .background(.black.opacity(0.45), in: Capsule())
         .accessibilityHidden(true)
+    }
+}
+
+private struct RuleOfThirds: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let oneThirdX = rect.minX + rect.width / 3
+        let twoThirdX = rect.minX + rect.width * 2 / 3
+        let oneThirdY = rect.minY + rect.height / 3
+        let twoThirdY = rect.minY + rect.height * 2 / 3
+
+        path.move(to: CGPoint(x: oneThirdX, y: rect.minY))
+        path.addLine(to: CGPoint(x: oneThirdX, y: rect.maxY))
+        path.move(to: CGPoint(x: twoThirdX, y: rect.minY))
+        path.addLine(to: CGPoint(x: twoThirdX, y: rect.maxY))
+        path.move(to: CGPoint(x: rect.minX, y: oneThirdY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: oneThirdY))
+        path.move(to: CGPoint(x: rect.minX, y: twoThirdY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: twoThirdY))
+        return path
     }
 }
 
@@ -531,4 +626,3 @@ enum ShootingHUDFixtures {
         0.04, 0.04, 0.05, 0.05, 0.06, 0.05, 0.05, 0.05
     ]
 }
-

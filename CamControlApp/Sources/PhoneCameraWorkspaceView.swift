@@ -68,17 +68,17 @@ struct PhoneCameraWorkspaceView: View {
                         Image(systemName: "camera.viewfinder")
                             .font(.system(size: 44))
                         Text(message)
-                            .font(.headline)
+                            .font(BlackmagicCamStyle.labelFont(size: 16, weight: .heavy))
                             .multilineTextAlignment(.center)
                     }
                     .foregroundStyle(.white)
                     .padding(24)
-                    .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .blackmagicPanel(cornerRadius: 18, borderOpacity: 0.20)
                     .padding()
                 }
             }
         }
-        .background(Color.black)
+        .background(BlackmagicCamStyle.canvas)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             camera.start()
@@ -91,14 +91,14 @@ struct PhoneCameraWorkspaceView: View {
 
     private var topItems: [ShootingHUDTopItem] {
         [
-            ShootingHUDTopItem(title: "镜头", value: camera.activePosition == .front ? "前置" : "24mm"),
-            ShootingHUDTopItem(title: "帧率", value: "24"),
-            ShootingHUDTopItem(title: "快门", value: "1/24", isAuto: true),
-            ShootingHUDTopItem(title: "光圈", value: "f1.8", isDimmed: true),
+            ShootingHUDTopItem(title: "Lens", value: camera.activePosition == .front ? "Front" : "24mm"),
+            ShootingHUDTopItem(title: "FPS", value: "24"),
+            ShootingHUDTopItem(title: "Shutter", value: "1/24", isAuto: true, isMonospaced: true),
+            ShootingHUDTopItem(title: "Iris", value: "f1.8", isDimmed: true, isMonospaced: true),
             ShootingHUDTopItem(title: "ISO", value: "Auto", isAuto: true),
-            ShootingHUDTopItem(title: "白平衡", value: "4700K", isAuto: true),
-            ShootingHUDTopItem(title: "色调", value: "0"),
-            ShootingHUDTopItem(title: "格式", value: "4K 16:9")
+            ShootingHUDTopItem(title: "WB", value: "4700K", isAuto: true),
+            ShootingHUDTopItem(title: "Tint", value: "0", isMonospaced: true),
+            ShootingHUDTopItem(title: "Format", value: "4K 16:9")
         ]
     }
 
@@ -106,7 +106,7 @@ struct PhoneCameraWorkspaceView: View {
         [
             ShootingHUDBottomCard(title: "Rec.709", kind: .histogram(ShootingHUDFixtures.histogramBars)),
             ShootingHUDBottomCard(title: "Storage", kind: .storage(primary: "09:00", progress: camera.isReady ? 0.35 : 0.02, trailing: camera.lastPhoto == nil ? "3GB" : "1 shot")),
-            ShootingHUDBottomCard(title: "iPhone麦克风", kind: .audio([0.24, 0.21]))
+            ShootingHUDBottomCard(title: "iPhone Mic", kind: .audio([0.24, 0.21]))
         ]
     }
 }

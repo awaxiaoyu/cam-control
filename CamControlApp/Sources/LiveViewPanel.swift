@@ -116,14 +116,14 @@ struct LiveViewPanel: View {
             Button {
                 Task { await controller.toggleLiveView() }
             } label: {
-                Label(controller.isLiveViewActive ? "Stop" : "Live", systemImage: controller.isLiveViewActive ? "pause.fill" : "play.fill")
+                stripLabel(controller.isLiveViewActive ? "STOP" : "LIVE", systemImage: controller.isLiveViewActive ? "pause.fill" : "play.fill", active: controller.isLiveViewActive)
             }
             .disabled(!controller.snapshot.capabilities.liveView)
 
             Button {
                 Task { await controller.focus() }
             } label: {
-                Label("AF", systemImage: "scope")
+                stripLabel("AF", systemImage: "scope")
             }
             .disabled(!controller.snapshot.capabilities.autofocus)
 
@@ -132,12 +132,25 @@ struct LiveViewPanel: View {
             reviewMenu
             streamMenu
         }
-        .buttonStyle(.bordered)
-        .controlSize(.small)
+        .buttonStyle(.plain)
         .foregroundStyle(.white)
-        .padding(.horizontal)
-        .padding(.vertical, 10)
-        .background(Color.black)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .background(BlackmagicCamStyle.rail)
+        .overlay(Rectangle().fill(Color.white.opacity(0.10)).frame(height: 1), alignment: .top)
+    }
+
+    private func stripLabel(_ title: String, systemImage: String, active: Bool = false) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: systemImage)
+            Text(title)
+        }
+        .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
+        .tracking(0.8)
+        .foregroundStyle(.white)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .blackmagicButtonShell(cornerRadius: 12, active: active)
     }
 
     @ViewBuilder
@@ -153,12 +166,15 @@ struct LiveViewPanel: View {
                     } label: {
                         Image(systemName: streamExpanded ? "chevron.down" : "chevron.up")
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.white)
+                    .padding(8)
+                    .blackmagicButtonShell(cornerRadius: 10)
 
                     Text("Picture stream")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
+                        .tracking(1.2)
+                        .foregroundStyle(BlackmagicCamStyle.mutedText)
                     Spacer()
                 }
                 .padding(.horizontal)
@@ -177,7 +193,7 @@ struct LiveViewPanel: View {
                     }
                 }
             }
-            .background(Color.black)
+            .background(BlackmagicCamStyle.canvas)
         }
     }
 
@@ -293,11 +309,11 @@ struct LiveViewPanel: View {
         }
         .overlay(alignment: .topLeading) {
             Text(item.filename)
-                .font(.caption)
+                .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
                 .lineLimit(1)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(.black.opacity(0.60), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .foregroundStyle(.white)
                 .padding(10)
         }
@@ -305,10 +321,9 @@ struct LiveViewPanel: View {
             Button {
                 dismissCapturedReview()
             } label: {
-                Label("Live", systemImage: "play.fill")
+                stripLabel("LIVE", systemImage: "play.fill", active: true)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.small)
+            .buttonStyle(.plain)
             .padding(10)
         }
     }
@@ -325,7 +340,7 @@ struct LiveViewPanel: View {
                 Task { await controller.driveLens(direction: direction, step: .hard) }
             }
         } label: {
-            Image(systemName: icon)
+            stripLabel(direction == .near ? "NEAR" : "FAR", systemImage: icon)
         }
         .disabled(!controller.snapshot.capabilities.driveLens)
     }
@@ -338,7 +353,7 @@ struct LiveViewPanel: View {
                 }
             }
         } label: {
-            Image(systemName: "timer")
+            stripLabel("REVIEW", systemImage: "timer")
         }
     }
 
@@ -351,7 +366,7 @@ struct LiveViewPanel: View {
             }
             Toggle("Filenames", isOn: $showStreamFilename)
         } label: {
-            Image(systemName: "film.stack")
+            stripLabel("STREAM", systemImage: "film.stack")
         }
     }
 
@@ -476,23 +491,24 @@ private struct PictureStreamThumbnail: View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: 5) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(.secondarySystemGroupedBackground))
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Color.white.opacity(0.08))
                     if let url = item.thumbnailURL ?? item.cachedURL, let image = PlatformImage(contentsOfFile: url.path) {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFill()
                     } else {
                         Image(systemName: "photo")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(BlackmagicCamStyle.mutedText)
                     }
                 }
                 .frame(width: 90, height: 58)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(Color.white.opacity(0.14), lineWidth: 1))
 
                 if showFilename {
                     Text(item.filename)
-                        .font(.caption2)
+                        .font(BlackmagicCamStyle.labelFont(size: 9, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.82))
                         .lineLimit(1)
                         .frame(width: 90, alignment: .leading)
