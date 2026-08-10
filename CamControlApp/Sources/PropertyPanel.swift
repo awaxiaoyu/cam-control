@@ -4,244 +4,533 @@ import SwiftUI
 
 struct PropertyPanel: View {
     @EnvironmentObject private var controller: CameraController
+    @State private var selectedCategory = "Camera"
 
     var body: some View {
+        GeometryReader { proxy in
+            let compact = proxy.size.width < 900
+            HStack(spacing: 0) {
+                settingsCategoryPanel(compact: compact)
+                    .frame(width: compact ? 176 : 238)
+                Divider().overlay(.white.opacity(0.10))
+                settingsOptionsPanel(compact: compact)
+            }
+            .background(BlackmagicCamStyle.canvas)
+        }
+        .refreshable {
+            await controller.refreshProperties()
+        }
+        // Firmware/update note: SettingsView/RemoteHwSettingsCategoryPanel structure is reverse-derived; new firmware properties should be mapped into CameraPropertyKey and categoryRows instead of changing the shell.
+    }
+
+    private func settingsCategoryPanel(compact: Bool) -> some View {
+        VStack(alignment: .leading, spacing: compact ? 8 : 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("SETTINGS")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                    .tracking(1.6)
+                    .foregroundStyle(BlackmagicCamStyle.cyan)
+                Text("Blackmagic Camera")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 18 : 22, weight: .heavy))
+                    .foregroundStyle(.white)
+                Text(BlackmagicReverseSpec.sourceBundle)
+                    .font(BlackmagicCamStyle.labelFont(size: 9, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.38))
+                    .lineLimit(2)
+            }
+            .padding(.horizontal, compact ? 12 : 18)
+            .padding(.top, compact ? 14 : 20)
+            .padding(.bottom, compact ? 10 : 14)
+
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: compact ? 6 : 8) {
+                    ForEach(BlackmagicReverseSpec.settingsCategories, id: \.self) { category in
+                        Button {
+                            withAnimation(.snappy(duration: 0.16)) { selectedCategory = category }
+                        } label: {
+                            SettingsCategoryRow(
+                                title: category,
+                                subtitle: subtitle(for: category),
+                                icon: icon(for: category),
+                                color: color(for: category),
+                                active: selectedCategory == category,
+                                compact: compact
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, compact ? 8 : 12)
+                .padding(.bottom, 18)
+            }
+        }
+        .background(
+            LinearGradient(
+                colors: [Color.black.opacity(0.92), BlackmagicCamStyle.rail.opacity(0.92)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+    }
+
+    private func settingsOptionsPanel(compact: Bool) -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: compact ? 16 : 22) {
                 HStack(alignment: .top, spacing: 16) {
-                    BMSectionHeader(
-                        eyebrow: "Configuration",
-                        title: "Camera settings",
-                        subtitle: "Dense, operator-facing controls modeled after Blackmagic's Exposure / Lens / Record settings hierarchy."
-                    )
-                    Spacer(minLength: 12)
+                    VStack(alignment: .leading, spacing: 7) {
+                        Text("SettingsOptionsPanel".uppercased())
+                            .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                            .tracking(1.5)
+                            .foregroundStyle(color(for: selectedCategory))
+                        Text(selectedCategory)
+                            .font(BlackmagicCamStyle.labelFont(size: compact ? 30 : 42, weight: .heavy))
+                            .foregroundStyle(.white)
+                        Text(description(for: selectedCategory))
+                            .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 14, weight: .medium))
+                            .foregroundStyle(BlackmagicCamStyle.mutedText)
+                    }
+                    Spacer()
                     BMStatusPill(title: "Props", value: "\(controller.snapshot.properties.count)", color: controller.snapshot.properties.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
                 }
 
-                reversedSettingsRail
-                SlateMetadataPanel()
+                if selectedCategory == "Camera" || selectedCategory == "Record" {
+                    livePropertyGrid(compact: compact)
+                }
 
-                if controller.snapshot.properties.isEmpty {
-                    BMEmptyState(
-                        systemImage: "slider.horizontal.3",
-                        title: "No properties exposed",
-                        subtitle: "Refresh the session after connecting a camera in remote mode. Unsupported firmware may expose live view without editable PTP properties."
-                    )
-                } else {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 238), spacing: 14)], spacing: 14) {
-                        ForEach(controller.snapshot.properties) { property in
-                            PropertyControl(property: property) { value in
-                                Task { await controller.setProperty(property.key, value: value) }
-                            }
+                settingsRows(compact: compact)
+
+                if selectedCategory == "Camera" {
+                    SlateMetadataPanel(compact: compact)
+                }
+            }
+            .padding(compact ? 18 : 28)
+        }
+        .background(BlackmagicCamStyle.studioGradient)
+    }
+
+    private func livePropertyGrid(compact: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("RemoteHwSettingsOptionsPanel".uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                    .tracking(1.3)
+                    .foregroundStyle(BlackmagicCamStyle.cyan)
+                Spacer()
+                Button {
+                    Task { await controller.refreshProperties() }
+                } label: {
+                    Label("REFRESH", systemImage: "arrow.clockwise")
+                        .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                        .tracking(1.0)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(.white.opacity(0.08), in: Capsule())
+            }
+
+            if controller.snapshot.properties.isEmpty {
+                BMEmptyState(
+                    systemImage: "slider.horizontal.3",
+                    title: "No remote camera properties",
+                    subtitle: "Refresh after connecting a body. Blackmagic Cam equivalent controls stay visible below from reverse-derived settings labels."
+                )
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 180 : 230), spacing: 12)], spacing: 12) {
+                    ForEach(controller.snapshot.properties) { property in
+                        PropertyControl(property: property, compact: compact) { value in
+                            Task { await controller.setProperty(property.key, value: value) }
                         }
                     }
                 }
             }
-            .padding(24)
         }
-        .background(BlackmagicCamStyle.studioGradient)
-        .refreshable {
-            await controller.refreshProperties()
-        }
-        // Firmware/update note: new firmware-specific PTP properties should be added to CameraPropertyKey first; this panel automatically renders new mapped properties.
+        .padding(compact ? 14 : 18)
+        .blackmagicPanel(cornerRadius: 22, borderOpacity: 0.16)
     }
 
-    private var reversedSettingsRail: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                SettingsSectionChip(title: "CAMERA", subtitle: "Codec · Resolution · FPS", systemImage: "camera.fill", color: BlackmagicCamStyle.activeBlue, active: true)
-                SettingsSectionChip(title: "AUDIO", subtitle: "Gain · Source · Meters", systemImage: "waveform", color: BlackmagicCamStyle.okGreen)
-                SettingsSectionChip(title: "MONITOR", subtitle: "LUT · Guides · False Color", systemImage: "rectangle.inset.filled", color: BlackmagicCamStyle.cyan)
-                SettingsSectionChip(title: "LUTs", subtitle: "Rec.709 · Apple Log", systemImage: "camera.filters", color: BlackmagicCamStyle.amber)
-                SettingsSectionChip(title: "PRESETS", subtitle: "Import · Export · Sync", systemImage: "tray.full.fill", color: .white.opacity(0.74))
-                SettingsSectionChip(title: "REMOTE", subtitle: "Camera Control · Cloud", systemImage: "dot.radiowaves.left.and.right", color: BlackmagicCamStyle.recordRed)
+    private func settingsRows(compact: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("\(selectedCategory) List Options".uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                .tracking(1.3)
+                .foregroundStyle(color(for: selectedCategory))
+
+            VStack(spacing: 8) {
+                ForEach(categoryRows, id: \.title) { row in
+                    SettingsOptionRow(row: row, compact: compact)
+                }
             }
-            .padding(.vertical, 2)
         }
-        // Firmware/update note: this rail mirrors reversed settings strings; when future firmware adds sections, add a chip here and bind controls below via CameraPropertyKey.
+        .padding(compact ? 14 : 18)
+        .blackmagicPanel(cornerRadius: 22, borderOpacity: 0.14)
+    }
+
+    private var categoryRows: [SettingsOptionModel] {
+        switch selectedCategory {
+        case "Record":
+            return BlackmagicReverseSpec.recordOptions.map { SettingsOptionModel(title: $0, value: valueForRecordOption($0), color: color(for: selectedCategory)) }
+        case "Camera":
+            return BlackmagicReverseSpec.cameraOptions.map { SettingsOptionModel(title: $0, value: valueForCameraOption($0), color: color(for: selectedCategory)) }
+        case "Monitor":
+            return BlackmagicReverseSpec.monitorOptions.map { SettingsOptionModel(title: $0, value: valueForMonitorOption($0), color: color(for: selectedCategory)) }
+        case "Audio":
+            return BlackmagicReverseSpec.audioLabels.map { SettingsOptionModel(title: $0, value: $0 == "AUDIO GAIN" ? "-12 dB" : "Auto", color: color(for: selectedCategory)) }
+        case "LUTs":
+            return [
+                SettingsOptionModel(title: "Display LUT", value: "On", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "LUT Selection", value: "Rec 709 Neutral", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Color Space Tag", value: BlackmagicReverseSpec.lutColorSpaces.joined(separator: " / "), color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Import LUT", value: "\(BlackmagicReverseSpec.lutNames.count) built-in names", color: color(for: selectedCategory))
+            ]
+        case "Media":
+            return [
+                SettingsOptionModel(title: "Save Clips to", value: "Private Storage", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Auto Upload To Selected Project", value: "Off", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Enable Upload Only Over Wi-Fi", value: "On", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Filename Convention", value: "A001", color: color(for: selectedCategory))
+            ]
+        case "Blackmagic Cloud":
+            return [
+                SettingsOptionModel(title: "Log in to Blackmagic Cloud", value: "Offline", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Available Cloud Projects", value: "No project selected - All Clips", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Sync Presets to Cloud Project", value: "Manual", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Remote Cam Control", value: "Not linked", color: color(for: selectedCategory))
+            ]
+        case "HDMI Out":
+            return [
+                SettingsOptionModel(title: "Clean Feed", value: "Off", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Mirror Display", value: "On", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Display LUT", value: "On", color: color(for: selectedCategory))
+            ]
+        case "Preset":
+            return [
+                SettingsOptionModel(title: "Import Preset", value: "Ready", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Export Preset", value: "Ready", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Reset Camera Settings", value: "Protected", color: color(for: selectedCategory))
+            ]
+        case "Accessories":
+            return [
+                SettingsOptionModel(title: "Tentacle Sync", value: "Disconnected", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Remote Camera", value: "Monitor Only", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Bluetooth Controller", value: "Off", color: color(for: selectedCategory))
+            ]
+        default:
+            return [
+                SettingsOptionModel(title: "Blackmagic Camera", value: "3.2.00", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "Reverse Source", value: "F:\\Blackmagic Cam_3.2.00.ipa", color: color(for: selectedCategory)),
+                SettingsOptionModel(title: "UI Anchors", value: "\(BlackmagicReverseSpec.hudComponentNames.count + BlackmagicReverseSpec.controlScrollerNames.count)", color: color(for: selectedCategory))
+            ]
+        }
+    }
+
+    private func valueForCameraOption(_ title: String) -> String {
+        switch title {
+        case "Lens": return propertyText(.focusMode, fallback: "24mm")
+        case "FPS": return "24"
+        case "Shutter": return propertyText(.shutterSpeed, fallback: "1/48")
+        case "Iris": return propertyText(.aperture, fallback: "f1.8")
+        case "ISO": return propertyText(.iso, fallback: "Auto")
+        case "White Balance": return propertyText(.colorTemperature, fallback: "5600K")
+        case "Tint": return propertyText(.exposureCompensation, fallback: "0")
+        default: return "Off"
+        }
+    }
+
+    private func valueForRecordOption(_ title: String) -> String {
+        switch title {
+        case "Codec": return "Apple ProRes 422"
+        case "Resolution": return "4K 16:9"
+        case "Frame Rate": return "24"
+        case "Record Audio as": return "AAC"
+        default: return "On"
+        }
+    }
+
+    private func valueForMonitorOption(_ title: String) -> String {
+        switch title {
+        case "Focus Assist Color": return "Blue"
+        case "Guides Color": return "White"
+        case "Guides Opacity": return "60%"
+        case "Clean Feed": return "Off"
+        default: return "On"
+        }
+    }
+
+    private func propertyText(_ key: CameraPropertyKey, fallback: String) -> String {
+        guard let property = controller.snapshot.properties.first(where: { $0.key == key }) else { return fallback }
+        return PropertyValueFormatter.displayValue(property.value, for: key)
+    }
+
+    private func subtitle(for category: String) -> String {
+        switch category {
+        case "Record": return "Codec / Resolution / FPS"
+        case "Camera": return "Lens / Exposure / Stabilization"
+        case "Monitor": return "LUT / Guides / False Color"
+        case "Audio": return "Gain / Source / Meters"
+        case "LUTs": return "Display LUT / Import LUT"
+        case "Media": return "Storage / Upload / Filename"
+        case "Blackmagic Cloud": return "Project / Chat / Sync"
+        case "HDMI Out": return "Clean Feed / Mirror Display"
+        default: return "Preset / Accessories / About"
+        }
+    }
+
+    private func description(for category: String) -> String {
+        switch category {
+        case "Record": return "Reverse-derived Record settings including codec, resolution, frame rate and media drop behavior."
+        case "Camera": return "Operator camera controls for lens, shutter, iris, ISO, white balance, tint and stabilization."
+        case "Monitor": return "Image monitoring overlays: histogram, audio meters, storage, focus assist, guides, zebra and clean feed."
+        case "Audio": return "Audio source, gain, metering and format controls from the recovered settings strings."
+        case "LUTs": return "Built from embedded LUT families and LUT selection/import labels in the IPA."
+        case "Media": return "Media storage, upload status and proxy/original upload behavior."
+        case "Blackmagic Cloud": return "Project library, chat, upload, organization and remote camera control shell."
+        case "HDMI Out": return "External monitor behavior including clean feed and mirror display."
+        default: return "Additional Blackmagic Camera settings recovered from SettingsView strings."
+        }
+    }
+
+    private func icon(for category: String) -> String {
+        switch category {
+        case "Record": return "record.circle"
+        case "Camera": return "camera.fill"
+        case "Monitor": return "rectangle.inset.filled"
+        case "Audio": return "waveform"
+        case "LUTs": return "camera.filters"
+        case "Media": return "photo.on.rectangle"
+        case "Blackmagic Cloud": return "cloud.fill"
+        case "HDMI Out": return "display"
+        case "Preset": return "tray.full.fill"
+        case "Accessories": return "dot.radiowaves.left.and.right"
+        default: return "info.circle"
+        }
+    }
+
+    private func color(for category: String) -> Color {
+        switch category {
+        case "Record": return BlackmagicCamStyle.recordRed
+        case "Camera": return BlackmagicCamStyle.activeBlue
+        case "Monitor": return BlackmagicCamStyle.cyan
+        case "Audio": return BlackmagicCamStyle.okGreen
+        case "LUTs": return BlackmagicCamStyle.amber
+        case "Media": return .white.opacity(0.82)
+        case "Blackmagic Cloud": return BlackmagicCamStyle.cyan
+        case "HDMI Out": return .white.opacity(0.72)
+        default: return BlackmagicCamStyle.mutedText
+        }
     }
 }
 
-private struct SettingsSectionChip: View {
+private struct SettingsCategoryRow: View {
     let title: String
     let subtitle: String
-    let systemImage: String
+    let icon: String
     let color: Color
-    var active = false
+    let active: Bool
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 9 : 12) {
+            Image(systemName: icon)
+                .font(.system(size: compact ? 15 : 18, weight: .bold))
+                .foregroundStyle(active ? .white : color)
+                .frame(width: compact ? 30 : 36, height: compact ? 30 : 36)
+                .background((active ? color : color.opacity(0.14)), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                    .tracking(0.8)
+                    .foregroundStyle(.white)
+                Text(subtitle)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(active ? 0.78 : 0.44))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, compact ? 9 : 12)
+        .padding(.vertical, compact ? 9 : 12)
+        .background(active ? color.opacity(0.22) : .white.opacity(0.045), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(active ? color.opacity(0.55) : .white.opacity(0.08), lineWidth: 1))
+    }
+}
+
+private struct SettingsOptionModel {
+    let title: String
+    let value: String
+    let color: Color
+}
+
+private struct SettingsOptionRow: View {
+    let row: SettingsOptionModel
+    let compact: Bool
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundStyle(color)
-                .frame(width: 34, height: 34)
-                .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             VStack(alignment: .leading, spacing: 4) {
-                Text(title.uppercased())
-                    .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
-                    .tracking(1.1)
+                Text(row.title)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 16, weight: .heavy))
                     .foregroundStyle(.white)
-                Text(subtitle)
-                    .font(BlackmagicCamStyle.labelFont(size: 11, weight: .medium))
-                    .foregroundStyle(BlackmagicCamStyle.mutedText)
+                Text("Settings > \(row.title) > List Option")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.38))
+                    .lineLimit(1)
             }
+            Spacer()
+            Text(row.value.uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                .tracking(0.7)
+                .foregroundStyle(row.color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(row.color.opacity(0.12), in: Capsule())
         }
-        .padding(14)
-        .frame(width: 214, alignment: .leading)
-        .blackmagicButtonShell(cornerRadius: 18, active: active)
+        .padding(compact ? 12 : 15)
+        .background(.black.opacity(0.28), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
     }
 }
 
 private struct SlateMetadataPanel: View {
-    private let rows = [
-        ("SCENE", "Scene, Shot"),
-        ("TAKE", "Take"),
-        ("DAY/NIGHT", "Day"),
-        ("ENVIRONMENT", "Interior"),
-        ("DIRECTOR", "Director"),
-        ("CAMERA OPERATOR", "Camera Operator"),
-        ("LENS DATA", "Lens Type · Aperture · Focal Length"),
-        ("LOOK", "LUTName · Rec.709")
-    ]
+    let compact: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                HStack(spacing: 10) {
-                    Image(systemName: "clapperboard.fill")
-                        .foregroundStyle(BlackmagicCamStyle.amber)
-                    Text("SLATE FOR")
-                        .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
-                        .tracking(1.4)
-                        .foregroundStyle(BlackmagicCamStyle.amber)
-                }
+                Label("SLATE FOR", systemImage: "clapperboard.fill")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                    .tracking(1.4)
+                    .foregroundStyle(BlackmagicCamStyle.amber)
                 Spacer()
-                Text("QUICKTIME METADATA")
-                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
-                    .tracking(1.3)
-                    .foregroundStyle(BlackmagicCamStyle.mutedText)
+                Text("SlateViewProjectInfo / SlateViewClipInfo / SlateViewLensInfo")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                    .tracking(1.1)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .lineLimit(1)
             }
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 10)], spacing: 10) {
-                ForEach(rows, id: \.0) { row in
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 150 : 190), spacing: 10)], spacing: 10) {
+                ForEach(BlackmagicReverseSpec.slateFields, id: \.self) { field in
                     VStack(alignment: .leading, spacing: 5) {
-                        Text(row.0)
-                            .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                        Text(field)
+                            .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
                             .tracking(1.1)
                             .foregroundStyle(BlackmagicCamStyle.mutedText)
-                        Text(row.1)
-                            .font(BlackmagicCamStyle.labelFont(size: 14, weight: .bold))
+                        Text(value(for: field))
+                            .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 15, weight: .bold))
                             .foregroundStyle(.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                     }
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.black.opacity(0.30), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.10), lineWidth: 1))
+                    .background(.black.opacity(0.30), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
                 }
             }
         }
-        .padding(18)
-        .blackmagicPanel(cornerRadius: 22)
-        // Firmware/update note: slate labels are mirrored from reversed QuickTimeMetadata/design.camera.* fields; when device firmware exposes more metadata, add rows here and bind values from the capture model.
+        .padding(compact ? 14 : 18)
+        .blackmagicPanel(cornerRadius: 22, borderOpacity: 0.16)
+    }
+
+    private func value(for field: String) -> String {
+        switch field {
+        case "SLATE FOR": return "A001"
+        case "PROJECT": return "No project selected - All Clips"
+        case "SCENE": return "001"
+        case "TAKE": return "1"
+        case "REEL": return "A"
+        case "CAMERA OPERATOR": return "CamControl"
+        case "LENS DATA": return "Lens Type / Aperture / Focal Length"
+        case "GOOD TAKE": return "Off"
+        default: return "--"
+        }
     }
 }
 
 private struct PropertyControl: View {
     let property: CameraPropertyState
+    let compact: Bool
     let onChange: (Int64) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: compact ? 10 : 13) {
             HStack(alignment: .top, spacing: 10) {
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(category.uppercased())
-                        .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                        .font(BlackmagicCamStyle.labelFont(size: 9, weight: .heavy))
                         .tracking(1.1)
                         .foregroundStyle(categoryColor)
                     Text(property.key.title)
-                        .font(BlackmagicCamStyle.labelFont(size: 18, weight: .heavy))
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 14 : 17, weight: .heavy))
                         .foregroundStyle(.white)
                 }
                 Spacer()
-                Text(settableLabel)
-                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                Text(isSettable ? "LIVE" : "LOCK")
+                    .font(BlackmagicCamStyle.labelFont(size: 9, weight: .heavy))
                     .foregroundStyle(isSettable ? BlackmagicCamStyle.okGreen : BlackmagicCamStyle.mutedText)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 6)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
                     .background((isSettable ? BlackmagicCamStyle.okGreen : Color.white).opacity(0.12), in: Capsule())
             }
 
-            Text(displayValue(property.value))
-                .font(BlackmagicCamStyle.readoutFont(size: 32, weight: .semibold))
+            Text(PropertyValueFormatter.displayValue(property.value, for: property.key))
+                .font(BlackmagicCamStyle.readoutFont(size: compact ? 25 : 32, weight: .semibold))
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.55)
 
             HStack(spacing: 10) {
                 Text(String(format: "PTP 0x%04X", Int(property.ptpCode)))
-                    .font(BlackmagicCamStyle.readoutFont(size: 11, weight: .medium))
+                    .font(BlackmagicCamStyle.readoutFont(size: 10, weight: .medium))
                     .foregroundStyle(BlackmagicCamStyle.mutedText)
                 Spacer()
                 control
             }
         }
-        .padding(17)
-        .frame(minHeight: 168, alignment: .top)
-        .blackmagicPanel(cornerRadius: 22)
+        .padding(compact ? 13 : 16)
+        .frame(minHeight: compact ? 142 : 160, alignment: .top)
+        .background(.black.opacity(0.34), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
     }
 
     @ViewBuilder
     private var control: some View {
         if let values = property.descriptor?.values, !values.isEmpty, isSettable {
             Menu {
-                Picker(property.key.title, selection: Binding(
-                    get: { property.value },
-                    set: { onChange($0) }
-                )) {
+                Picker(property.key.title, selection: Binding(get: { property.value }, set: { onChange($0) })) {
                     ForEach(values, id: \.self) { value in
-                        Text(displayValue(value)).tag(value)
+                        Text(PropertyValueFormatter.displayValue(value, for: property.key)).tag(value)
                     }
                 }
             } label: {
-                HStack(spacing: 7) {
-                    Text("SET")
-                    Image(systemName: "chevron.up.chevron.down")
-                }
-                .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .blackmagicButtonShell(cornerRadius: 12, active: true)
+                Label("SET", systemImage: "chevron.up.chevron.down")
+                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(BlackmagicCamStyle.activeBlue.opacity(0.28), in: Capsule())
             }
         } else {
             Text(isSettable ? "EDIT ON CAMERA" : "READ ONLY")
-                .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                .font(BlackmagicCamStyle.labelFont(size: 9, weight: .heavy))
                 .foregroundStyle(BlackmagicCamStyle.mutedText)
         }
     }
 
-    private var isSettable: Bool {
-        property.descriptor?.isSettable == true
-    }
-
-    private var settableLabel: String {
-        isSettable ? "LIVE" : "LOCK"
-    }
+    private var isSettable: Bool { property.descriptor?.isSettable == true }
 
     private var category: String {
         switch property.key {
-        case .shutterSpeed, .aperture, .iso, .exposureCompensation, .exposureIndicator:
-            return "Exposure"
-        case .whiteBalance, .colorTemperature, .pictureStyle:
-            return "Color"
-        case .focusMode, .focusMeteringMode, .currentFocusPoint:
-            return "Lens"
-        case .batteryLevel, .availableShots:
-            return "Status"
-        case .shootingMode, .exposureMeteringMode:
-            return "Camera"
+        case .shutterSpeed, .aperture, .iso, .exposureCompensation, .exposureIndicator: return "Exposure"
+        case .whiteBalance, .colorTemperature, .pictureStyle: return "Color"
+        case .focusMode, .focusMeteringMode, .currentFocusPoint: return "Lens"
+        case .batteryLevel, .availableShots: return "Status"
+        case .shootingMode, .exposureMeteringMode: return "Camera"
         }
     }
 
@@ -254,33 +543,27 @@ private struct PropertyControl: View {
         default: return BlackmagicCamStyle.recordRed
         }
     }
+}
 
-    private func displayValue(_ value: Int64) -> String {
-        switch property.key {
-        case .batteryLevel:
-            return "\(value)%"
-        case .colorTemperature:
-            return "\(value)K"
-        case .exposureCompensation:
-            return value == 0 ? "0.0" : String(format: "%+.1f", Double(value) / 100.0)
-        case .iso, .availableShots:
-            return "\(value)"
+private enum PropertyValueFormatter {
+    static func displayValue(_ value: Int64, for key: CameraPropertyKey) -> String {
+        switch key {
+        case .batteryLevel: return "\(value)%"
+        case .colorTemperature: return "\(value)K"
+        case .exposureCompensation: return value == 0 ? "0.0" : String(format: "%+.1f", Double(value) / 100.0)
+        case .iso, .availableShots: return "\(value)"
         case .aperture:
-            if value > 0, value < 1_000 {
-                return String(format: "f%.1f", Double(value) / 100.0)
-            }
+            if value > 0, value < 1_000 { return String(format: "f%.1f", Double(value) / 100.0) }
             return rawDisplay(value)
         case .shutterSpeed:
-            if value > 0, value <= 8_000 {
-                return "1/\(value)"
-            }
+            if value > 0, value <= 8_000 { return "1/\(value)" }
             return rawDisplay(value)
         default:
             return rawDisplay(value)
         }
     }
 
-    private func rawDisplay(_ value: Int64) -> String {
+    private static func rawDisplay(_ value: Int64) -> String {
         "0x\(String(UInt64(bitPattern: value), radix: 16))"
     }
 }

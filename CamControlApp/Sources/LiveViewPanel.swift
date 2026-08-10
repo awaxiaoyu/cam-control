@@ -34,43 +34,41 @@ struct LiveViewPanel: View {
     @State private var streamExpanded = true
 
     var body: some View {
-        VStack(spacing: 0) {
-            ShootingHUDLayout(
-                title: deviceName,
-                subtitle: controller.snapshot.deviceInfo?.manufacturer ?? "Recording image display",
-                timecode: timecodeText,
-                topItems: topItems,
-                bottomCards: bottomCards,
-                navSelection: navSelection,
-                isCaptureActive: controller.isBulbActive,
-                isLiveActive: controller.isLiveViewActive,
-                canCapture: true,
-                canFocus: controller.snapshot.capabilities.autofocus,
-                canToggleLive: controller.snapshot.capabilities.liveView,
-                onCapture: {
-                    if capturedReviewItem != nil {
-                        dismissCapturedReview()
-                    } else {
-                        Task { await controller.capture() }
-                    }
-                },
-                onToggleLive: {
-                    Task { await controller.toggleLiveView() }
-                },
-                onFocus: {
-                    Task { await controller.focus() }
-                },
-                onRefresh: {
-                    Task { await controller.refreshProperties() }
-                },
-                onNavigate: navigate
-            ) {
-                liveViewContent
-            }
-
+        ShootingHUDLayout(
+            title: deviceName,
+            subtitle: controller.snapshot.deviceInfo?.manufacturer ?? "Recording image display",
+            timecode: timecodeText,
+            topItems: topItems,
+            bottomCards: bottomCards,
+            navSelection: navSelection,
+            isCaptureActive: controller.isBulbActive,
+            isLiveActive: controller.isLiveViewActive,
+            canCapture: true,
+            canFocus: controller.snapshot.capabilities.autofocus,
+            canToggleLive: controller.snapshot.capabilities.liveView,
+            onCapture: {
+                if capturedReviewItem != nil {
+                    dismissCapturedReview()
+                } else {
+                    Task { await controller.capture() }
+                }
+            },
+            onToggleLive: {
+                Task { await controller.toggleLiveView() }
+            },
+            onFocus: {
+                Task { await controller.focus() }
+            },
+            onRefresh: {
+                Task { await controller.refreshProperties() }
+            },
+            onNavigate: navigate
+        ) {
+            liveViewContent
+        }
+        .overlay(alignment: .bottomLeading) {
             if selectedTab == .live {
-                compactControlStrip
-                pictureStream
+                pictureStreamOverlay
             }
         }
         .background(Color.black)
@@ -111,35 +109,6 @@ struct LiveViewPanel: View {
         }
     }
 
-    private var compactControlStrip: some View {
-        HStack(spacing: 10) {
-            Button {
-                Task { await controller.toggleLiveView() }
-            } label: {
-                stripLabel(controller.isLiveViewActive ? "STOP" : "LIVE", systemImage: controller.isLiveViewActive ? "pause.fill" : "play.fill", active: controller.isLiveViewActive)
-            }
-            .disabled(!controller.snapshot.capabilities.liveView)
-
-            Button {
-                Task { await controller.focus() }
-            } label: {
-                stripLabel("AF", systemImage: "scope")
-            }
-            .disabled(!controller.snapshot.capabilities.autofocus)
-
-            lensMenu(direction: .near, icon: "minus.magnifyingglass")
-            lensMenu(direction: .far, icon: "plus.magnifyingglass")
-            reviewMenu
-            streamMenu
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(.white)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 11)
-        .background(BlackmagicCamStyle.rail)
-        .overlay(Rectangle().fill(Color.white.opacity(0.10)).frame(height: 1), alignment: .top)
-    }
-
     private func stripLabel(_ title: String, systemImage: String, active: Bool = false) -> some View {
         HStack(spacing: 7) {
             Image(systemName: systemImage)
@@ -154,46 +123,49 @@ struct LiveViewPanel: View {
     }
 
     @ViewBuilder
-    private var pictureStream: some View {
+    private var pictureStreamOverlay: some View {
         let items = Array(controller.pictureStreamItems.prefix(max(0, pictureStreamLimit)))
         if pictureStreamLimit > 0, !items.isEmpty {
-            VStack(spacing: 8) {
-                HStack {
-                    Button {
-                        withAnimation(.snappy(duration: 0.2)) {
-                            streamExpanded.toggle()
-                        }
-                    } label: {
-                        Image(systemName: streamExpanded ? "chevron.down" : "chevron.up")
+            VStack(alignment: .leading, spacing: 8) {
+                Button {
+                    withAnimation(.snappy(duration: 0.2)) {
+                        streamExpanded.toggle()
                     }
-                    .buttonStyle(.plain)
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: streamExpanded ? "chevron.down" : "chevron.up")
+                        Text("MEDIA POOL")
+                        Text("\(items.count)")
+                            .foregroundStyle(BlackmagicCamStyle.okGreen)
+                    }
+                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                    .tracking(1.1)
                     .foregroundStyle(.white)
-                    .padding(8)
-                    .blackmagicButtonShell(cornerRadius: 10)
-
-                    Text("Picture stream")
-                        .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
-                        .tracking(1.2)
-                        .foregroundStyle(BlackmagicCamStyle.mutedText)
-                    Spacer()
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(.black.opacity(0.58), in: Capsule())
+                    .overlay(Capsule().stroke(.white.opacity(0.12), lineWidth: 1))
                 }
-                .padding(.horizontal)
+                .buttonStyle(.plain)
 
                 if streamExpanded {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
+                        HStack(spacing: 8) {
                             ForEach(items) { item in
                                 PictureStreamThumbnail(item: item, showFilename: showStreamFilename) {
                                     presentCapturedReview(item, obeyNever: false)
                                 }
+                                .frame(width: 76, height: 86)
                             }
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 8)
                     }
+                    .frame(maxWidth: 430)
                 }
             }
-            .background(BlackmagicCamStyle.canvas)
+            .padding(.leading, 18)
+            .padding(.bottom, 112)
+            .transition(.move(edge: .leading).combined(with: .opacity))
+            // Firmware/update note: picture stream overlay now maps Blackmagic MediaPoolView thumbnail behavior without adding an app-style bottom bar under the camera HUD.
         }
     }
 

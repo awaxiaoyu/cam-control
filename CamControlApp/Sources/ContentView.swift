@@ -96,20 +96,11 @@ private struct CameraWorkspaceView: View {
             case .live:
                 LiveViewPanel(selectedTab: $selection)
             case .controls:
-                VStack(spacing: 0) {
-                    workspaceHeader(title: "Camera settings", systemImage: "slider.horizontal.3")
-                    PropertyPanel()
-                }
+                PropertyPanel()
             case .gallery:
-                VStack(spacing: 0) {
-                    workspaceHeader(title: "Media", systemImage: "photo.on.rectangle")
-                    GalleryView()
-                }
+                GalleryView()
             case .chat:
-                VStack(spacing: 0) {
-                    workspaceHeader(title: "Chat", systemImage: "ellipsis.message")
-                    CloudChatPanel()
-                }
+                CloudChatPanel()
             }
         }
         .background {
@@ -121,99 +112,7 @@ private struct CameraWorkspaceView: View {
         }
     }
 
-    private func workspaceHeader(title: String, systemImage: String) -> some View {
-        HStack(spacing: 14) {
-            Button {
-                selection = .live
-            } label: {
-                HStack(spacing: 9) {
-                    Image(systemName: "video.fill")
-                    Text("MONITOR")
-                }
-                .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
-                .tracking(1.1)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 11)
-                .blackmagicButtonShell(cornerRadius: 14, active: false)
-            }
-            .buttonStyle(.plain)
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Image(systemName: systemImage)
-                        .foregroundStyle(BlackmagicCamStyle.cyan)
-                    Text(title.uppercased())
-                }
-                .font(BlackmagicCamStyle.labelFont(size: 13, weight: .heavy))
-                .tracking(1.2)
-                .foregroundStyle(.white)
-                Text(deviceName + " · " + (controller.snapshot.deviceInfo?.model ?? "Ready"))
-                    .font(BlackmagicCamStyle.readoutFont(size: 12, weight: .medium))
-                    .foregroundStyle(BlackmagicCamStyle.mutedText)
-            }
-            Spacer()
-            Button {
-                Task { await controller.refreshProperties() }
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 42, height: 38)
-                    .blackmagicButtonShell(cornerRadius: 12)
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                Task { await controller.capture() }
-            } label: {
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(controller.isBulbActive ? BlackmagicCamStyle.recordRed : BlackmagicCamStyle.recordRed.opacity(0.66))
-                        .frame(width: 12, height: 12)
-                    Text(controller.isBulbActive ? "STOP" : "CAPTURE")
-                }
-                .font(BlackmagicCamStyle.labelFont(size: 12, weight: .heavy))
-                .tracking(1.1)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 11)
-                .background(BlackmagicCamStyle.recordRed.opacity(controller.isBulbActive ? 0.24 : 0.16), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(BlackmagicCamStyle.recordRed.opacity(0.58), lineWidth: 1))
-            }
-            .accessibilityLabel(controller.isBulbActive ? "Stop bulb" : "Shoot")
-            .buttonStyle(.plain)
-
-            if controller.isBulbActive {
-                Text("\(controller.bulbElapsedSeconds)s")
-                    .font(BlackmagicCamStyle.readoutFont(size: 12, weight: .semibold))
-                    .foregroundStyle(BlackmagicCamStyle.recordRed)
-            }
-
-            Button {
-                Task { await controller.disconnect() }
-            } label: {
-                Image(systemName: "eject")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(BlackmagicCamStyle.amber)
-                    .frame(width: 42, height: 38)
-                    .blackmagicButtonShell(cornerRadius: 12)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
-        .background(BlackmagicCamStyle.rail)
-        .overlay(Rectangle().fill(Color.white.opacity(0.10)).frame(height: 1), alignment: .bottom)
-        // Firmware/update note: header actions call controller APIs only; when firmware changes capability support, gate behavior in controller/snapshot rather than this chrome.
-    }
-
-    private var deviceName: String {
-        if case .connected(let device) = controller.status {
-            return device.name
-        }
-        return "Camera"
-    }
 }
 
 enum WorkspaceTab: Hashable {
