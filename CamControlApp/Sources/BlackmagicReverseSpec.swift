@@ -103,13 +103,13 @@ enum BlackmagicReverseSpec {
     static let slateFields = slateProjectFields + slateClipFields
 
     static let hudAssetNames = [
-        "Camera", "Camera_active", "Media", "Media_active", "Media_disabled", "Cloud", "BmdCloudSidebar", "ControlIcon", "ControlIconNotConnected", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
+        "Camera", "Camera_active", "Media", "Media_active", "Media_disabled", "Chat", "Chat_active", "Chat_disabled", "Cloud", "BmdCloudSidebar", "ControlIcon", "ControlIconNotConnected", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
         "IconAe", "IconAe_active", "IconAf", "IconAf_active", "IconAwb", "IconAwb_active",
         "IconLock", "IconLock_active", "IconLut", "IconLut_active", "IconStream", "IconStream_active", "IconTimelapse", "IconTimelapse_active",
         "BatteryIndicator", "BatteryIndicatorWarning", "StorageIphone", "StorageDrive",
-        "Exposure", "Exposure_active", "Lens", "Lens_active", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
+        "Exposure", "Exposure_active", "Lens", "Lens_active", "Zoom", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
         "Lut", "LutDisplay", "LutRecord", "LutSelector", "LutSelector_active",
-        "Media", "Media_active", "MediaSync", "MediaSync_active", "MediaSync_disabled", "UploadToCloud", "UploadToCloud_active", "UploadToCloud_disabled", "UploadedToCloud", "UploadedToCloudHq", "UploadedToCloudPxy", "Uploading", "UploadingDone", "ProjectUpload", "ProjectUploadFailed", "ProjectUploadNoConnection", "Sync", "Sync_active", "SyncFooter", "SyncSidebar",
+        "Media", "Media_active", "MediaSync", "MediaSync_active", "MediaSync_disabled", "Sort", "Sort_active", "SortDatetime", "SortFilename", "SortLocation", "SortTimecode", "SortUploadStatus", "UploadToCloud", "UploadToCloud_active", "UploadToCloud_disabled", "UploadedToCloud", "UploadedToCloudHq", "UploadedToCloudPxy", "Uploading", "UploadingSmall", "UploadingPause", "UploadingDone", "UploadingFailedThumbnail", "ProjectUpload", "ProjectUploadFailed", "ProjectUploadNoConnection", "Sync", "Sync_active", "SyncFooter", "SyncSidebar",
         "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate",
         "HdmiRecord", "HdmiRecord_active", "HdmiPlay", "HdmiPlay_active", "HdmiHistogramRgb",
         "HdmiStorageIphone", "HdmiStorageDrive", "HdmiFalseColorLegend", "HudStream"
@@ -119,6 +119,7 @@ enum BlackmagicReverseSpec {
         "Camera": "camera.fill",
         "Camera_active": "camera.fill",
         "Chat": "ellipsis.message.fill",
+        "Chat_active": "ellipsis.message.fill",
         "Cloud": "cloud.fill",
         "ProjectUpload": "folder.fill",
         "Sync": "arrow.triangle.2.circlepath",
@@ -137,6 +138,7 @@ enum BlackmagicReverseSpec {
         "IconTimelapse": "timer",
         "Exposure": "plusminus.circle",
         "Lens": "camera.aperture",
+        "Zoom": "plus.magnifyingglass",
         "BatteryIndicator": "battery.75percent",
         "StorageIphone": "iphone",
         "StorageDrive": "externaldrive.fill",
@@ -149,6 +151,8 @@ enum BlackmagicReverseSpec {
         "Zebra": "line.diagonal",
         "Lut": "camera.filters",
         "Media": "photo.on.rectangle",
+        "Sort": "arrow.up.arrow.down",
+        "Sort_active": "arrow.up.arrow.down",
         "UploadToCloud": "arrow.up.circle.fill",
         "Cloud": "cloud.fill",
         "Slate": "rectangle.and.pencil.and.ellipsis",

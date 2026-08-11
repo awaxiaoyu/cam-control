@@ -1,4 +1,4 @@
-import CamControlCore
+﻿import CamControlCore
 import SwiftUI
 
 struct ShootingHUDLayout<Preview: View>: View {
@@ -152,10 +152,10 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
 
             HStack(alignment: .top) {
-                leftMonitorRail(compact: metrics.compact)
+                leftQuickAccessRail(compact: metrics.compact)
                     .padding(.leading, metrics.safePad)
                 Spacer()
-                trailingIndicators(compact: metrics.compact)
+                rightProgrammableFunctionRail(compact: metrics.compact)
                     .frame(width: metrics.pageTabWidth)
                     .padding(.trailing, metrics.safePad)
             }
@@ -265,6 +265,64 @@ struct ShootingHUDLayout<Preview: View>: View {
         }
         .allowsHitTesting(false)
         // Firmware/update note: overlays mirror reversed HUDGuides, HUDSafeAreas, HUDFalseColor and HUDWhiteBalanceOverlay strings; only values should change for new camera firmware.
+    }
+
+    private func leftQuickAccessRail(compact: Bool) -> some View {
+        VStack(spacing: compact ? 7 : 9) {
+            quickAccessButton(title: "SETTINGS", asset: "ControlIcon", color: BlackmagicCamStyle.cyan, compact: compact) {
+                onNavigate(.settings)
+            }
+            quickAccessButton(title: "MEDIA", asset: "Media", color: .white.opacity(0.86), compact: compact) {
+                onNavigate(.media)
+            }
+            quickAccessButton(title: "CHAT", asset: "Chat", color: BlackmagicCamStyle.activeBlue, compact: compact) {
+                onNavigate(.chat)
+            }
+            quickAccessButton(title: "SLATE", asset: "Slate", color: BlackmagicCamStyle.amber, compact: compact) {
+                withAnimation(.snappy(duration: 0.18)) { showSlate = true }
+            }
+            quickAccessButton(title: "PRESET", asset: "Sync", color: BlackmagicCamStyle.okGreen, compact: compact) {
+                withAnimation(.snappy(duration: 0.18)) { activeScroller = .preset }
+            }
+        }
+        .padding(.vertical, compact ? 7 : 10)
+        .padding(.horizontal, compact ? 4 : 6)
+        .background(.black.opacity(0.54), in: RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
+        .shadow(color: .black.opacity(0.38), radius: 18, x: 0, y: 10)
+        // Firmware/update note: this maps recovered HUDLeftNavMenuIndicator, PresetScrollListView, SlateView and pageCamera/pageMedia/pageChat/pageSettings symbols; update asset order from IPA strings on future app changes.
+    }
+
+    private func rightProgrammableFunctionRail(compact: Bool) -> some View {
+        VStack(spacing: compact ? 7 : 9) {
+            monitorIconButton(asset: "FalseColor", color: BlackmagicCamStyle.amber, scroller: .falseColor, compact: compact)
+            monitorIconButton(asset: "FocusAssist", color: BlackmagicCamStyle.cyan, scroller: .focusAssist, compact: compact)
+            monitorIconButton(asset: "Guides", color: .white.opacity(0.82), scroller: .guides, compact: compact)
+        }
+        .padding(.vertical, compact ? 7 : 10)
+        .padding(.horizontal, compact ? 4 : 6)
+        .background(.black.opacity(0.54), in: RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
+        .shadow(color: .black.opacity(0.38), radius: 18, x: 0, y: 10)
+        // Firmware/update note: this maps HUDRightNavMenuIndicator and the 3.2 right-edge programmable function affordance; keep it to three visible function buttons unless recovered symbols change.
+    }
+
+    private func quickAccessButton(title: String, asset: String, color: Color, compact: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: compact ? 2 : 3) {
+                BMDAssetIcon(name: asset, active: false, fallback: BlackmagicReverseSpec.assetFallbackSystemImages[asset] ?? "circle", color: color, size: compact ? 15 : 18)
+                Text(title)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
+                    .tracking(0.5)
+                    .foregroundStyle(.white.opacity(0.54))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+            }
+            .frame(width: compact ? 38 : 48, height: compact ? 38 : 50)
+            .background(.white.opacity(0.052), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
     }
 
     private func leftMonitorRail(compact: Bool) -> some View {
@@ -385,12 +443,15 @@ struct ShootingHUDLayout<Preview: View>: View {
     private var bottomControlItems: [BottomControlItem] {
         [
             BottomControlItem(title: "LENS", value: value(for: "Lens"), asset: "Lens", scroller: .lens),
+            BottomControlItem(title: "ZOOM", value: value(forAny: ["Zoom"], fallback: "1.0x"), asset: "Zoom", scroller: .zoom),
             BottomControlItem(title: "FPS", value: value(for: "FPS"), asset: "IconTimelapse", scroller: .fps),
             BottomControlItem(title: "SHUTTER", value: value(for: "Shutter"), asset: "Exposure", scroller: .shutter),
             BottomControlItem(title: "IRIS", value: value(forAny: ["Iris", "Aperture"]), asset: "Exposure", scroller: .iris),
             BottomControlItem(title: "ISO", value: value(for: "ISO"), asset: "Exposure", scroller: .iso),
+            BottomControlItem(title: "EXP", value: value(forAny: ["Exposure", "Exposure Compensation"], fallback: "0.0"), asset: "Exposure", scroller: .exposure),
             BottomControlItem(title: "WB", value: value(forAny: ["WB", "White Balance"]), asset: "IconAwb", scroller: .whiteBalance),
             BottomControlItem(title: "TINT", value: value(for: "Tint"), asset: "IconAwb", scroller: .tint),
+            BottomControlItem(title: "STAB", value: "Off", asset: "ControlIcon", scroller: .stabilization),
             BottomControlItem(title: "LUT", value: "Rec.709", asset: "IconLut", scroller: .lut)
         ]
     }
@@ -399,12 +460,12 @@ struct ShootingHUDLayout<Preview: View>: View {
         topItems.first { $0.title.caseInsensitiveCompare(title) == .orderedSame }?.value ?? "--"
     }
 
-    private func value(forAny titles: [String]) -> String {
+    private func value(forAny titles: [String], fallback: String = "--") -> String {
         for title in titles {
             let found = value(for: title)
             if found != "--" { return found }
         }
-        return "--"
+        return fallback
     }
 
     private func scroller(for item: ShootingHUDTopItem) -> BlackmagicHUDScroller {
@@ -423,7 +484,7 @@ struct ShootingHUDLayout<Preview: View>: View {
         if option == "Refresh" { onRefresh() }
         if option == "Live" { onToggleLive() }
         if option == "AF" { onFocus() }
-        // Firmware/update note: scroller selections are UI placeholders until CameraController exposes Blackmagic cam_app_control style property writes.
+        // Firmware/update note: scroller labels are reverse-derived from CameraAppToolbox HUD/AppIntent strings; bind selection actions to cam_app_control properties when the controller layer exposes those writes.
     }
 }
 
@@ -483,28 +544,30 @@ enum ShootingHUDNavItem: String, CaseIterable, Identifiable {
         case .settings: return "slider.horizontal.3"
         }
     }
-    /// Firmware/update note: page names come from pageCamera/pageMedia/pageChat/pageSettings; visible glyphs use recovered Camera/Media plus Cloud/ControlIcon because Chat/Settings glyph asset names are not present in the 3.2.00 CameraAppToolbox Assets.car.
+    /// Firmware/update note: page names come from pageCamera/pageMedia/pageChat/pageSettings; glyphs use recovered Camera/Media/Chat/ControlIcon assets from CameraAppToolbox Assets.car.
     var assetName: String {
         switch self {
         case .camera: return "Camera"
         case .media: return "Media"
-        case .chat: return "Cloud"
+        case .chat: return "Chat"
         case .settings: return "ControlIcon"
         }
     }
 }
 
 private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
-    case lens, fps, shutter, iris, iso, whiteBalance, tint, codec, lut, focus, focusAssist, falseColor, guides, zebra, monitor, audio, stabilization
+    case lens, zoom, fps, shutter, iris, iso, exposure, whiteBalance, tint, codec, lut, focus, focusAssist, falseColor, guides, zebra, monitor, audio, stabilization, preset
     var id: String { rawValue }
     var title: String {
         switch self {
         case .lens: return "Lens"
+        case .zoom: return "ZOOM"
         case .fps: return "FPS"
         case .shutter: return "SHUTTER"
         case .iris: return "IRIS"
         case .iso: return "ISO"
         case .whiteBalance: return "WHITE BALANCE"
+        case .exposure: return "EXPOSURE"
         case .tint: return "TINT"
         case .codec: return "CODEC / RESOLUTION"
         case .lut: return "LUT SELECTION"
@@ -516,24 +579,28 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
         case .monitor: return "MONITOR"
         case .audio: return "AUDIO METERS"
         case .stabilization: return "STABILIZATION"
+        case .preset: return "PRESET SELECTION"
         }
     }
     var eyebrow: String {
         switch self {
-        case .lens, .fps, .shutter, .iris, .iso, .whiteBalance, .tint, .focus, .stabilization: return "Camera"
+        case .lens, .zoom, .fps, .shutter, .iris, .iso, .exposure, .whiteBalance, .tint, .focus, .stabilization: return "Camera"
         case .codec: return "Record"
         case .lut: return "LUTs"
         case .focusAssist, .falseColor, .guides, .zebra, .monitor: return "Monitor"
         case .audio: return "Audio"
+        case .preset: return "Presets"
         }
     }
     var options: [String] {
         switch self {
         case .lens: return ["0.5x", "13mm", "24mm", "35mm", "48mm", "77mm", "Front", "Refresh"]
+        case .zoom: return ["0.5x", "1.0x", "2.0x", "3.0x", "5.0x", "Refresh"]
         case .fps: return ["23.98", "24", "25", "29.97", "30", "48", "50", "59.94", "60"]
         case .shutter: return ["1/24", "1/48", "180\u{00B0}", "172.8\u{00B0}", "1/50", "1/60", "1/120", "Auto"]
         case .iris: return ["f1.8", "f2.0", "f2.8", "f4", "f5.6", "f8", "Auto"]
         case .iso: return ["Auto", "100", "200", "400", "800", "1250", "1600", "3200", "6400"]
+        case .exposure: return ["Auto", "Shutter", "ISO", "Shutter + ISO", "-2.0", "-1.0", "0.0", "+1.0", "+2.0"]
         case .whiteBalance: return ["Auto", "3200K", "4300K", "4700K", "5600K", "6500K", "7500K", "Lock"]
         case .tint: return ["-50", "-25", "0", "+10", "+25", "+50"]
         case .codec: return BlackmagicReverseSpec.recordCodecOptions + BlackmagicReverseSpec.recordResolutionOptions + BlackmagicReverseSpec.recordTimecodeOptions
@@ -545,7 +612,8 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
         case .zebra: return ["Off", "50%", "60%", "70%", "75%", "80%", "90%", "95%", "100%"]
         case .monitor: return BlackmagicReverseSpec.monitorOptions
         case .audio: return BlackmagicReverseSpec.audioLabels + ["None", "iPhone Microphone"]
-        case .stabilization: return ["Off", "Standard", "Cinematic", "Extreme"]
+        case .stabilization: return ["Off", "Standard", "Cinematic", "Extreme", "Optical"]
+        case .preset: return BlackmagicReverseSpec.presetSelectionOptions + ["Sync Presets to Cloud Project"]
         }
     }
 }
@@ -876,7 +944,7 @@ private struct BlackmagicScrollerPanel: View {
         .background(.black.opacity(0.78), in: RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous).stroke(.white.opacity(0.16), lineWidth: 1))
         .shadow(color: .black.opacity(0.55), radius: 24, x: 0, y: 12)
-        // Firmware/update note: options are reverse-derived stand-ins for FpsOptions, ShutterScroll, IsoScroll, LutScroller and Monitor scrollers.
+        // Firmware/update note: option strips mirror recovered FpsOptions, ShutterScroll, IsoScroll, ZoomScroll, ExposureScroll, LutScroller and Monitor scroller families.
     }
 }
 
@@ -1052,3 +1120,6 @@ private struct AudioMeterRow: View {
 enum ShootingHUDFixtures {
     static let histogramBars: [CGFloat] = [0.10, 0.18, 0.22, 0.15, 0.25, 0.38, 0.52, 0.44, 0.62, 0.74, 0.56, 0.43, 0.68, 0.82, 0.70, 0.48, 0.37, 0.28, 0.20, 0.16, 0.12, 0.09, 0.07, 0.05]
 }
+
+
+

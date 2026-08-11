@@ -29,7 +29,10 @@ struct BMDAssetIcon: View {
 
     private var loadedImage: UIImage? {
         let preferredName = active ? (activeName ?? "\(name)_active") : name
-        let names = Array(Set([preferredName, name])).filter { !$0.isEmpty }
+        var names: [String] = []
+        for assetName in [preferredName, name] where !assetName.isEmpty && !names.contains(assetName) {
+            names.append(assetName)
+        }
         let bundles = BMDAssetBundleStore.imageBundles
         for bundle in bundles {
             for assetName in names {
@@ -60,3 +63,4 @@ private enum BMDAssetBundleStore {
         return bundles
     }()
 }
+
