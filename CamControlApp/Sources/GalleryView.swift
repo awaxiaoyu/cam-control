@@ -101,6 +101,7 @@ struct GalleryView: View {
                         .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
             }
+            RemoteClipSyncStatusFooterView(status: sidePanel == .upload ? "Uploading proxy..." : "Waiting to Upload...", clips: controller.galleryItems.count, compact: compact)
         }
         .background(Color(red: 0.045, green: 0.048, blue: 0.052))
         // Firmware/update note: main media area follows recovered MediaViewToolbar plus MediaSortPanel/MediaUploadToCloudPanel/MediaClipDetailsLandscapePanel: grid left, dark contextual panel right, never a floating iOS sheet.

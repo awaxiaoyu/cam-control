@@ -268,8 +268,8 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private func topLeftStatus(compact: Bool) -> some View {
         HStack(spacing: compact ? 5 : 7) {
-            TopHudGlyph(asset: "Camera", text: isLiveActive ? "CAM" : "STBY", color: .white.opacity(0.74), compact: compact)
-            TopHudGlyph(asset: "Record", text: isCaptureActive ? "REC" : "READY", color: isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.68), compact: compact)
+            HUDCameraLightIndicator(title: isLiveActive ? "CAM" : "STBY", asset: "Camera", active: isLiveActive, compact: compact, color: BlackmagicCamStyle.cyan)
+            HUDCameraLightIndicator(title: isCaptureActive ? "REC" : "READY", asset: "Record", active: isCaptureActive, compact: compact, color: BlackmagicCamStyle.recordRed)
             Text(subtitle.uppercased())
                 .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 7, weight: .heavy))
                 .tracking(0.55)
@@ -434,12 +434,9 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func monitorIconButton(asset: String, color: Color, scroller: BlackmagicHUDScroller, compact: Bool) -> some View {
-        Button {
+        BmdIndicatorIconButton(image: asset, active: activeScroller == scroller, compact: compact, color: color) {
             withAnimation(.snappy(duration: 0.18)) { activeScroller = scroller }
-        } label: {
-            monitorIconShell(asset: asset, color: color, active: activeScroller == scroller, compact: compact)
         }
-        .buttonStyle(.plain)
     }
 
     private func monitorIconShell(asset: String, color: Color, active: Bool, compact: Bool) -> some View {
@@ -448,6 +445,7 @@ struct ShootingHUDLayout<Preview: View>: View {
             .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.68) : .black.opacity(0.24), in: RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.50) : .white.opacity(0.07), lineWidth: 1))
             .contentShape(RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous))
+        // Firmware/update note: retained for non-button overlays; interactive indicators use recovered BmdIndicatorIconButton above.
     }
 
     private func bottomScopeStrip(compact: Bool) -> some View {
@@ -987,33 +985,34 @@ private struct BlackmagicScrollerPanel: View {
     let onSelect: (String) -> Void
     let onClose: () -> Void
     var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 10 : 14) {
-            HStack(spacing: 10) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(scroller.eyebrow.uppercased()).font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy)).tracking(1.4).foregroundStyle(BlackmagicCamStyle.cyan)
-                    Text(scroller.title).font(BlackmagicCamStyle.labelFont(size: compact ? 17 : 22, weight: .heavy)).foregroundStyle(.white)
-                }
-                Spacer()
-                Text("SWIPE TO SELECT").font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 9, weight: .heavy)).tracking(1.1).foregroundStyle(.white.opacity(0.38)).lineLimit(1)
-                Button(action: onClose) { Image(systemName: "xmark").font(.system(size: compact ? 12 : 14, weight: .heavy)).foregroundStyle(.white).frame(width: compact ? 28 : 34, height: compact ? 28 : 34).background(.white.opacity(0.10), in: Circle()) }.buttonStyle(.plain)
-            }
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: compact ? 7 : 10) {
-                    ForEach(Array(scroller.options.enumerated()), id: \.offset) { index, option in
-                        Button { onSelect(option) } label: {
-                            ScrollerOptionDial(option: option, selected: index == 0, compact: compact)
-                        }
-                        .buttonStyle(.plain)
+        BmdPopoverShell(compact: compact) {
+            VStack(alignment: .leading, spacing: compact ? 10 : 14) {
+                HStack(spacing: 10) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(scroller.eyebrow.uppercased()).font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy)).tracking(1.4).foregroundStyle(BlackmagicCamStyle.cyan)
+                        Text(scroller.title).font(BlackmagicCamStyle.labelFont(size: compact ? 17 : 22, weight: .heavy)).foregroundStyle(.white)
                     }
+                    Spacer()
+                    Text("SWIPE TO SELECT").font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 9, weight: .heavy)).tracking(1.1).foregroundStyle(.white.opacity(0.38)).lineLimit(1)
+                    BmdTextButton(title: "Close", compact: compact, color: BlackmagicCamStyle.cyan, action: onClose)
                 }
-                .padding(.vertical, 2)
+                if scroller == .lut {
+                    LutNamesPanel(compact: compact)
+                }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: compact ? 7 : 10) {
+                        ForEach(Array(scroller.options.enumerated()), id: \.offset) { index, option in
+                            Button { onSelect(option) } label: {
+                                ScrollerOptionDial(option: option, selected: index == 0, compact: compact)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
             }
         }
-        .padding(compact ? 13 : 18)
-        .background(.black.opacity(0.78), in: RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous).stroke(.white.opacity(0.16), lineWidth: 1))
-        .shadow(color: .black.opacity(0.55), radius: 24, x: 0, y: 12)
-        // Firmware/update note: option strips mirror recovered FpsOptions, ShutterScroll, IsoScroll, ZoomScroll, ExposureScroll, LutScroller and Monitor scroller families.
+        // Firmware/update note: option strips mirror recovered BmdPopover, BmdTextButton, FpsOptions, ShutterScroll, IsoScroll, ZoomScroll, ExposureScroll, LutScroller and Monitor scroller families.
     }
 }
 
@@ -1074,9 +1073,8 @@ private struct BottomHUDPreviewCard: View {
                     ProgressView(value: progress).tint(BlackmagicCamStyle.okGreen).frame(width: compact ? 66 : 86)
                 }
             case .audio(let levels):
-                VStack(spacing: 3) {
-                    ForEach(Array(levels.enumerated()), id: \.offset) { _, level in AudioMeterRow(level: level).frame(width: compact ? 66 : 86, height: compact ? 5 : 6) }
-                }
+                AudioMeterMini(levels: levels, compact: compact)
+                    .frame(width: compact ? 66 : 86)
             }
         }
         .padding(.horizontal, compact ? 8 : 10).padding(.vertical, compact ? 6 : 7)

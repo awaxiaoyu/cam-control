@@ -141,7 +141,12 @@ struct PropertyPanel: View {
         let rows = categoryRows
         return VStack(spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.element.title) { index, row in
-                SettingsOptionRow(row: row, compact: compact)
+                VStack(spacing: 0) {
+                    SettingsOptionRow(row: row, compact: compact)
+                    if !row.choices.isEmpty {
+                        BmdTextListSelector(title: row.title, options: row.choices, selected: row.value, compact: compact, color: row.color)
+                    }
+                }
                 if index < rows.count - 1 {
                     Rectangle().fill(.white.opacity(0.07)).frame(height: 1)
                 }

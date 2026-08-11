@@ -46,6 +46,11 @@ REQUIRED_SOURCE_PATTERNS = {
     'stealth_layout_toggle': (SRC / 'ShootingHUDComponents.swift', r'stealthHUD[\s\S]*StealthLayoutData'),
     'reset_settings_category': (SRC / 'BlackmagicReverseSpec.swift', r'static let resetChoices'),
     'reset_settings_panel_rows': (SRC / 'PropertyPanel.swift', r'valueForResetOption[\s\S]*Reset Settings Dialog'),
+    'bmd_reversed_controls_file': (SRC / 'BlackmagicReversedControls.swift', r'BmdIndicatorIconButton[\s\S]*BmdTextButton[\s\S]*BmdPopoverShell[\s\S]*BmdTextListSelector'),
+    'hud_camera_light_indicator': (SRC / 'ShootingHUDComponents.swift', r'HUDCameraLightIndicator\(title:'),
+    'lut_names_panel_scroller': (SRC / 'ShootingHUDComponents.swift', r'LutNamesPanel\(compact:'),
+    'audio_meter_mini': (SRC / 'ShootingHUDComponents.swift', r'AudioMeterMini\(levels:'),
+    'remote_clip_sync_footer': (SRC / 'GalleryView.swift', r'RemoteClipSyncStatusFooterView\('),
     'complete_reverse_script': (ROOT / 'scripts' / 'reverse_blackmagic_complete_ui.py', r'UI_BUCKETS'),
 }
 FORBIDDEN_SOURCE_PATTERNS = {
