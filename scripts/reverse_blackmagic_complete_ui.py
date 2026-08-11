@@ -1,4 +1,4 @@
-﻿import argparse
+import argparse
 import collections
 import hashlib
 import json
@@ -19,7 +19,7 @@ UI_BUCKETS = {
 }
 
 ASSET_TERMS = [
-    "Camera", "Media", "Cloud", "ControlIcon", "Record", "Slate", "Exposure", "Focus", "FalseColor", "Guides", "Grids", "Zebra", "Lut", "BatteryIndicator", "Storage", "Upload", "Sync", "Hdmi", "IconAf", "IconAwb", "IconLock", "IconLut", "IconTimelapse", "Sort"
+    "Camera", "Media", "Cloud", "ControlIcon", "Record", "Slate", "Exposure", "Focus", "FalseColor", "Guides", "Grids", "Zebra", "Lut", "BatteryIndicator", "Storage", "Upload", "Sync", "Stream", "Hdmi", "IconAf", "IconAwb", "IconLock", "IconLut", "IconTimelapse", "Sort"
 ]
 
 SETTING_COMMENT_RE = re.compile(r'/\*(.*?)\*/\s*"((?:\\.|[^"\\])*)"\s*=\s*"((?:\\.|[^"\\])*)"\s*;', re.S)

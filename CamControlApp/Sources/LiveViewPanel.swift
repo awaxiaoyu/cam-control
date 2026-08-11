@@ -99,8 +99,13 @@ struct LiveViewPanel: View {
                     endPoint: .bottomTrailing
                 )
                 VStack(spacing: 12) {
-                    Image(systemName: controller.snapshot.capabilities.liveView ? "viewfinder" : "camera.viewfinder")
-                        .font(.system(size: 48, weight: .medium))
+                    BMDAssetIcon(
+                        name: controller.snapshot.capabilities.liveView ? "HdmiPlay" : "Camera",
+                        active: controller.snapshot.capabilities.liveView,
+                        fallback: controller.snapshot.capabilities.liveView ? "play.fill" : "camera.viewfinder",
+                        color: .white.opacity(0.78),
+                        size: 48
+                    )
                     Text(controller.snapshot.capabilities.liveView ? "Start live view from the right rail" : "Live view is not exposed by this camera")
                         .font(.headline)
                 }
@@ -109,9 +114,9 @@ struct LiveViewPanel: View {
         }
     }
 
-    private func stripLabel(_ title: String, systemImage: String, active: Bool = false) -> some View {
+    private func stripLabel(_ title: String, asset: String, fallback: String? = nil, active: Bool = false) -> some View {
         HStack(spacing: 7) {
-            Image(systemName: systemImage)
+            BMDAssetIcon(name: asset, active: active, fallback: fallback, color: active ? .white : .white.opacity(0.72), size: 14)
             Text(title)
         }
         .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
@@ -120,6 +125,7 @@ struct LiveViewPanel: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .blackmagicButtonShell(cornerRadius: 12, active: active)
+        // Firmware/update note: review/live/stream controls use recovered CameraAppToolbox assets first; update asset aliases when a new IPA changes the right-rail or media overlay glyph set.
     }
 
     @ViewBuilder
@@ -293,7 +299,7 @@ struct LiveViewPanel: View {
             Button {
                 dismissCapturedReview()
             } label: {
-                stripLabel("LIVE", systemImage: "play.fill", active: true)
+                stripLabel("LIVE", asset: "HdmiPlay", fallback: "play.fill", active: true)
             }
             .buttonStyle(.plain)
             .padding(10)
@@ -312,7 +318,7 @@ struct LiveViewPanel: View {
                 Task { await controller.driveLens(direction: direction, step: .hard) }
             }
         } label: {
-            stripLabel(direction == .near ? "NEAR" : "FAR", systemImage: icon)
+            stripLabel(direction == .near ? "NEAR" : "FAR", asset: "Focus", fallback: icon)
         }
         .disabled(!controller.snapshot.capabilities.driveLens)
     }
@@ -325,7 +331,7 @@ struct LiveViewPanel: View {
                 }
             }
         } label: {
-            stripLabel("REVIEW", systemImage: "timer")
+            stripLabel("REVIEW", asset: "IconTimelapse", fallback: "timer")
         }
     }
 
@@ -338,7 +344,7 @@ struct LiveViewPanel: View {
             }
             Toggle("Filenames", isOn: $showStreamFilename)
         } label: {
-            stripLabel("STREAM", systemImage: "film.stack")
+            stripLabel("STREAM", asset: "IconStream", fallback: "film.stack")
         }
     }
 
@@ -470,8 +476,7 @@ private struct PictureStreamThumbnail: View {
                             .resizable()
                             .scaledToFill()
                     } else {
-                        Image(systemName: "photo")
-                            .foregroundStyle(BlackmagicCamStyle.mutedText)
+                        BMDAssetIcon(name: "Media", fallback: "photo", color: BlackmagicCamStyle.mutedText, size: 24)
                     }
                 }
                 .frame(width: 90, height: 58)
@@ -511,4 +516,3 @@ private struct AutofocusOverlay: View {
         }
     }
 }
-

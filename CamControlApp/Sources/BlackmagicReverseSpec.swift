@@ -113,7 +113,7 @@ enum BlackmagicReverseSpec {
         "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate",
         "HdmiRecord", "HdmiRecord_active", "HdmiPlay", "HdmiPlay_active", "HdmiHistogramRgb",
         "Hdmi4kRecord", "Hdmi4kRecord_active", "Hdmi4kPlay", "Hdmi4kPlay_active", "Hdmi4kHistogramRgb",
-        "HdmiStorageIphone", "HdmiStorageDrive", "Hdmi4kStorageIphone", "Hdmi4kStorageDrive", "HdmiFalseColorLegend", "Hdmi4kFalseColorLegend", "HudStream"
+        "HdmiStorageIphone", "HdmiStorageDrive", "Hdmi4kStorageIphone", "Hdmi4kStorageDrive", "HdmiFalseColorLegend", "Hdmi4kFalseColorLegend"
     ]
 
     static let assetAliasNotes = [
@@ -121,6 +121,13 @@ enum BlackmagicReverseSpec {
         "HUD auto icons": "IconAf/IconAwb/IconLock/IconLut/IconTimelapse are recovered under Apple Watch/* plus png rendition aliases.",
         "Lens footer glyph": "3.2.00 exposes LensOptions as UI symbols but no bare Lens asset; use Camera glyph while preserving LENS label.",
         "Zoom/function rail glyph": "3.2.00 screenshots show a zoom/function icon in the camera-control rail; use recovered FocusAutoZoom/ExposureAutoZoom assets because no bare Zoom asset exists in 3.2.00."
+    ]
+
+    static let implementationRules = [
+        "HUDTopLeftIndicators/HUDTopIndicators are status-only; never duplicate LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT in the top overlay.",
+        "LHUDFooterElements/PHUDFooterElements/PLHUDFooterElements render the seven camera controls as BmdAdjustmentDial cells.",
+        "BmdVTabView pageCamera/pageMedia/pageChat/pageSettings is an icon-only right-edge rail; visible text labels are not part of the 3.2.00 page rail.",
+        "Live/review/stream controls should use recovered HdmiPlay/IconTimelapse/IconStream/Media assets before SF Symbol fallback."
     ]
 
     static let assetFallbackSystemImages: [String: String] = [
@@ -169,7 +176,6 @@ enum BlackmagicReverseSpec {
         "Slate": "rectangle.and.pencil.and.ellipsis",
         "HdmiRecord": "record.circle",
         "HdmiPlay": "play.fill",
-        "HdmiHistogramRgb": "waveform.path.ecg",
-        "HudStream": "film.stack"
+        "HdmiHistogramRgb": "waveform.path.ecg"
     ]
 }

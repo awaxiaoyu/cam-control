@@ -16,12 +16,12 @@ struct BlackmagicRootPageRail: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.vertical, compact ? 5 : 8)
+        .padding(.vertical, compact ? 4 : 6)
         .padding(.horizontal, compact ? 2 : 3)
         .background(.black.opacity(0.72), in: RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
         .shadow(color: .black.opacity(0.42), radius: 14, x: 0, y: 8)
-        // Firmware/update note: visual proportions follow 3.2.00 screenshots: a black right-edge page strip with icon + tiny label for Camera/Media/Chat/Settings.
+        // Firmware/update note: visual proportions follow recovered 3.2.00 BmdVTabView/pageCamera/pageMedia/pageChat/pageSettings: a black right-edge page strip with icon-only cells, not app-style text tabs.
     }
 }
 
@@ -34,19 +34,13 @@ private struct RootPageRailButton: View {
     private var fillColor: Color { selected ? BlackmagicCamStyle.activeBlue.opacity(0.58) : .white.opacity(0.052) }
     private var strokeColor: Color { selected ? BlackmagicCamStyle.cyan.opacity(0.48) : .white.opacity(0.08) }
     private var cornerRadius: CGFloat { compact ? 6 : 8 }
-    private var buttonSize: CGSize { CGSize(width: compact ? 38 : 50, height: compact ? 42 : 56) }
-    private var iconSize: CGFloat { compact ? 13 : 16 }
+    private var buttonSize: CGSize { CGSize(width: compact ? 36 : 48, height: compact ? 36 : 48) }
+    private var iconSize: CGFloat { compact ? 16 : 20 }
 
     var body: some View {
         ZStack(alignment: .trailing) {
-            VStack(spacing: compact ? 2 : 3) {
+            ZStack {
                 BMDAssetIcon(name: item.assetName, active: selected, fallback: item.systemImage, color: iconColor, size: iconSize)
-                Text(item.title.capitalized)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5.5 : 7, weight: .heavy))
-                    .tracking(0.15)
-                    .foregroundStyle(selected ? .white : .white.opacity(0.62))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.55)
             }
             .frame(width: buttonSize.width, height: buttonSize.height)
             .background(fillColor, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
@@ -59,6 +53,6 @@ private struct RootPageRailButton: View {
             }
         }
         .accessibilityLabel(item.title)
-        // Firmware/update note: page tabs map recovered pageCamera/pageMedia/pageChat/pageSettings, pageTabWidth and tabButton size symbols; glyph names must be checked against asset_ui_names_unique.txt on firmware updates.
+        // Firmware/update note: page tabs map recovered pageCamera/pageMedia/pageChat/pageSettings, pageTabWidth and tabButton size symbols; keep labels accessibility-only unless a future IPA exposes visible page text.
     }
 }

@@ -90,6 +90,8 @@ private enum BMDAssetImageLoader {
         case "IconLock_active": return ["Apple Watch/IconLock_active", "icon_lock_active", "Lock_active", "LockHud_active"]
         case "IconLut": return ["Apple Watch/IconLut", "icon_LUT", "Lut"]
         case "IconLut_active": return ["Apple Watch/IconLut_active", "icon_LUT_active", "Lut_active"]
+        case "IconStream": return ["Apple Watch/IconStream", "icon_stream"]
+        case "IconStream_active": return ["Apple Watch/IconStream_active", "icon_stream_active"]
         case "IconTimelapse": return ["Apple Watch/IconTimelapse", "icon_timelapse", "Timelapse"]
         case "IconTimelapse_active": return ["Apple Watch/IconTimelapse_active", "icon_timelapse_active"]
         case "Chat", "Chat_active": return ["Cloud", "BmdCloudSidebar"]

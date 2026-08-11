@@ -169,7 +169,7 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private func topHUD(compact: Bool) -> some View {
         HStack(alignment: .top, spacing: compact ? 8 : 12) {
-            topCameraReadouts(compact: compact)
+            topLeftStatus(compact: compact)
             Spacer(minLength: compact ? 8 : 16)
             recordTimerBar(compact: compact)
             Spacer(minLength: compact ? 8 : 16)
@@ -177,17 +177,21 @@ struct ShootingHUDLayout<Preview: View>: View {
         }
     }
 
-    private func topCameraReadouts(compact: Bool) -> some View {
-        HStack(alignment: .top, spacing: compact ? 8 : 13) {
-            ForEach(bottomControlItems) { item in
-                CameraTopReadout(item: item, compact: compact, active: activeScroller == item.scroller)
-                    .onTapGesture { withAnimation(.snappy(duration: 0.18)) { activeScroller = item.scroller } }
-            }
+    private func topLeftStatus(compact: Bool) -> some View {
+        HStack(spacing: compact ? 5 : 7) {
+            TopHudGlyph(asset: "Camera", text: isLiveActive ? "CAM" : "STBY", color: .white.opacity(0.74), compact: compact)
+            TopHudGlyph(asset: "Record", text: isCaptureActive ? "REC" : "READY", color: isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.68), compact: compact)
+            Text(subtitle.uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 7, weight: .heavy))
+                .tracking(0.55)
+                .foregroundStyle(.white.opacity(0.52))
+                .lineLimit(1)
+                .minimumScaleFactor(0.50)
         }
         .padding(.horizontal, compact ? 4 : 6)
-        .padding(.vertical, compact ? 2 : 4)
-        .background(.black.opacity(0.08), in: RoundedRectangle(cornerRadius: compact ? 5 : 7, style: .continuous))
-        // Firmware/update note: matches 3.2.00 Camera HUD readouts LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT as tiny transparent top overlay labels, not boxed tiles.
+        .padding(.vertical, compact ? 2 : 3)
+        .background(.black.opacity(0.16), in: Capsule())
+        // Firmware/update note: top overlay is status-only per recovered HUDTopLeftIndicators/HUDTopIndicators; LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT must remain in the footer dial strip when the IPA changes.
     }
 
     private func recordTimerBar(compact: Bool) -> some View {
@@ -365,7 +369,7 @@ struct ShootingHUDLayout<Preview: View>: View {
                         Button {
                             withAnimation(.snappy(duration: 0.18)) { activeScroller = item.scroller }
                         } label: {
-                            MiniFooterReadout(item: item, compact: compact, active: activeScroller == item.scroller)
+                            BmdAdjustmentDialCell(item: item, compact: compact, active: activeScroller == item.scroller)
                         }
                         .buttonStyle(.plain)
                     }
@@ -374,11 +378,9 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal, compact ? 4 : 6)
-        .padding(.vertical, compact ? 3 : 4)
-        .background(.black.opacity(0.18), in: RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous).stroke(.white.opacity(0.05), lineWidth: 1))
-        // Firmware/update note: screenshot evidence shows capture/AF controls in the right function rail; footer remains a minimal value strip for LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT.
+        .padding(.horizontal, compact ? 2 : 4)
+        .padding(.vertical, compact ? 1 : 2)
+        // Firmware/update note: screenshot/binary evidence exposes BmdAdjustmentDial/BmdDialHDivider/BmdDialVDivider for the footer; capture/AF controls stay in the right function rail and the top HUD remains status-only.
     }
 
     private var bottomControlItems: [BottomControlItem] {
@@ -432,12 +434,12 @@ private struct BlackmagicHUDMetrics {
     var compact: Bool { size.width < 980 || size.height < 620 }
     var safePad: CGFloat { compact ? 6 : 10 }
     var pageTabWidth: CGFloat { compact ? 82 : 110 }
-    var footerHeight: CGFloat { compact ? 48 : 60 }
     var footerBottomPadding: CGFloat { compact ? 6 : 10 }
     var leftHudWidth: CGFloat { compact ? 26 : 34 }
     var rightControlRailWidth: CGFloat { compact ? 34 : 44 }
     var rightPageRailWidth: CGFloat { compact ? 44 : 58 }
-    // Firmware/update note: values are reverse-derived from 3.2.00 MainViewLayoutData plus App Store 3.x landscape screenshots: compact top readouts, narrow left HUD strip, icon rail + page rail on the right, and no card-like bottom footer.
+    var footerHeight: CGFloat { compact ? 72 : 92 }
+    // Firmware/update note: values are reverse-derived from 3.2.00 MainViewLayoutData plus App Store 3.x landscape screenshots: status-only top HUD, BmdAdjustmentDial footer controls, narrow left HUD strip, icon rail + page rail on the right, and no generic card-like bottom toolbar.
 }
 
 struct ShootingHUDTopItem: Identifiable, Equatable {

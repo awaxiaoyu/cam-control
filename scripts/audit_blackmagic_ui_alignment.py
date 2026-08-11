@@ -1,4 +1,4 @@
-﻿import json
+import json
 import plistlib
 import re
 import sys
@@ -22,6 +22,13 @@ REQUIRED_SOURCE_PATTERNS = {
     'asset_aliases': (SRC / 'BMDAssetIcon.swift', r'Apple Watch/IconAf'),
     'false_color_original_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetImage\(name: "FalseColorLegend".*preserveOriginalColors: true'),
     'bmd_cloud_logo_asset': (SRC / 'CloudChatPanel.swift', r'BMDAssetImage\(name: "BmdCloudLogo".*preserveOriginalColors: true'),
+    'top_status_only_hud': (SRC / 'ShootingHUDComponents.swift', r'topLeftStatus\(compact: compact\)'),
+    'footer_bmd_adjustment_dials': (SRC / 'ShootingHUDComponents.swift', r'BmdAdjustmentDialCell\(item: item, compact: compact, active: activeScroller == item\.scroller\)'),
+    'footer_height_for_dials': (SRC / 'ShootingHUDComponents.swift', r'var footerHeight: CGFloat \{ compact \? 72 : 92 \}'),
+    'icon_only_page_rail': (SRC / 'BlackmagicRootPageRail.swift', r'icon-only cells'),
+    'liveview_live_asset_button': (SRC / 'LiveViewPanel.swift', r'stripLabel\("LIVE", asset: "HdmiPlay"'),
+    'liveview_review_asset_button': (SRC / 'LiveViewPanel.swift', r'stripLabel\("REVIEW", asset: "IconTimelapse"'),
+    'liveview_stream_asset_button': (SRC / 'LiveViewPanel.swift', r'stripLabel\("STREAM", asset: "IconStream"'),
     'slate_tab_panel': (SRC / 'ShootingHUDComponents.swift', r'SlateInfoTab|SlateViewProjectInfo|SlateViewClipInfo|SlateViewLensInfo'),
     'slate_close_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetIcon\(name: "SlateClose"'),
     'settings_option_list_cells': (SRC / 'PropertyPanel.swift', r'SettingsChoiceCell|OptionListView/BmdTextListSelector'),
@@ -31,6 +38,10 @@ REQUIRED_SOURCE_PATTERNS = {
 FORBIDDEN_SOURCE_PATTERNS = {
     'stale_left_app_nav': (SRC / 'ShootingHUDComponents.swift', r'leftQuickAccessRail|quickAccessButton|FloatingNavPill|trailingIndicators'),
     'bare_chat_asset_in_nav': (SRC / 'ShootingHUDComponents.swift', r'case \.chat: return "Chat"'),
+    'top_footer_readout_duplication': (SRC / 'ShootingHUDComponents.swift', r'CameraTopReadout\(item:'),
+    'mini_footer_not_bmd_dial': (SRC / 'ShootingHUDComponents.swift', r'MiniFooterReadout\(item:'),
+    'visible_page_rail_text': (SRC / 'BlackmagicRootPageRail.swift', r'Text\(item\.title\.capitalized\)'),
+    'liveview_sf_striplabel': (SRC / 'LiveViewPanel.swift', r'stripLabel\([^\\n]*systemImage:'),
 }
 
 
@@ -120,6 +131,7 @@ def check_asset_coverage():
         'IconAwb': ['Apple Watch/IconAwb', 'icon_AWB'], 'IconAwb_active': ['Apple Watch/IconAwb_active', 'icon_AWB_active'],
         'IconLock': ['Apple Watch/IconLock', 'icon_lock', 'Lock', 'LockHud'], 'IconLock_active': ['Apple Watch/IconLock_active', 'icon_lock_active', 'Lock_active', 'LockHud_active'],
         'IconLut': ['Apple Watch/IconLut', 'icon_LUT', 'Lut'], 'IconLut_active': ['Apple Watch/IconLut_active', 'icon_LUT_active', 'Lut_active'],
+        'IconStream': ['Apple Watch/IconStream', 'icon_stream'], 'IconStream_active': ['Apple Watch/IconStream_active', 'icon_stream_active'],
         'IconTimelapse': ['Apple Watch/IconTimelapse', 'icon_timelapse', 'Timelapse'], 'IconTimelapse_active': ['Apple Watch/IconTimelapse_active', 'icon_timelapse_active'],
         'Chat': ['Cloud', 'BmdCloudSidebar'], 'Chat_active': ['Cloud', 'BmdCloudSidebar'], 'Lens': ['Camera', 'Camera_active'], 'Lens_active': ['Camera', 'Camera_active'],
     }

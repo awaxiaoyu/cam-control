@@ -10,6 +10,8 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - Left edge is icon-only monitor/control rail: false color, focus assist, guides, zebra, LUT/clean feed.
 - Footer controls are exactly LENS, FPS, SHUTTER, IRIS, ISO, WB, TINT; secondary controls live in scrollers.
 - Top overlay is compact status/timecode/storage/upload, using BMD Lato fonts.
+- Top overlay must not duplicate footer camera controls; LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT render only as footer `BmdAdjustmentDial` cells.
+- Right edge `pageCamera/pageMedia/pageChat/pageSettings` rail is icon-only in the visible UI; text labels remain accessibility-only.
 - Settings, Media, Chat use Blackmagic side-panel layouts, not iOS grouped list chrome.
 - Use recovered CameraAppToolbox Assets.car names and documented aliases before SF Symbol fallback.
 
@@ -272,6 +274,7 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - Slate is implemented as tabbed `PROJECT INFO` / `CLIP INFO` / `LENS INFO` panels mapped to recovered `SlateViewProjectInfo`, `SlateViewClipInfo`, and `SlateViewLensInfo` symbols; the close button uses recovered `SlateClose`.
 - Settings option choices use square `OptionListView` / `BmdTextListSelector`-style selector cells rather than iOS capsule chips.
 - Media, Chat, Settings sidebars must remain dark panel-driven surfaces consistent with `MediaViewSidebar`, `ChatViewSidebar`, and `SettingsCategoryPanel` evidence.
+- Camera HUD layout separates `HUDTopLeftIndicators` / `HUDTopIndicators` status from `LHUDFooterElements` / `PHUDFooterElements`; top status shows camera/record/timecode/storage/upload only, while the footer uses `BmdAdjustmentDial`, `BmdDialHDivider`, and `BmdDialVDivider` for the seven camera controls.
 
 ## Assetutil Dimension Evidence
 
