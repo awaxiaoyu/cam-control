@@ -146,7 +146,8 @@ final class CameraControllerTests: XCTestCase {
 
         await controller.connect(to: device)
         transport.yield(.objectAdded(handle, PTP.ObjectFormat.exifJpeg))
-        XCTAssertTrue(await waitUntil { controller.pictureStreamItems.first?.objectHandle == handle })
+        let didReceivePictureStreamItem = await waitUntil { controller.pictureStreamItems.first?.objectHandle == handle }
+        XCTAssertTrue(didReceivePictureStreamItem)
 
         XCTAssertEqual(controller.pictureStreamItems.first?.objectHandle, handle)
         XCTAssertEqual(controller.pictureStreamItems.first?.filename, "DSC_0077.JPG")
