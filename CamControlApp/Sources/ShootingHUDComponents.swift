@@ -1058,124 +1058,139 @@ private enum SlateInfoTab: String, CaseIterable, Identifiable {
 private struct SlateOverlay: View {
     let compact: Bool
     let onClose: () -> Void
-    @State private var selectedTab: SlateInfoTab = .project
+
+    private var bluePanel: Color { Color(red: 0.11, green: 0.18, blue: 0.30) }
+    private var blueCell: Color { Color(red: 0.15, green: 0.24, blue: 0.39) }
+    private var activeBlueCell: Color { Color(red: 0.22, green: 0.38, blue: 0.66) }
 
     var body: some View {
-        HStack(spacing: 0) {
-            slateTabs
-                .frame(width: compact ? 142 : 188)
-            Rectangle()
-                .fill(.white.opacity(0.10))
-                .frame(width: 1)
-            slateContent
-        }
-        .frame(maxWidth: compact ? 720 : 980, maxHeight: compact ? 438 : 620)
-        .background(.black.opacity(0.90), in: RoundedRectangle(cornerRadius: compact ? 20 : 28, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 20 : 28, style: .continuous).stroke(BlackmagicCamStyle.cyan.opacity(0.22), lineWidth: 1))
-        .shadow(color: .black.opacity(0.62), radius: 30, x: 0, y: 18)
-        // Firmware/update note: tab split mirrors recovered SlateViewProjectInfo, SlateViewClipInfo and SlateViewLensInfo symbols; when Blackmagic updates slate field selections, update SlateInfoTab.fields from Localizable.strings/comments before layout.
-    }
-
-    private var slateTabs: some View {
-        VStack(alignment: .leading, spacing: compact ? 10 : 14) {
-            HStack(spacing: 8) {
-                BMDAssetIcon(name: "Slate", activeName: "Slate_active", active: true, fallback: "clapperboard.fill", color: BlackmagicCamStyle.amber, size: compact ? 18 : 22)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("SLATE FOR")
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                        .tracking(1.4)
-                        .foregroundStyle(BlackmagicCamStyle.amber)
-                    Text("A001")
-                        .font(BlackmagicCamStyle.timecodeFont(size: compact ? 24 : 34))
-                        .foregroundStyle(.white)
-                }
-            }
-            .padding(.horizontal, compact ? 12 : 16)
-            .padding(.top, compact ? 14 : 20)
-
-            VStack(spacing: compact ? 6 : 8) {
-                ForEach(SlateInfoTab.allCases) { tab in
-                    Button {
-                        withAnimation(.snappy(duration: 0.16)) { selectedTab = tab }
-                    } label: {
-                        SlateTabButton(tab: tab, active: selectedTab == tab, compact: compact)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, compact ? 8 : 12)
-
-            Spacer()
-            VStack(alignment: .leading, spacing: 5) {
-                Text(selectedTab.evidenceName)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
-                    .tracking(0.7)
-                    .foregroundStyle(.white.opacity(0.42))
-                Text("NEXT CLIP  A002")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                    .foregroundStyle(.white.opacity(0.72))
-            }
-            .padding(compact ? 12 : 16)
-        }
-        .background(LinearGradient(colors: [.black.opacity(0.96), BlackmagicCamStyle.rail.opacity(0.92)], startPoint: .top, endPoint: .bottom))
-    }
-
-    private var slateContent: some View {
-        VStack(alignment: .leading, spacing: compact ? 12 : 16) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(selectedTab.title)
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 22 : 32, weight: .heavy))
-                        .foregroundStyle(.white)
-                    Text("Blackmagic Camera Metadata")
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                        .tracking(1.2)
-                        .foregroundStyle(.white.opacity(0.48))
-                }
+        VStack(spacing: 0) {
+            HStack {
                 Spacer()
                 Button(action: onClose) {
-                    BMDAssetIcon(name: "SlateClose", fallback: "xmark", color: .white, size: compact ? 14 : 18)
-                        .frame(width: compact ? 34 : 42, height: compact ? 34 : 42)
-                        .background(.white.opacity(0.10), in: Circle())
-                        .overlay(Circle().stroke(.white.opacity(0.12), lineWidth: 1))
+                    BMDAssetIcon(name: "SlateClose", fallback: "xmark", color: .white.opacity(0.52), size: compact ? 11 : 14)
+                        .frame(width: compact ? 26 : 34, height: compact ? 26 : 34)
                 }
                 .buttonStyle(.plain)
             }
+            .frame(height: compact ? 18 : 24)
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: compact ? 8 : 12), count: selectedTab == .clip ? 3 : 2), spacing: compact ? 8 : 12) {
-                ForEach(selectedTab.fields, id: \.self) { field in
-                    SlateInputCell(field: field, value: defaultSlateValue(for: field), compact: compact, accent: selectedTab == .project ? BlackmagicCamStyle.cyan : (selectedTab == .clip ? BlackmagicCamStyle.amber : BlackmagicCamStyle.activeBlue))
+            VStack(spacing: 1) {
+                HStack(spacing: 1) {
+                    SlateTopField(title: "SLATE FOR", value: "Next Clip", compact: compact)
+                    SlateTopField(title: "LENS DATA", value: "iPhone 14 Pro Max 77mm", compact: compact)
                 }
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(compact ? 16 : 24)
-    }
+                .frame(height: compact ? 48 : 64)
 
-    private func defaultSlateValue(for field: String) -> String {
-        switch field {
-        case "PRODUCTION NAME": return "No project selected - All Clips"
-        case "DIRECTOR": return "--"
-        case "CAMERA": return "A"
-        case "CAMERA OPERATOR": return "Blackmagic Camera"
-        case "SLATE FOR": return "A001"
-        case "SCENE": return "001"
-        case "TAKE": return "1"
-        case "REEL": return "A"
-        case "LENS DATA": return "24mm / f1.8 / 16:9"
-        case "Lens": return "24mm"
-        case "Frame Rate": return "24 FPS"
-        case "Iris": return "f1.8"
-        case "ISO": return "AUTO"
-        case "Shutter": return "1/48"
-        case "WB": return "4700K"
-        case "Tint": return "0"
-        case "Good Take Last Clip": return "Off"
-        case "Interior", "Exterior", "Day", "Night": return "--"
-        case "Next Clip": return "A002"
-        default: return "--"
+                HStack(spacing: 1) {
+                    SlateNumberCell(title: "REEL", value: "1", compact: compact)
+                    SlateNumberCell(title: "SCENE", value: "10", compact: compact)
+                    SlateNumberCell(title: "TAKE", value: "2", suffix: "A", compact: compact)
+                }
+                .frame(height: compact ? 62 : 86)
+
+                HStack(spacing: 1) {
+                    SlateChoiceCell(title: "Good Take Last Clip", selected: false, compact: compact)
+                    SlateChoiceCell(title: "Interior", selected: true, compact: compact)
+                    SlateChoiceCell(title: "Exterior", selected: false, compact: compact)
+                    SlateChoiceCell(title: "Day", selected: true, compact: compact)
+                    SlateChoiceCell(title: "Night", selected: false, compact: compact)
+                }
+                .frame(height: compact ? 32 : 44)
+            }
+            .background(.black.opacity(0.28))
+            .clipShape(RoundedRectangle(cornerRadius: compact ? 4 : 6, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: compact ? 4 : 6, style: .continuous).stroke(.white.opacity(0.06), lineWidth: 1))
+
+            HStack(spacing: compact ? 3 : 4) {
+                Circle().fill(BlackmagicCamStyle.activeBlue).frame(width: compact ? 4 : 5, height: compact ? 4 : 5)
+                Circle().fill(.white.opacity(0.30)).frame(width: compact ? 4 : 5, height: compact ? 4 : 5)
+            }
+            .padding(.top, compact ? 8 : 10)
         }
-        // Firmware/update note: values mirror Camera > Slate project/clip/lens metadata labels recovered from Localizable.strings and SlateView* symbols.
+        .frame(maxWidth: compact ? 520 : 760)
+        .padding(.horizontal, compact ? 12 : 18)
+        .padding(.vertical, compact ? 8 : 12)
+        .background(Color(red: 0.035, green: 0.055, blue: 0.085).opacity(0.94), in: RoundedRectangle(cornerRadius: compact ? 8 : 12, style: .continuous))
+        .shadow(color: .black.opacity(0.62), radius: 24, x: 0, y: 12)
+        // Firmware/update note: this maps 3.2.00 SlateView/SlateViewClipInfo screenshot exactly: top Slate/Lens fields, REEL/SCENE/TAKE numeric cells, Interior/Day choice strip, pager dots, and close X.
+    }
+}
+
+private struct SlateTopField: View {
+    let title: String
+    let value: String
+    let compact: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 3 : 5) {
+            Text(title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 7, weight: .heavy))
+                .foregroundStyle(.white.opacity(0.48))
+            Text(value)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 12, weight: .bold))
+                .foregroundStyle(.white.opacity(0.88))
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, compact ? 9 : 12)
+        .padding(.vertical, compact ? 7 : 9)
+        .background(Color(red: 0.12, green: 0.20, blue: 0.34))
+    }
+}
+
+private struct SlateNumberCell: View {
+    let title: String
+    let value: String
+    var suffix: String? = nil
+    let compact: Bool
+
+    var body: some View {
+        VStack(spacing: compact ? 4 : 6) {
+            Text(title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 7, weight: .heavy))
+                .foregroundStyle(.white.opacity(0.46))
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+            HStack(spacing: compact ? 12 : 18) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: compact ? 11 : 15, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.42))
+                Text(value)
+                    .font(BlackmagicCamStyle.timecodeFont(size: compact ? 22 : 34))
+                    .foregroundStyle(.white)
+                    .frame(minWidth: compact ? 34 : 48)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: compact ? 11 : 15, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.42))
+            }
+            if let suffix {
+                Text(suffix)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                    .foregroundStyle(.white.opacity(0.50))
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+        .padding(.horizontal, compact ? 8 : 11)
+        .padding(.vertical, compact ? 5 : 7)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 0.15, green: 0.24, blue: 0.39))
+    }
+}
+
+private struct SlateChoiceCell: View {
+    let title: String
+    let selected: Bool
+    let compact: Bool
+
+    var body: some View {
+        Text(title)
+            .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+            .foregroundStyle(.white.opacity(selected ? 0.94 : 0.58))
+            .lineLimit(1)
+            .minimumScaleFactor(0.58)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(selected ? Color(red: 0.24, green: 0.39, blue: 0.66) : Color(red: 0.15, green: 0.24, blue: 0.39))
     }
 }
 
