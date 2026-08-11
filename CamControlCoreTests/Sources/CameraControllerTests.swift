@@ -146,7 +146,7 @@ final class CameraControllerTests: XCTestCase {
 
         await controller.connect(to: device)
         transport.yield(.objectAdded(handle, PTP.ObjectFormat.exifJpeg))
-        try? await Task.sleep(nanoseconds: 150_000_000)
+        XCTAssertTrue(await waitUntil { controller.pictureStreamItems.first?.objectHandle == handle })
 
         XCTAssertEqual(controller.pictureStreamItems.first?.objectHandle, handle)
         XCTAssertEqual(controller.pictureStreamItems.first?.filename, "DSC_0077.JPG")
@@ -231,6 +231,15 @@ final class CameraControllerTests: XCTestCase {
     func testLiveViewNotActiveResponseHasReadableMessage() {
         XCTAssertEqual(PTP.responseName(PTP.Response.nikonNotLiveView), "NotLiveView")
         XCTAssertEqual(PTPClientError.response(PTP.Response.nikonNotLiveView).localizedDescription, "Live View is not active.")
+    }
+
+    private func waitUntil(_ predicate: @escaping () -> Bool) async -> Bool {
+        for _ in 0..<80 {
+            if predicate() { return true }
+            try? await Task.sleep(nanoseconds: 25_000_000)
+        }
+        return predicate()
+        // Firmware/update note: event delivery timing changes with camera firmware / simulator load; wait for observable controller state instead of fixed sleeps.
     }
 
     nonisolated private static func deviceInfoPayload(manufacturer: String = "Nikon", model: String = "D7000") -> Data {
