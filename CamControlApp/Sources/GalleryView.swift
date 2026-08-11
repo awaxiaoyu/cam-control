@@ -14,7 +14,7 @@ struct GalleryView: View {
             let compact = proxy.size.width < 900
             HStack(spacing: 0) {
                 mediaSidebar(compact: compact)
-                    .frame(width: compact ? 174 : 236)
+                    .frame(width: compact ? 150 : 220)
                 Divider().overlay(.white.opacity(0.10))
                 mediaWorkspace(compact: compact)
             }
@@ -29,64 +29,74 @@ struct GalleryView: View {
     }
 
     private func mediaSidebar(compact: Bool) -> some View {
-        VStack(alignment: .leading, spacing: compact ? 8 : 10) {
-            VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 8) {
-                    BMDAssetIcon(name: "Media", activeName: "Media_active", active: true, fallback: "photo.on.rectangle", color: BlackmagicCamStyle.cyan, size: compact ? 18 : 22)
-                    Text("MEDIA")
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                        .tracking(1.6)
-                        .foregroundStyle(BlackmagicCamStyle.cyan)
-                }
-                Text("All Clips")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 18 : 23, weight: .heavy))
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 7) {
+                BMDAssetIcon(name: "Media", activeName: "Media_active", active: true, fallback: "photo.on.rectangle", color: BlackmagicCamStyle.cyan, size: compact ? 12 : 15)
+                Text(sidePanel == .allClips ? "All Clips" : "No project selected - All Clips")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
                     .foregroundStyle(.white)
-                Text("No project selected - All Clips")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.48))
-                    .lineLimit(2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
             }
-            .padding(.horizontal, compact ? 12 : 18)
-            .padding(.top, compact ? 14 : 20)
-            .padding(.bottom, compact ? 10 : 14)
+            .padding(.horizontal, compact ? 9 : 12)
+            .padding(.top, compact ? 9 : 12)
+            .padding(.bottom, compact ? 8 : 10)
 
-            ForEach(MediaPanel.allCases) { panel in
-                Button {
-                    withAnimation(.snappy(duration: 0.16)) { sidePanel = panel }
-                } label: {
-                    MediaSidebarRow(panel: panel, count: controller.galleryItems.count, selectedItem: selectedItem, active: sidePanel == panel, compact: compact)
+            VStack(alignment: .leading, spacing: compact ? 6 : 8) {
+                MediaSourceCard(title: "iPhone 14 Pro Max", subtitle: "All Clips", selected: sidePanel == .allClips, icon: "Media", compact: compact) {
+                    sidePanel = .allClips
                 }
-                .buttonStyle(.plain)
+                VStack(alignment: .leading, spacing: compact ? 5 : 7) {
+                    Text("Blackmagic Cloud")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                        .foregroundStyle(.white.opacity(0.64))
+                    if sidePanel == .upload {
+                        ForEach(["Short Film", "Documentary", "Green Book", "Trailer"], id: \.self) { project in
+                            MediaSourceCard(title: project, subtitle: "\(max(0, controller.galleryItems.count)) Clips", selected: selectedCloudProjectTitle == project, icon: "ProjectUpload", compact: compact) {
+                                selectedCloudProjectTitle = project
+                            }
+                        }
+                    } else {
+                        VStack(spacing: compact ? 6 : 8) {
+                            BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
+                                .frame(width: compact ? 76 : 112, height: compact ? 24 : 36)
+                            Text("Log in to Blackmagic Cloud
+to access your projects")
+                                .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .bold))
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(.white.opacity(0.44))
+                            Button { sidePanel = .upload } label: {
+                                Text("Log In")
+                                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, compact ? 6 : 8)
+                                    .background(BlackmagicCamStyle.activeBlue, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                                    .foregroundStyle(.white)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(compact ? 9 : 12)
+                        .frame(maxWidth: .infinity)
+                        .background(.white.opacity(0.055), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+                    }
+                }
             }
             .padding(.horizontal, compact ? 8 : 12)
-
             Spacer()
-
-            VStack(alignment: .leading, spacing: 8) {
-                BMStatusPill(title: "Clips", value: "\(controller.galleryItems.count)", color: controller.galleryItems.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
-                BMStatusPill(title: "Upload", value: "Waiting", color: BlackmagicCamStyle.amber)
-                BMStatusPill(title: "Proxy", value: "Ready", color: .white.opacity(0.68))
-            }
-            .padding(compact ? 12 : 18)
         }
-        .background(
-            LinearGradient(colors: [.black.opacity(0.96), BlackmagicCamStyle.rail.opacity(0.94)], startPoint: .top, endPoint: .bottom)
-        )
+        .background(Color.black.opacity(0.92))
+        // Firmware/update note: MediaViewSidebar now mirrors Blackmagic 3.x screenshots: simple dark source list, iPhone source card, Cloud login/projects block.
     }
+
+    @State private var selectedCloudProjectTitle = "Short Film"
 
     private func mediaWorkspace(compact: Bool) -> some View {
         VStack(spacing: 0) {
             mediaToolbar(compact: compact)
-            HStack(spacing: 0) {
-                mediaPool(compact: compact)
-                if !compact {
-                    Divider().overlay(.white.opacity(0.10))
-                    mediaSidePanel(compact: compact)
-                        .frame(width: 330)
-                }
-            }
+            mediaPool(compact: compact)
         }
-        .background(BlackmagicCamStyle.studioGradient)
+        .background(Color(red: 0.045, green: 0.048, blue: 0.052))
+        // Firmware/update note: main media area follows screenshot grid-only surface; auxiliary panels are represented by toolbar/sidebar states rather than a persistent right drawer.
     }
 
     private func mediaPool(compact: Bool) -> some View {
@@ -105,7 +115,7 @@ struct GalleryView: View {
                 .padding(24)
             } else {
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 138 : 188), spacing: compact ? 10 : 14)], spacing: compact ? 10 : 14) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 96 : 132), spacing: compact ? 8 : 10)], spacing: compact ? 10 : 14) {
                         ForEach(controller.galleryItems) { item in
                             Button {
                                 withAnimation(.snappy(duration: 0.16)) {
@@ -123,7 +133,7 @@ struct GalleryView: View {
                             }
                         }
                     }
-                    .padding(compact ? 14 : 22)
+                    .padding(compact ? 10 : 14)
                 }
             }
         }
@@ -131,31 +141,34 @@ struct GalleryView: View {
 
     private func mediaToolbar(compact: Bool) -> some View {
         HStack(spacing: compact ? 8 : 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text("MEDIA")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                    .tracking(1.4)
-                    .foregroundStyle(BlackmagicCamStyle.cyan)
-                Text(sidePanel.title)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 22 : 28, weight: .heavy))
-                    .foregroundStyle(.white)
-            }
+            BMDAssetIcon(name: "Media", activeName: "Media_active", active: true, fallback: "photo.on.rectangle", color: BlackmagicCamStyle.cyan, size: compact ? 12 : 15)
+            Text(sidePanel == .upload ? "No project selected - All Clips" : "All Clips")
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
+                .foregroundStyle(.white)
             Spacer()
-            toolbarButton(.allClips, "All Clips", "\(controller.galleryItems.count)", asset: "Media", compact: compact)
-            toolbarButton(.sort, "Sort By", "Date Time", asset: "Sort", compact: compact)
-            toolbarButton(.upload, "Upload", "Proxy", asset: "UploadToCloud", compact: compact)
-            Button {
-                Task { await controller.refreshGallery() }
-            } label: {
-                toolbarPill("Refresh", "Media", asset: "MediaSync", fallback: "arrow.clockwise", compact: compact)
-            }
-            .buttonStyle(.plain)
+            toolbarIconButton(.allClips, asset: "Media", fallback: "rectangle.grid.2x2", compact: compact)
+            toolbarIconButton(.clipDetails, asset: "HdmiPlay", fallback: "play.rectangle", compact: compact)
+            toolbarIconButton(.sort, asset: "Sort", fallback: "arrow.up.arrow.down", compact: compact)
+            toolbarIconButton(.upload, asset: "UploadToCloud", fallback: "icloud.and.arrow.up", compact: compact)
+            Circle()
+                .fill(.white.opacity(0.24))
+                .frame(width: compact ? 22 : 28, height: compact ? 22 : 28)
+                .overlay(BMDAssetIcon(name: "Cloud", active: true, fallback: "person.crop.circle", color: .white, size: compact ? 12 : 15))
         }
-        .padding(.horizontal, compact ? 14 : 22)
-        .padding(.vertical, compact ? 10 : 14)
-        .background(.black.opacity(0.64))
-        .overlay(Rectangle().fill(.white.opacity(0.10)).frame(height: 1), alignment: .bottom)
-        // Firmware/update note: toolbar labels follow recovered MediaViewToolbar, MediaViewUploadToolbar and MediaViewClipDetailsToolbar strings.
+        .padding(.horizontal, compact ? 9 : 12)
+        .padding(.vertical, compact ? 6 : 8)
+        .background(Color.black.opacity(0.76))
+        .overlay(Rectangle().fill(.white.opacity(0.08)).frame(height: 1), alignment: .bottom)
+        // Firmware/update note: toolbar mirrors MediaViewToolbar screenshot: tiny title on left, icon-only sort/upload/filter controls on the right.
+    }
+
+    private func toolbarIconButton(_ panel: MediaPanel, asset: String, fallback: String, compact: Bool) -> some View {
+        Button { withAnimation(.snappy(duration: 0.16)) { sidePanel = panel } } label: {
+            BMDAssetIcon(name: asset, active: sidePanel == panel, fallback: fallback, color: sidePanel == panel ? .white : .white.opacity(0.70), size: compact ? 12 : 15)
+                .frame(width: compact ? 24 : 30, height: compact ? 22 : 28)
+                .background(sidePanel == panel ? BlackmagicCamStyle.activeBlue.opacity(0.82) : .white.opacity(0.055), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 
     private func toolbarButton(_ panel: MediaPanel, _ title: String, _ value: String, asset: String, compact: Bool) -> some View {
@@ -245,6 +258,40 @@ private enum MediaPanel: String, CaseIterable, Identifiable {
         case .upload: return "arrow.up.circle.fill"
         case .clipDetails: return "info.circle.fill"
         }
+    }
+}
+
+private struct MediaSourceCard: View {
+    let title: String
+    let subtitle: String
+    let selected: Bool
+    let icon: String
+    let compact: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: compact ? 7 : 9) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    Text(subtitle)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.42))
+                        .lineLimit(1)
+                }
+                Spacer()
+                BMDAssetIcon(name: icon, active: selected, fallback: "folder", color: selected ? BlackmagicCamStyle.cyan : .white.opacity(0.45), size: compact ? 11 : 14)
+            }
+            .padding(.horizontal, compact ? 8 : 10)
+            .padding(.vertical, compact ? 7 : 9)
+            .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.26) : .white.opacity(0.075), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 5, style: .continuous).stroke(selected ? BlackmagicCamStyle.activeBlue.opacity(0.8) : .white.opacity(0.06), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        // Firmware/update note: source/project cards mirror MediaViewSidebar/MediaViewSidebarCloudLogIn screenshot proportions.
     }
 }
 

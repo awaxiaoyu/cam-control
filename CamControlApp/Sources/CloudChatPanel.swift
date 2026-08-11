@@ -15,7 +15,7 @@ struct CloudChatPanel: View {
             let compact = proxy.size.width < 900
             HStack(spacing: 0) {
                 cloudSidebar(compact: compact)
-                    .frame(width: compact ? 190 : 260)
+                    .frame(width: compact ? 150 : 220)
                 Divider().overlay(.white.opacity(0.10))
                 chatSurface(compact: compact)
             }
@@ -25,126 +25,104 @@ struct CloudChatPanel: View {
     }
 
     private func cloudSidebar(compact: Bool) -> some View {
-        VStack(alignment: .leading, spacing: compact ? 8 : 10) {
-            VStack(alignment: .leading, spacing: 6) {
-                BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
-                    .frame(width: compact ? 136 : 172, height: compact ? 44 : 56)
-                Text("CHAT")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                    .tracking(1.5)
-                    .foregroundStyle(BlackmagicCamStyle.cyan)
-                Text("No project selected - All Clips")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 11, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.50))
-                    .lineLimit(2)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 7) {
+                BMDAssetIcon(name: "Cloud", active: true, fallback: "cloud.fill", color: BlackmagicCamStyle.cyan, size: compact ? 12 : 15)
+                Text(selectedRoom == "Project" ? "Short Film" : selectedRoom)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
             }
-            .padding(.horizontal, compact ? 12 : 18)
-            .padding(.top, compact ? 14 : 20)
-            .padding(.bottom, compact ? 10 : 14)
+            .padding(.horizontal, compact ? 9 : 12)
+            .padding(.top, compact ? 9 : 12)
+            .padding(.bottom, compact ? 8 : 10)
 
-            ForEach(rooms) { room in
-                Button {
-                    withAnimation(.snappy(duration: 0.16)) { selectedRoom = room.title }
-                } label: {
-                    CloudSidebarRoom(room: room, active: selectedRoom == room.title, compact: compact)
+            VStack(spacing: compact ? 6 : 8) {
+                ForEach(rooms) { room in
+                    Button {
+                        withAnimation(.snappy(duration: 0.16)) { selectedRoom = room.title }
+                    } label: {
+                        CloudSidebarRoom(room: room, active: selectedRoom == room.title, compact: compact)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, compact ? 8 : 12)
-
             Spacer()
-
-            VStack(alignment: .leading, spacing: 8) {
-                BMStatusPill(title: "Cloud", value: "Offline", color: BlackmagicCamStyle.amber)
-                BMStatusPill(title: "Members", value: "0", color: .white.opacity(0.62))
-            }
-            .padding(compact ? 12 : 18)
         }
         .background(
             ZStack(alignment: .bottomTrailing) {
-                LinearGradient(colors: [.black.opacity(0.94), BlackmagicCamStyle.rail.opacity(0.94)], startPoint: .top, endPoint: .bottom)
-                BMDAssetImage(name: "BmdCloudSidebar", fallback: "cloud.fill", preserveOriginalColors: true)
-                    .frame(width: compact ? 122 : 164, height: compact ? 110 : 148)
-                    .opacity(0.12)
-                    .padding(compact ? 12 : 18)
+                Color.black.opacity(0.92)
+                BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
+                    .frame(width: compact ? 66 : 92, height: compact ? 22 : 30)
+                    .opacity(0.035)
+                    .padding(compact ? 8 : 12)
             }
         )
+        // Firmware/update note: ChatViewSidebar mirrors screenshot: compact dark room list with active blue outline; BmdCloudLogo remains as a barely-visible recovered asset watermark.
     }
 
     private func chatSurface(compact: Bool) -> some View {
         VStack(spacing: 0) {
             chatToolbar(compact: compact)
-            HStack(spacing: 0) {
-                messagePane(compact: compact)
-                if !compact {
-                    Divider().overlay(.white.opacity(0.10))
-                    syncPanel(compact: compact)
-                        .frame(width: 330)
-                }
-            }
+            messagePane(compact: compact)
         }
-        .background(BlackmagicCamStyle.studioGradient)
+        .background(Color(red: 0.040, green: 0.043, blue: 0.047))
+        // Firmware/update note: ChatTableView occupies the full right surface in Blackmagic screenshots; project/upload info stays in sidebar/toolbars.
     }
 
     private func chatToolbar(compact: Bool) -> some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text("PROJECT CHAT")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                    .tracking(1.4)
-                    .foregroundStyle(BlackmagicCamStyle.cyan)
-                Text(selectedRoom == "Project" ? "Chat in Project" : selectedRoom)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 22 : 28, weight: .heavy))
-                    .foregroundStyle(.white)
-            }
+        HStack(spacing: compact ? 7 : 10) {
+            Text(selectedRoom == "Project" ? "Short Film" : selectedRoom)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
+                .foregroundStyle(.white)
             Spacer()
-            cloudToolbarPill("Project", "All Clips", icon: "ProjectUpload")
-            cloudToolbarPill("Upload", "Proxy", icon: "UploadToCloud")
-            cloudToolbarPill("Login", "Offline", icon: "Cloud")
+            ForEach(["person.crop.circle.fill", "person.crop.circle", "person.crop.circle.badge.plus", "person.crop.circle"], id: \.self) { icon in
+                Image(systemName: icon)
+                    .font(.system(size: compact ? 12 : 16, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.86))
+                    .frame(width: compact ? 18 : 24, height: compact ? 18 : 24)
+                    .background(.white.opacity(0.10), in: Circle())
+            }
         }
-        .padding(.horizontal, compact ? 14 : 22)
-        .padding(.vertical, compact ? 10 : 14)
-        .background(.black.opacity(0.62))
-        .overlay(Rectangle().fill(.white.opacity(0.10)).frame(height: 1), alignment: .bottom)
+        .padding(.horizontal, compact ? 10 : 14)
+        .padding(.vertical, compact ? 7 : 9)
+        .background(Color.black.opacity(0.74))
+        .overlay(Rectangle().fill(.white.opacity(0.08)).frame(height: 1), alignment: .bottom)
+        // Firmware/update note: toolbar mirrors ChatViewToolbar screenshot: room title left, participant avatars right.
     }
 
     private func messagePane(compact: Bool) -> some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: compact ? 10 : 14) {
-                    ChatDateDivider(title: "TODAY")
-                    CloudMessage(author: "Blackmagic Cloud", text: "Log in to Blackmagic Cloud to access your projects chat.", tone: .cyan)
-                    CloudMessage(author: "Project", text: "No project selected - All Clips", tone: .blue)
-                    ChatNewMessageDivider()
-                    CloudMessage(author: "Upload Status", text: "Waiting to Upload... Original and proxy queues will appear here.", tone: .amber)
-                    CloudMessage(author: "Remote Cam Control", text: "No remote camera linked. Remote camera monitor-only state is ready.", tone: .red)
+                VStack(alignment: .leading, spacing: compact ? 8 : 10) {
+                    ChatBubble(author: "Melissa Williamson", text: "Morning! I will upload what I've been shooting as well.", time: "9:04 AM", outgoing: false, compact: compact)
+                    ChatBubble(author: "You", text: "Hello!", time: "9:05 AM", outgoing: true, compact: compact)
+                    ChatBubble(author: "You", text: "Yes. I will record more clips", time: "9:05 AM", outgoing: true, compact: compact)
+                    ChatBubble(author: "You", text: "Hey, I've finished recording. More clips are uploading now", time: "9:18 AM", outgoing: true, compact: compact)
+                    ChatBubble(author: "Michael Lee", text: "Thank you guys, nice work!", time: "9:21 AM", outgoing: false, compact: compact)
+                    ChatBubble(author: "You", text: "Thank you!", time: "9:22 AM", outgoing: true, compact: compact)
                 }
-                .padding(compact ? 16 : 24)
+                .padding(.horizontal, compact ? 12 : 18)
+                .padding(.vertical, compact ? 12 : 16)
             }
 
-            HStack(spacing: 10) {
-                Text("Message")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 14, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.42))
+            HStack(spacing: compact ? 6 : 8) {
+                Text("Message...")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.36))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .background(.black.opacity(0.36), in: Capsule())
-                    .overlay(Capsule().stroke(.white.opacity(0.10), lineWidth: 1))
-                Button {
-                } label: {
-                    BMDAssetIcon(name: "UploadToCloud", activeName: "UploadToCloud_active", active: true, fallback: "paperplane.fill", color: .white, size: 16)
-                        .font(.system(size: compact ? 14 : 16, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: compact ? 40 : 46, height: compact ? 40 : 46)
-                        .background(BlackmagicCamStyle.activeBlue, in: Circle())
-                }
-                .buttonStyle(.plain)
+                    .padding(.horizontal, compact ? 10 : 12)
+                    .padding(.vertical, compact ? 7 : 9)
+                    .background(.black.opacity(0.46), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
             }
-            .padding(compact ? 14 : 18)
-            .background(.black.opacity(0.42))
-            .overlay(Rectangle().fill(.white.opacity(0.10)).frame(height: 1), alignment: .top)
+            .padding(.horizontal, compact ? 10 : 14)
+            .padding(.vertical, compact ? 7 : 9)
+            .background(.black.opacity(0.46))
+            .overlay(Rectangle().fill(.white.opacity(0.08)).frame(height: 1), alignment: .top)
         }
+        // Firmware/update note: ChatTableView is represented as compact left/right message bubbles with timestamps and bottom input field, matching recovered ChatTableView and screenshots.
     }
 
     private func syncPanel(compact: Bool) -> some View {
@@ -241,6 +219,44 @@ private struct CloudSidebarRoom: View {
         case "Remote Cam Control": return "CameraLinked"
         default: return "Cloud"
         }
+    }
+}
+
+private struct ChatBubble: View {
+    let author: String
+    let text: String
+    let time: String
+    let outgoing: Bool
+    let compact: Bool
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: compact ? 6 : 8) {
+            if outgoing { Spacer(minLength: compact ? 60 : 110) }
+            if !outgoing {
+                Circle()
+                    .fill(.white.opacity(0.16))
+                    .frame(width: compact ? 18 : 24, height: compact ? 18 : 24)
+                    .overlay(Text(String(author.prefix(1))).font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).foregroundStyle(.white.opacity(0.8)))
+            }
+            VStack(alignment: outgoing ? .trailing : .leading, spacing: 2) {
+                if !outgoing {
+                    Text(author)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                        .foregroundStyle(.white.opacity(0.56))
+                }
+                Text(text)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, compact ? 8 : 10)
+                    .padding(.vertical, compact ? 6 : 8)
+                    .background(outgoing ? BlackmagicCamStyle.activeBlue : .white.opacity(0.12), in: RoundedRectangle(cornerRadius: compact ? 5 : 7, style: .continuous))
+                Text(time)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 7, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.34))
+            }
+            if !outgoing { Spacer(minLength: compact ? 60 : 110) }
+        }
+        // Firmware/update note: bubble colors and alignment match Blackmagic Chat screenshots: blue outgoing, gray incoming, timestamps beside compact table rows.
     }
 }
 
