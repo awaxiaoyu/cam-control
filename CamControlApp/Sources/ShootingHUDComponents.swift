@@ -64,32 +64,33 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let compact = proxy.size.width < 1_120 || proxy.size.height < 680
+            let metrics = BlackmagicHUDMetrics(size: proxy.size)
             ZStack {
                 BlackmagicCamStyle.canvas.ignoresSafeArea()
                 previewLayer
                 if !cleanFeed {
-                    guideLayer(compact: compact)
-                    cameraChrome(compact: compact)
+                    guideLayer(metrics: metrics)
+                    cameraChrome(metrics: metrics)
                     if let activeScroller {
                         VStack {
                             Spacer()
-                            BlackmagicScrollerPanel(scroller: activeScroller, compact: compact) { option in
+                            BlackmagicScrollerPanel(scroller: activeScroller, compact: metrics.compact) { option in
                                 handle(option)
                             } onClose: {
                                 withAnimation(.snappy(duration: 0.18)) { self.activeScroller = nil }
                             }
-                            .padding(.horizontal, compact ? 78 : 132)
-                            .padding(.bottom, compact ? 88 : 126)
+                            .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.pageTabWidth + 10 : 0))
+                            .padding(.trailing, metrics.safePad + (metrics.isLandscape ? 80 : 0))
+                            .padding(.bottom, metrics.footerBottomPadding + metrics.footerHeight + 10)
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .zIndex(6)
                     }
                     if showSlate {
-                        SlateOverlay(compact: compact) {
+                        SlateOverlay(compact: metrics.compact) {
                             withAnimation(.snappy(duration: 0.18)) { showSlate = false }
                         }
-                        .padding(compact ? 24 : 48)
+                        .padding(metrics.compact ? 20 : 44)
                         .transition(.scale(scale: 0.96).combined(with: .opacity))
                         .zIndex(8)
                     }
@@ -99,10 +100,10 @@ struct ShootingHUDLayout<Preview: View>: View {
                             Button {
                                 withAnimation(.snappy(duration: 0.18)) { cleanFeed = false }
                             } label: {
-                                HUDAuxIndicator(title: "CLEAN FEED", value: "EXIT", color: BlackmagicCamStyle.okGreen, compact: compact)
+                                HUDAuxIndicator(title: "CLEAN FEED", value: "EXIT", color: BlackmagicCamStyle.okGreen, compact: metrics.compact)
                             }
                             .buttonStyle(.plain)
-                            .padding(compact ? 8 : 16)
+                            .padding(metrics.safePad)
                             Spacer()
                         }
                         Spacer()
@@ -132,27 +133,62 @@ struct ShootingHUDLayout<Preview: View>: View {
             .accessibilityLabel("Blackmagic Cam recording image display")
     }
 
-    private func cameraChrome(compact: Bool) -> some View {
+    private func cameraChrome(metrics: BlackmagicHUDMetrics) -> some View {
         ZStack {
-            VStack(spacing: 0) {
-                topHUD(compact: compact)
-                    .padding(.horizontal, compact ? 10 : 18)
-                    .padding(.top, compact ? 6 : 12)
-                Spacer()
-                monitorTools(compact: compact)
-                    .padding(.horizontal, compact ? 10 : 18)
-                    .padding(.bottom, compact ? 6 : 8)
-                bottomControls(compact: compact)
-                    .padding(.horizontal, compact ? 8 : 16)
-                    .padding(.bottom, compact ? 8 : 14)
+            if metrics.isLandscape {
+                VStack(spacing: 0) {
+                    topHUD(compact: metrics.compact)
+                        .padding(.leading, metrics.safePad + metrics.pageTabWidth + 10)
+                        .padding(.trailing, metrics.safePad)
+                        .padding(.top, metrics.safePad)
+                    Spacer()
+                    monitorTools(compact: metrics.compact)
+                        .padding(.leading, metrics.safePad + metrics.pageTabWidth + 10)
+                        .padding(.trailing, metrics.safePad + 76)
+                        .padding(.bottom, metrics.compact ? 6 : 8)
+                    bottomControls(compact: metrics.compact)
+                        .padding(.leading, metrics.safePad + metrics.pageTabWidth + 10)
+                        .padding(.trailing, metrics.safePad)
+                        .padding(.bottom, metrics.footerBottomPadding)
+                }
+                HStack {
+                    trailingIndicators(compact: metrics.compact)
+                        .frame(width: metrics.pageTabWidth)
+                        .padding(.leading, metrics.safePad)
+                    Spacer()
+                    leadingIndicators(compact: metrics.compact)
+                        .padding(.trailing, metrics.safePad)
+                }
+                .padding(.top, metrics.compact ? 76 : 110)
+            } else {
+                VStack(spacing: 0) {
+                    HStack(alignment: .top, spacing: 8) {
+                        topLeftIndicators(compact: metrics.compact)
+                        Spacer(minLength: 6)
+                        trailingIndicators(compact: metrics.compact)
+                            .frame(width: metrics.pageTabWidth)
+                    }
+                    .padding(.horizontal, metrics.safePad)
+                    .padding(.top, metrics.safePad)
+                    recordTimerBar(compact: metrics.compact)
+                        .padding(.top, 4)
+                    Spacer()
+                    monitorTools(compact: metrics.compact)
+                        .padding(.horizontal, metrics.safePad)
+                        .padding(.bottom, 6)
+                    bottomControls(compact: metrics.compact)
+                        .padding(.horizontal, metrics.safePad)
+                        .padding(.bottom, metrics.footerBottomPadding)
+                }
+                HStack {
+                    leadingIndicators(compact: metrics.compact)
+                        .padding(.leading, metrics.safePad)
+                    Spacer()
+                }
+                .padding(.top, metrics.size.height * 0.28)
             }
-            HStack {
-                leadingIndicators(compact: compact).padding(.leading, compact ? 8 : 16)
-                Spacer()
-                trailingIndicators(compact: compact).padding(.trailing, compact ? 8 : 16)
-            }
-            .padding(.top, compact ? 92 : 132)
         }
+        // Firmware/update note: layout now follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors instead of a generic desktop card overlay.
     }
 
     private func topHUD(compact: Bool) -> some View {
@@ -227,12 +263,14 @@ struct ShootingHUDLayout<Preview: View>: View {
         // Firmware/update note: right cluster follows StorageStatusHUD, UploadStatusHUD and BatteryIndicator assets recovered from the IPA.
     }
 
-    private func guideLayer(compact: Bool) -> some View {
+    private func guideLayer(metrics: BlackmagicHUDMetrics) -> some View {
+        let compact = metrics.compact
         ZStack {
             RuleOfThirds()
                 .stroke(.white.opacity(0.28), style: StrokeStyle(lineWidth: 1, dash: [compact ? 5 : 7, compact ? 8 : 11]))
-                .padding(.horizontal, compact ? 72 : 132)
-                .padding(.vertical, compact ? 64 : 98)
+                .padding(.leading, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 42 : 66) : (compact ? 48 : 72))
+                .padding(.trailing, metrics.isLandscape ? (compact ? 78 : 104) : (compact ? 48 : 72))
+                .padding(.vertical, metrics.isLandscape ? (compact ? 58 : 86) : (compact ? 108 : 132))
             RoundedRectangle(cornerRadius: 2)
                 .stroke(BlackmagicCamStyle.activeBlue.opacity(0.42), lineWidth: 1)
                 .frame(width: compact ? 120 : 184, height: compact ? 72 : 108)
@@ -249,11 +287,13 @@ struct ShootingHUDLayout<Preview: View>: View {
                     WhiteBalanceOverlay(compact: compact, value: value(forAny: ["WB", "White Balance"]))
                 }
             }
-            .padding(.horizontal, compact ? 18 : 28)
-            .padding(.vertical, compact ? 70 : 106)
+            .padding(.leading, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 10 : 16) : (compact ? 18 : 28))
+            .padding(.trailing, metrics.isLandscape ? (compact ? 84 : 112) : (compact ? 18 : 28))
+            .padding(.top, metrics.isLandscape ? (compact ? 70 : 106) : (compact ? 126 : 154))
+            .padding(.bottom, metrics.isLandscape ? (compact ? 96 : 128) : (compact ? 126 : 154))
         }
         .allowsHitTesting(false)
-        // Firmware/update note: overlays mirror reversed HUDGuides, HUDFalseColor and HUDWhiteBalanceOverlay strings; only values should change for new camera firmware.
+        // Firmware/update note: overlays mirror reversed HUDGuides, HUDSafeAreas, HUDFalseColor and HUDWhiteBalanceOverlay strings; only values should change for new camera firmware.
     }
 
     private func leadingIndicators(compact: Bool) -> some View {
@@ -285,7 +325,12 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
             .buttonStyle(.plain)
         }
-        // Firmware/update note: trailing indicators map reversed HUDLeftNavMenuIndicator/HUDRightNavMenuIndicator plus SlateView.
+        .padding(.vertical, compact ? 7 : 10)
+        .padding(.horizontal, compact ? 4 : 6)
+        .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous).stroke(.white.opacity(0.11), lineWidth: 1))
+        .shadow(color: .black.opacity(0.40), radius: 18, x: 0, y: 10)
+        // Firmware/update note: trailing indicators map reversed HUDLeftNavMenuIndicator/HUDRightNavMenuIndicator plus SlateView and page tab layout data.
     }
 
     private func monitorTools(compact: Bool) -> some View {
@@ -401,6 +446,17 @@ struct ShootingHUDLayout<Preview: View>: View {
         if option == "AF" { onFocus() }
         // Firmware/update note: scroller selections are UI placeholders until CameraController exposes Blackmagic cam_app_control style property writes.
     }
+}
+
+private struct BlackmagicHUDMetrics {
+    let size: CGSize
+    var isLandscape: Bool { size.width >= size.height }
+    var compact: Bool { size.width < 980 || size.height < 620 }
+    var safePad: CGFloat { compact ? 8 : 14 }
+    var pageTabWidth: CGFloat { compact ? 52 : 64 }
+    var footerHeight: CGFloat { compact ? 74 : 96 }
+    var footerBottomPadding: CGFloat { compact ? 8 : 14 }
+    // Firmware/update note: values are reverse-derived approximations of MainViewLayoutData pageTabWidth/footerHeight/navMenuEdgePadding; refresh from IPA symbols when Blackmagic changes layout data.
 }
 
 struct ShootingHUDTopItem: Identifiable, Equatable {
@@ -592,14 +648,19 @@ private struct FloatingNavPill: View {
         self.title = title; self.systemImage = systemImage; self.selected = selected; self.compact = compact
     }
     var body: some View {
-        HStack(spacing: compact ? 5 : 7) {
-            Text(title).font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).tracking(0.9)
-            BMDAssetIcon(name: assetName, active: selected, fallback: systemImage, color: selected ? .white : .white.opacity(0.70), size: compact ? 13 : 16)
+        VStack(spacing: compact ? 3 : 4) {
+            BMDAssetIcon(name: assetName, active: selected, fallback: systemImage, color: selected ? .white : .white.opacity(0.66), size: compact ? 17 : 20)
+            Text(title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 7, weight: .heavy))
+                .tracking(0.45)
+                .lineLimit(1)
+                .minimumScaleFactor(0.48)
         }
-        .foregroundStyle(selected ? .white : .white.opacity(0.70))
-        .padding(.leading, compact ? 9 : 12).padding(.trailing, compact ? 8 : 10).padding(.vertical, compact ? 7 : 9)
-        .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.52) : .black.opacity(0.45), in: Capsule())
-        .overlay(Capsule().stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.58) : .white.opacity(0.12), lineWidth: 1))
+        .foregroundStyle(selected ? .white : .white.opacity(0.54))
+        .frame(width: compact ? 42 : 52, height: compact ? 42 : 54)
+        .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.56) : .white.opacity(0.055), in: RoundedRectangle(cornerRadius: compact ? 11 : 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 11 : 14, style: .continuous).stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.52) : .white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: page tabs map recovered pageCamera/pageMedia/pageChat/pageSettings, pageTabWidth and tabButton size symbols.
     }
 
     private var assetName: String {
@@ -624,25 +685,20 @@ private struct CameraControlCell: View {
     }
 
     var body: some View {
-        VStack(spacing: compact ? 3 : 5) {
-            ZStack {
-                Circle()
-                    .stroke(.white.opacity(0.13), lineWidth: compact ? 4 : 5)
-                Circle()
-                    .trim(from: 0.08, to: active ? 0.88 : 0.66)
-                    .stroke(active ? BlackmagicCamStyle.cyan : .white.opacity(0.50), style: StrokeStyle(lineWidth: compact ? 4 : 5, lineCap: .round))
-                    .rotationEffect(.degrees(118))
-                Circle()
-                    .fill(active ? BlackmagicCamStyle.activeBlue.opacity(0.20) : .black.opacity(0.42))
-                    .padding(compact ? 8 : 10)
-                BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.72), size: compact ? 12 : 15)
-                    .offset(y: compact ? -9 : -12)
+        VStack(spacing: compact ? 3 : 4) {
+            HStack(spacing: 5) {
+                BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.70), size: compact ? 12 : 14)
+                Text(item.title)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
+                    .tracking(0.8)
+                    .foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.50))
+            }
+            HStack(spacing: 5) {
                 Text(item.value)
-                    .font(item.title == "FPS" || item.title == "ISO" || item.title == "TINT" ? BlackmagicCamStyle.readoutFont(size: compact ? 13 : 18, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 13 : 18, weight: .heavy))
+                    .font(item.title == "FPS" || item.title == "ISO" || item.title == "TINT" ? BlackmagicCamStyle.readoutFont(size: compact ? 15 : 19, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 15 : 19, weight: .heavy))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.46)
-                    .offset(y: compact ? 7 : 10)
+                    .minimumScaleFactor(0.45)
                 if let autoLabel {
                     Text(autoLabel)
                         .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
@@ -651,19 +707,15 @@ private struct CameraControlCell: View {
                         .padding(.horizontal, 4)
                         .padding(.vertical, 1)
                         .background(BlackmagicCamStyle.activeBlue, in: Capsule())
-                        .offset(x: compact ? 22 : 29, y: compact ? -20 : -27)
                 }
             }
-            .frame(width: compact ? 54 : 72, height: compact ? 54 : 72)
-            Text(item.title)
-                .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
-                .tracking(0.8)
-                .foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.62))
         }
-        .frame(width: compact ? 62 : 88, height: compact ? 74 : 96)
+        .frame(width: compact ? 76 : 98, height: compact ? 48 : 62)
+        .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.24) : .white.opacity(0.060), in: RoundedRectangle(cornerRadius: compact ? 12 : 15, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 12 : 15, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.42) : .white.opacity(0.09), lineWidth: 1))
         .contentShape(Rectangle())
         .accessibilityLabel("Camera HUD \(item.title) \(item.value)")
-        // Firmware/update note: dial shell is derived from CameraAppToolbox BmdAdjustmentDial and Camera HUD Lens/Fps/shutter/Iris/ISO/white balance/Tint strings; update only if those symbols change in a new IPA.
+        // Firmware/update note: footer readout is derived from MainControlsOption/BmdAdjustmentDial and Camera HUD Lens/FPS/Shutter/IRIS/ISO/WB/TINT strings; update only if those symbols change in a new IPA.
     }
 }
 
