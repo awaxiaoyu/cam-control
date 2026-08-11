@@ -22,6 +22,8 @@ REQUIRED_SOURCE_PATTERNS = {
     'asset_aliases': (SRC / 'BMDAssetIcon.swift', r'Apple Watch/IconAf'),
     'false_color_original_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetImage\(name: "FalseColorLegend".*preserveOriginalColors: true'),
     'bmd_cloud_logo_asset': (SRC / 'CloudChatPanel.swift', r'BMDAssetImage\(name: "BmdCloudLogo".*preserveOriginalColors: true'),
+    'media_side_panel_rendered': (SRC / 'GalleryView.swift', r'mediaSidePanel\(compact: compact\)'),
+    'media_side_panel_width': (SRC / 'GalleryView.swift', r'\.frame\(width: compact \? 220 : 320\)'),
     'chat_participant_dots': (SRC / 'CloudChatPanel.swift', r'ChatParticipantDot\(initials: "MW"'),
     'chat_remote_camera_asset': (SRC / 'CloudChatPanel.swift', r'return "CameraLinkedSmall"'),
     'top_status_only_hud': (SRC / 'ShootingHUDComponents.swift', r'topLeftStatus\(compact: compact\)'),
@@ -46,6 +48,7 @@ FORBIDDEN_SOURCE_PATTERNS = {
     'liveview_sf_striplabel': (SRC / 'LiveViewPanel.swift', r'stripLabel\([^\\n]*systemImage:'),
     'chat_toolbar_sf_person_icons': (SRC / 'CloudChatPanel.swift', r'Image\(systemName:.*person\.crop\.circle'),
     'stale_camera_linked_asset': (SRC / 'CloudChatPanel.swift', r'return "CameraLinked"'),
+    'media_side_panel_unmounted': (SRC / 'GalleryView.swift', r'auxiliary panels are represented by toolbar/sidebar states'),
 }
 
 

@@ -274,6 +274,7 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - Slate is implemented as tabbed `PROJECT INFO` / `CLIP INFO` / `LENS INFO` panels mapped to recovered `SlateViewProjectInfo`, `SlateViewClipInfo`, and `SlateViewLensInfo` symbols; the close button uses recovered `SlateClose`.
 - Settings option choices use square `OptionListView` / `BmdTextListSelector`-style selector cells rather than iOS capsule chips.
 - Media, Chat, Settings sidebars must remain dark panel-driven surfaces consistent with `MediaViewSidebar`, `ChatViewSidebar`, and `SettingsCategoryPanel` evidence.
+- Media page must mount `MediaSortPanel`, `MediaUploadToCloudPanel`, and `MediaClipDetailsLandscapePanel` as a dark contextual right panel beside the clip grid, not leave them as unused toolbar state.
 - Camera HUD layout separates `HUDTopLeftIndicators` / `HUDTopIndicators` status from `LHUDFooterElements` / `PHUDFooterElements`; top status shows camera/record/timecode/storage/upload only, while the footer uses `BmdAdjustmentDial`, `BmdDialHDivider`, and `BmdDialVDivider` for the seven camera controls.
 - Chat toolbar participant presence uses compact text-avatar dots and recovered project/cloud/upload/remote-camera assets; SF Symbol `person.crop.circle` glyphs are not part of the recovered `ChatViewToolbar`/`ChatTableView` surface.
 

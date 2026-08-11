@@ -92,10 +92,18 @@ struct GalleryView: View {
     private func mediaWorkspace(compact: Bool) -> some View {
         VStack(spacing: 0) {
             mediaToolbar(compact: compact)
-            mediaPool(compact: compact)
+            HStack(spacing: 0) {
+                mediaPool(compact: compact)
+                if sidePanel != .allClips {
+                    Divider().overlay(.white.opacity(0.10))
+                    mediaSidePanel(compact: compact)
+                        .frame(width: compact ? 220 : 320)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                }
+            }
         }
         .background(Color(red: 0.045, green: 0.048, blue: 0.052))
-        // Firmware/update note: main media area follows screenshot grid-only surface; auxiliary panels are represented by toolbar/sidebar states rather than a persistent right drawer.
+        // Firmware/update note: main media area follows recovered MediaViewToolbar plus MediaSortPanel/MediaUploadToCloudPanel/MediaClipDetailsLandscapePanel: grid left, dark contextual panel right, never a floating iOS sheet.
     }
 
     private func mediaPool(compact: Bool) -> some View {
