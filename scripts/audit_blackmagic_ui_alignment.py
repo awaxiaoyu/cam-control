@@ -22,6 +22,8 @@ REQUIRED_SOURCE_PATTERNS = {
     'asset_aliases': (SRC / 'BMDAssetIcon.swift', r'Apple Watch/IconAf'),
     'false_color_original_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetImage\(name: "FalseColorLegend".*preserveOriginalColors: true'),
     'bmd_cloud_logo_asset': (SRC / 'CloudChatPanel.swift', r'BMDAssetImage\(name: "BmdCloudLogo".*preserveOriginalColors: true'),
+    'chat_participant_dots': (SRC / 'CloudChatPanel.swift', r'ChatParticipantDot\(initials: "MW"'),
+    'chat_remote_camera_asset': (SRC / 'CloudChatPanel.swift', r'return "CameraLinkedSmall"'),
     'top_status_only_hud': (SRC / 'ShootingHUDComponents.swift', r'topLeftStatus\(compact: compact\)'),
     'footer_bmd_adjustment_dials': (SRC / 'ShootingHUDComponents.swift', r'BmdAdjustmentDialCell\(item: item, compact: compact, active: activeScroller == item\.scroller\)'),
     'footer_height_for_dials': (SRC / 'ShootingHUDComponents.swift', r'var footerHeight: CGFloat \{ compact \? 72 : 92 \}'),
@@ -42,6 +44,8 @@ FORBIDDEN_SOURCE_PATTERNS = {
     'mini_footer_not_bmd_dial': (SRC / 'ShootingHUDComponents.swift', r'MiniFooterReadout\(item:'),
     'visible_page_rail_text': (SRC / 'BlackmagicRootPageRail.swift', r'Text\(item\.title\.capitalized\)'),
     'liveview_sf_striplabel': (SRC / 'LiveViewPanel.swift', r'stripLabel\([^\\n]*systemImage:'),
+    'chat_toolbar_sf_person_icons': (SRC / 'CloudChatPanel.swift', r'Image\(systemName:.*person\.crop\.circle'),
+    'stale_camera_linked_asset': (SRC / 'CloudChatPanel.swift', r'return "CameraLinked"'),
 }
 
 

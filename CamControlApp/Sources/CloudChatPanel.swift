@@ -77,19 +77,18 @@ struct CloudChatPanel: View {
                 .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
                 .foregroundStyle(.white)
             Spacer()
-            ForEach(["person.crop.circle.fill", "person.crop.circle", "person.crop.circle.badge.plus", "person.crop.circle"], id: \.self) { icon in
-                Image(systemName: icon)
-                    .font(.system(size: compact ? 12 : 16, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.86))
-                    .frame(width: compact ? 18 : 24, height: compact ? 18 : 24)
-                    .background(.white.opacity(0.10), in: Circle())
+            HStack(spacing: compact ? -4 : -6) {
+                ChatParticipantDot(initials: "MW", color: BlackmagicCamStyle.activeBlue, compact: compact)
+                ChatParticipantDot(initials: "ML", color: BlackmagicCamStyle.cyan, compact: compact)
+                ChatParticipantDot(initials: "YO", color: .white.opacity(0.20), compact: compact)
+                ChatParticipantDot(initials: "+", color: .white.opacity(0.10), compact: compact)
             }
         }
         .padding(.horizontal, compact ? 10 : 14)
         .padding(.vertical, compact ? 7 : 9)
         .background(Color.black.opacity(0.74))
         .overlay(Rectangle().fill(.white.opacity(0.08)).frame(height: 1), alignment: .bottom)
-        // Firmware/update note: toolbar mirrors ChatViewToolbar screenshot: room title left, participant avatars right.
+        // Firmware/update note: toolbar mirrors ChatViewToolbar/ChatTableView evidence: room title left, compact text-avatar participants right; do not reintroduce SF Symbol person icons unless a future IPA exposes them as assets.
     }
 
     private func messagePane(compact: Bool) -> some View {
@@ -216,9 +215,26 @@ private struct CloudSidebarRoom: View {
         case "Project": return "ProjectUpload"
         case "Blackmagic Cloud": return "BmdCloudSidebar"
         case "Upload Status": return "UploadToCloud"
-        case "Remote Cam Control": return "CameraLinked"
+        case "Remote Cam Control": return "CameraLinkedSmall"
         default: return "Cloud"
         }
+    }
+}
+
+private struct ChatParticipantDot: View {
+    let initials: String
+    let color: Color
+    let compact: Bool
+
+    var body: some View {
+        Text(initials)
+            .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+            .foregroundStyle(.white.opacity(0.92))
+            .frame(width: compact ? 20 : 26, height: compact ? 20 : 26)
+            .background(color, in: Circle())
+            .overlay(Circle().stroke(.black.opacity(0.72), lineWidth: compact ? 1.5 : 2))
+            .shadow(color: .black.opacity(0.30), radius: 3, x: 0, y: 2)
+        // Firmware/update note: ChatViewToolbar in 3.2.00 uses compact participant presence dots; initials are data placeholders and should be replaced by cloud profile data, not SF Symbols.
     }
 }
 

@@ -275,6 +275,7 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - Settings option choices use square `OptionListView` / `BmdTextListSelector`-style selector cells rather than iOS capsule chips.
 - Media, Chat, Settings sidebars must remain dark panel-driven surfaces consistent with `MediaViewSidebar`, `ChatViewSidebar`, and `SettingsCategoryPanel` evidence.
 - Camera HUD layout separates `HUDTopLeftIndicators` / `HUDTopIndicators` status from `LHUDFooterElements` / `PHUDFooterElements`; top status shows camera/record/timecode/storage/upload only, while the footer uses `BmdAdjustmentDial`, `BmdDialHDivider`, and `BmdDialVDivider` for the seven camera controls.
+- Chat toolbar participant presence uses compact text-avatar dots and recovered project/cloud/upload/remote-camera assets; SF Symbol `person.crop.circle` glyphs are not part of the recovered `ChatViewToolbar`/`ChatTableView` surface.
 
 ## Assetutil Dimension Evidence
 

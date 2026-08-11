@@ -110,7 +110,7 @@ enum BlackmagicReverseSpec {
         "Exposure", "Exposure_active", "FocusAutoZoom", "FocusAutoZoom_active", "ExposureAutoZoom", "ExposureAutoZoom_active", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
         "Lut", "LutDisplay", "LutRecord", "LutSelector", "LutSelector_active",
         "Media", "Media_active", "MediaSync", "MediaSync_active", "MediaSync_disabled", "Sort", "Sort_active", "SortDatetime", "SortFilename", "SortLocation", "SortTimecode", "SortUploadStatus", "UploadToCloud", "UploadToCloud_active", "UploadToCloud_disabled", "UploadedToCloud", "UploadedToCloudHq", "UploadedToCloudPxy", "Uploading", "UploadingSmall", "UploadingPause", "UploadingDone", "UploadingFailedThumbnail", "ProjectUpload", "ProjectUploadFailed", "ProjectUploadNoConnection", "Sync", "Sync_active", "SyncFooter", "SyncSidebar",
-        "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate",
+        "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate", "CameraLinkedSmall",
         "HdmiRecord", "HdmiRecord_active", "HdmiPlay", "HdmiPlay_active", "HdmiHistogramRgb",
         "Hdmi4kRecord", "Hdmi4kRecord_active", "Hdmi4kPlay", "Hdmi4kPlay_active", "Hdmi4kHistogramRgb",
         "HdmiStorageIphone", "HdmiStorageDrive", "Hdmi4kStorageIphone", "Hdmi4kStorageDrive", "HdmiFalseColorLegend", "Hdmi4kFalseColorLegend"
