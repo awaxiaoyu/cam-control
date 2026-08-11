@@ -504,6 +504,15 @@ enum ShootingHUDNavItem: String, CaseIterable, Identifiable {
         case .settings: return "slider.horizontal.3"
         }
     }
+    /// Firmware/update note: root page assets mirror recovered Camera/Media/Chat/Settings icons; update with BlackmagicReverseSpec.hudAssetNames after a new IPA reverse pass.
+    var assetName: String {
+        switch self {
+        case .camera: return "Camera"
+        case .media: return "Media"
+        case .chat: return "Chat"
+        case .settings: return "Settings"
+        }
+    }
 }
 
 private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
