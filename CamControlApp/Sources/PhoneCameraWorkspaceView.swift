@@ -21,14 +21,16 @@ struct PhoneCameraWorkspaceView: View {
                 isLiveActive: camera.isSessionRunning,
                 canCapture: camera.isReady,
                 canFocus: false,
-                canToggleLive: false,
+                canToggleLive: true,
                 onCapture: {
                     camera.capturePhoto()
                 },
-                onToggleLive: {},
+                onToggleLive: {
+                    camera.start()
+                },
                 onFocus: {},
                 onRefresh: {
-                    if camera.canSwitchCamera {
+                    if camera.isSessionRunning, camera.canSwitchCamera {
                         camera.switchCamera()
                     } else {
                         camera.start()
@@ -37,8 +39,12 @@ struct PhoneCameraWorkspaceView: View {
                 onNavigate: navigate
             ) {
                 ZStack {
-                    PhoneCameraPreview(session: camera.session, activePosition: camera.activePosition)
-                        .ignoresSafeArea()
+                    if let session = camera.session {
+                        PhoneCameraPreview(session: session, activePosition: camera.activePosition)
+                            .ignoresSafeArea()
+                    } else {
+                        Color.black.ignoresSafeArea()
+                    }
 
                     if let image = camera.lastPhoto {
                         VStack {
@@ -86,7 +92,6 @@ struct PhoneCameraWorkspaceView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             selectedSourceRaw = CameraSourceKind.phone.rawValue
-            camera.start()
         }
         .onDisappear {
             camera.stop()
@@ -171,16 +176,17 @@ struct PhoneCameraWorkspaceView: View {
     }
 }
 private final class PhoneCameraViewModel: NSObject, ObservableObject {
-    let session = AVCaptureSession()
-
-    @Published private(set) var authorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
+    @Published private(set) var session: AVCaptureSession?
+    @Published private(set) var authorizationStatus: AVAuthorizationStatus = .notDetermined
     @Published private(set) var isSessionRunning = false
     @Published private(set) var lastPhoto: UIImage?
     @Published private(set) var lastError: String?
     @Published private(set) var activePosition: AVCaptureDevice.Position = .back
+    @Published private(set) var hasAttemptedStart = false
 
     private let sessionQueue = DispatchQueue(label: "com.aicomposition.camcontrol.phone-camera.session")
-    private let photoOutput = AVCapturePhotoOutput()
+    private var currentSession: AVCaptureSession?
+    private var photoOutput: AVCapturePhotoOutput?
     private var currentInput: AVCaptureDeviceInput?
     private var isConfigured = false
 
@@ -196,11 +202,14 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
         if let lastError {
             return lastError
         }
+        if session == nil && !hasAttemptedStart {
+            return "Tap VIEW or Refresh to start phone camera."
+        }
         switch authorizationStatus {
         case .authorized:
             return isSessionRunning ? nil : "Starting phone camera..."
         case .notDetermined:
-            return "Requesting camera permission..."
+            return hasAttemptedStart ? "Requesting camera permission..." : "Tap VIEW or Refresh to start phone camera."
         case .denied, .restricted:
             return "Camera permission is disabled. Enable Camera access in Settings."
         @unknown default:
@@ -209,6 +218,7 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
     }
 
     func start() {
+        hasAttemptedStart = true
         Task { [weak self] in
             guard let self else { return }
             let granted = await self.requestAccessIfNeeded()
@@ -222,8 +232,8 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
     func stop() {
         sessionQueue.async { [weak self] in
             guard let self else { return }
-            if self.session.isRunning {
-                self.session.stopRunning()
+            if let session = self.currentSession, session.isRunning {
+                session.stopRunning()
             }
             DispatchQueue.main.async {
                 self.isSessionRunning = false
@@ -232,6 +242,10 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
     }
 
     func switchCamera() {
+        guard currentSession != nil else {
+            start()
+            return
+        }
         let nextPosition: AVCaptureDevice.Position = activePosition == .back ? .front : .back
         sessionQueue.async { [weak self] in
             self?.reconfigureInput(position: nextPosition)
@@ -240,13 +254,14 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
 
     func capturePhoto() {
         guard isReady else { return }
+        guard let output = photoOutput else { return }
         let settings = AVCapturePhotoSettings()
-        if photoOutput.supportedFlashModes.contains(.auto), activePosition == .back {
+        if output.supportedFlashModes.contains(.auto), activePosition == .back {
             settings.flashMode = .auto
         }
         sessionQueue.async { [weak self] in
             guard let self else { return }
-            self.photoOutput.capturePhoto(with: settings, delegate: self)
+            output.capturePhoto(with: settings, delegate: self)
         }
     }
 
@@ -273,15 +288,18 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
     }
 
     private func configureAndStart() {
+        let captureSession = currentSession ?? AVCaptureSession()
+        currentSession = captureSession
         if !isConfigured {
-            session.beginConfiguration()
-            session.sessionPreset = .photo
+            captureSession.beginConfiguration()
+            captureSession.sessionPreset = .photo
             reconfigureInput(position: activePosition, commitConfiguration: false)
-            if session.canAddOutput(photoOutput) {
-                session.addOutput(photoOutput)
-                photoOutput.isHighResolutionCaptureEnabled = true
+            let output = photoOutput ?? AVCapturePhotoOutput()
+            photoOutput = output
+            if captureSession.canAddOutput(output) {
+                captureSession.addOutput(output)
             }
-            session.commitConfiguration()
+            captureSession.commitConfiguration()
             isConfigured = true
         }
 
@@ -290,13 +308,15 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
             return
         }
 
-        if !session.isRunning {
-            session.startRunning()
+        if !captureSession.isRunning {
+            captureSession.startRunning()
         }
         DispatchQueue.main.async {
-            self.isSessionRunning = self.session.isRunning
+            self.session = captureSession
+            self.isSessionRunning = captureSession.isRunning
             self.lastError = nil
         }
+        // Firmware/update note: phone camera hardware is created only after user action; keep this lazy path so future iOS camera or game-version updates cannot crash the first rendered Blackmagic HUD frame.
     }
 
     private func reconfigureInput(position: AVCaptureDevice.Position, commitConfiguration: Bool = true) {
@@ -305,16 +325,21 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
             return
         }
 
+        guard let captureSession = currentSession else {
+            publishError("Phone camera session has not been created.")
+            return
+        }
+
         do {
             let input = try AVCaptureDeviceInput(device: device)
             if commitConfiguration {
-                session.beginConfiguration()
+                captureSession.beginConfiguration()
             }
             if let currentInput {
-                session.removeInput(currentInput)
+                captureSession.removeInput(currentInput)
             }
-            if session.canAddInput(input) {
-                session.addInput(input)
+            if captureSession.canAddInput(input) {
+                captureSession.addInput(input)
                 currentInput = input
                 DispatchQueue.main.async {
                     self.activePosition = position
@@ -324,12 +349,12 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
                 publishError("Phone camera input cannot be added.")
             }
             if commitConfiguration {
-                session.commitConfiguration()
+                captureSession.commitConfiguration()
             }
         } catch {
             publishError(error.localizedDescription)
             if commitConfiguration {
-                session.commitConfiguration()
+                captureSession.commitConfiguration()
             }
         }
     }

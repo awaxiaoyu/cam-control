@@ -60,6 +60,8 @@ REQUIRED_SOURCE_PATTERNS = {
     'lut_names_panel_scroller': (SRC / 'ShootingHUDComponents.swift', r'LutNamesPanel\(compact:'),
     'audio_meter_mini': (SRC / 'ShootingHUDComponents.swift', r'AudioMeterMini\(levels:'),
     'complete_reverse_script': (ROOT / 'scripts' / 'reverse_blackmagic_complete_ui.py', r'UI_BUCKETS'),
+    'phone_camera_lazy_session': (SRC / 'PhoneCameraWorkspaceView.swift', r'@Published private\(set\) var session: AVCaptureSession\?'),
+    'phone_camera_manual_start_message': (SRC / 'PhoneCameraWorkspaceView.swift', r'Tap VIEW or Refresh to start phone camera'),
 }
 FORBIDDEN_SOURCE_PATTERNS = {
     'stale_left_app_nav': (SRC / 'ShootingHUDComponents.swift', r'leftQuickAccessRail|quickAccessButton|FloatingNavPill|trailingIndicators'),
@@ -72,6 +74,7 @@ FORBIDDEN_SOURCE_PATTERNS = {
     'chat_feature_menu_sidebar': (SRC / 'CloudChatPanel.swift', r'CloudRoom\(title: "Remote Cam Control"|CloudRoom\(title: "Upload Status"'),
     'media_side_panel_unmounted': (SRC / 'GalleryView.swift', r'auxiliary panels are represented by toolbar/sidebar states'),
     'media_default_footer_status': (SRC / 'GalleryView.swift', r'RemoteClipSyncStatusFooterView\(status:'),
+    'phone_camera_autostart_on_appear': (SRC / 'PhoneCameraWorkspaceView.swift', r'\.onAppear \{[\s\S]{0,120}camera\.start\(\)'),
 }
 
 
