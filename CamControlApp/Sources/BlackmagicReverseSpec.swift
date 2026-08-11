@@ -63,15 +63,41 @@ enum BlackmagicReverseSpec {
     static let hudControlLabels = ["LENS", "FPS", "SHUTTER", "IRIS", "ISO", "WB", "TINT"]
     static let lutColorSpaces = ["Rec.709", "Rec.2020", "P3 D65", "Apple Log", "Apple Log 2"]
     static let lutNames = ["Rec 709 Neutral", "Cinema Teal", "Day Night", "Dusty", "Monochrome", "Nature", "Nostalgic", "Paloma", "Rift", "Vivid", "Warm Fade"]
-    static let audioLabels = ["Audio Format", "Audio Metering", "Audio Source", "iPhone Microphone", "Record Audio as", "Sample Rate", "AUDIO GAIN"]
+    static let audioLabels = ["Audio Format", "Audio Metering", "Audio Source", "iPhone Microphone", "Record Audio as", "Sample Rate"]
+    static let audioHudLabels = audioLabels + ["AUDIO GAIN"]
     static let mediaOptions = ["Auto Upload To Selected Project", "Enable Upload Only Over Wi-Fi", "Filename Convention", "Save Clips to", "Save Location Data to Clip", "Upload Clips"]
     static let cloudOptions = ["Available Cloud Projects", "Log in to Blackmagic Cloud"]
     static let mediaSortOptions = ["Sort By", "Clip Name", "Date Time", "Location", "Scene, Shot", "Timecode", "Upload Status"]
     static let mediaClipInfoLabels = ["Original Video", "Proxy", "Color Space", "Created", "File Size", "Frame Rate", "Iris", "ISO", "Lens Data", "Location", "Notes", "Reel", "Resolution", "Scene", "Shutter", "Take", "Tint", "WB"]
     static let hdmiOutOptions = ["Clean Feed", "Mirror Display", "Status Text", "Status Text Surrounds Image"]
-    static let presetOptions = ["Preset Selection", "Sync Presets to Cloud Project", "Export Preset", "Import Preset", "Save New Preset"]
+    static let presetOptions = ["Preset Selection", "Sync Presets to Cloud Project"]
+    static let presetSelectionOptions = ["Export Preset", "Import Preset", "Save New Preset"]
     static let accessoriesOptions = ["Nucleus Wireless Lens Control", "Use Bluetooth"]
     static let aboutOptions = ["App Version", "Learn More at Blackmagicdesign.com"]
+
+    static let settingsOptionChoices: [String: [String]] = [
+        "Capture 1 Frame Every": ["1 Second", "%d Seconds", "1 Minute", "%d Minutes", "%d Frames"],
+        "Codec": recordCodecOptions,
+        "If Media Drops Frame": ["Alert ", "Stop Recording"],
+        "Resolution": recordResolutionOptions,
+        "Timecode Display": recordTimecodeOptions,
+        "Audio Format": ["AAC", "IEEE Float", "Linear PCM"],
+        "Audio Metering": ["PPM (-18dBFS)", "PPM (-20dBFS)", "VU (-18dBFS)", "VU (-20dBFS)"],
+        "Audio Source": ["iPhone Microphone", "None"],
+        "iPhone Microphone": ["Auto"],
+        "Record Audio as": ["Mono", "Stereo", "Dual Mono", "4 Channels"],
+        "Sample Rate": ["Auto", "44.1 kHz", "48.0 kHz", "96.0 kHz", "192.0 kHz"],
+        "Shutter Measurement": ["Speed", "Angle"],
+        "Trigger Record Indicator": ["None", "Beeper", "Beeper and Flash"],
+        "Anamorphic De-Squeeze": ["None"],
+        "Focus Assist": ["Colored Lines", "Peaking"],
+        "Focus Assist Color": ["Blue", "Red", "Green", "White", "Black"],
+        "Filename Convention": ["Blackmagic Camera", "iOS"],
+        "Save Clips to": ["In-App Only", "In-App and Photo Library", "Files"],
+        "Upload Clips": ["Proxies Only", "Originals and Proxies"],
+        "Preset Selection": presetSelectionOptions,
+        "LUT Selection": ["Import LUT"] + lutNames
+    ]
     static let slateProjectFields = ["PRODUCTION NAME", "DIRECTOR", "CAMERA", "CAMERA OPERATOR"]
     static let slateClipFields = ["SLATE FOR", "SCENE", "TAKE", "REEL", "LENS DATA", "Good Take Last Clip", "Interior", "Exterior", "Day", "Night", "Next Clip"]
     static let slateFields = slateProjectFields + slateClipFields

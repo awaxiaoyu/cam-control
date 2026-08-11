@@ -112,6 +112,50 @@ def parse_macho(path):
         return res
     return {'fat': False, **parse_macho_slice(full_head)}
 
+
+def decode_text_resource(path):
+    data = open(path, 'rb').read()
+    for enc in ('utf-16-le', 'utf-16', 'utf-8-sig', 'utf-8', 'latin1'):
+        try:
+            text = data.decode(enc)
+            if text.count('\x00') < max(1, len(text) // 20):
+                return text
+        except Exception:
+            continue
+    return data.decode('latin1', 'ignore')
+
+def parse_strings_pairs(path):
+    text = decode_text_resource(path)
+    pairs = {}
+    pattern = re.compile(r'"((?:\\.|[^"\\])*)"\s*=\s*"((?:\\.|[^"\\])*)"\s*;', re.S)
+    for key, value in pattern.findall(text):
+        unesc = lambda x: x.replace('\\n', '\n').replace('\\"', '"').replace('\\\\', '\\')
+        pairs[unesc(key)] = unesc(value)
+    return pairs
+
+def extract_settings_comment_hierarchy(path):
+    text = decode_text_resource(path)
+    blocks = re.findall(r'/\*(.*?)\*/\s*"((?:\\.|[^"\\])*)"\s*=\s*"((?:\\.|[^"\\])*)"\s*;', text, flags=re.S)
+    rows = []
+    hierarchy = collections.defaultdict(lambda: collections.defaultdict(set))
+    for comment, key, value in blocks:
+        for line in comment.splitlines():
+            line = line.strip(' *')
+            if not line.startswith('Settings >'):
+                continue
+            parts = [x.strip() for x in line.split('>')]
+            if len(parts) < 3:
+                continue
+            category, item = parts[1], parts[2]
+            subpath = ' > '.join(parts[3:]) if len(parts) > 3 else ''
+            hierarchy[category][item].add(subpath)
+            rows.append({'category': category, 'item': item, 'subpath': subpath, 'key': key, 'value': value, 'comment': line})
+    serial = {
+        category: {item: sorted(x for x in subpaths if x) for item, subpaths in sorted(items.items())}
+        for category, items in sorted(hierarchy.items())
+    }
+    return serial, rows
+
 def extract_assets_car_names(app, resources):
     result = {}
     pattern = re.compile(rb'[A-Za-z0-9_@./+\- ]{3,120}')
@@ -224,6 +268,32 @@ def main():
         f.write('relpath\tsize\text\n')
         for rel, size, ext in sorted(resources):
             f.write(f'{rel}\t{size}\t{ext}\n')
+
+    localized_strings = {}
+    settings_hierarchy = {}
+    settings_rows = []
+    for rel, _size, ext in resources:
+        if ext != '.strings':
+            continue
+        p = os.path.join(app, rel)
+        try:
+            pairs = parse_strings_pairs(p)
+        except Exception as e:
+            pairs = {'__parse_error__': str(e)}
+        localized_strings[rel] = pairs
+        rel_norm = rel.replace(os.sep, '/')
+        if rel_norm.endswith('CameraAppToolbox.framework/en.lproj/Localizable.strings') or rel_norm.endswith('en.lproj/Localizable.strings'):
+            try:
+                settings_hierarchy, settings_rows = extract_settings_comment_hierarchy(p)
+            except Exception as e:
+                settings_hierarchy, settings_rows = {'__parse_error__': str(e)}, []
+    with open(os.path.join(args.out, 'localized_strings.json'), 'w', encoding='utf-8') as f:
+        json.dump(localized_strings, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(args.out, 'settings_comment_hierarchy.json'), 'w', encoding='utf-8') as f:
+        json.dump(settings_hierarchy, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(args.out, 'settings_comment_rows.json'), 'w', encoding='utf-8') as f:
+        json.dump(settings_rows, f, ensure_ascii=False, indent=2)
+
     asset_names = extract_assets_car_names(app, resources)
     with open(os.path.join(args.out, 'assets_car_strings.json'), 'w', encoding='utf-8') as f:
         json.dump(asset_names, f, ensure_ascii=False, indent=2)
@@ -241,9 +311,11 @@ def main():
         'ui_strings': len(ui_strings),
         'file_terms': len(file_terms),
         'assets_car_files': len(asset_names),
+        'settings_rows': len(settings_rows),
         'macho': summary['macho'],
         'largest': summary['largest_files'][:12],
     }, ensure_ascii=False, indent=2))
 
 if __name__ == '__main__':
     main()
+

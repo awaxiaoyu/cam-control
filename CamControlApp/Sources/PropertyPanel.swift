@@ -93,14 +93,14 @@ struct PropertyPanel: View {
                     BMStatusPill(title: "Props", value: "\(controller.snapshot.properties.count)", color: controller.snapshot.properties.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
                 }
 
-                if selectedCategory == "Camera" || selectedCategory == "Record" {
-                    livePropertyGrid(compact: compact)
-                }
-
                 settingsRows(compact: compact)
 
                 if selectedCategory == "Camera" {
                     SlateMetadataPanel(compact: compact)
+                }
+
+                if selectedCategory == "Camera" || selectedCategory == "Record" {
+                    livePropertyGrid(compact: compact)
                 }
             }
             .padding(compact ? 18 : 28)
@@ -173,32 +173,52 @@ struct PropertyPanel: View {
     private var categoryRows: [SettingsOptionModel] {
         switch selectedCategory {
         case "Record":
-            return BlackmagicReverseSpec.recordOptions.map { SettingsOptionModel(title: $0, value: valueForRecordOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.recordOptions.map { settingRow($0, value: valueForRecordOption($0)) }
         case "Camera":
-            return BlackmagicReverseSpec.cameraOptions.map { SettingsOptionModel(title: $0, value: valueForCameraOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.cameraOptions.map { settingRow($0, value: valueForCameraOption($0)) }
         case "Monitor":
-            return BlackmagicReverseSpec.monitorOptions.map { SettingsOptionModel(title: $0, value: valueForMonitorOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.monitorOptions.map { settingRow($0, value: valueForMonitorOption($0)) }
         case "Audio":
-            return BlackmagicReverseSpec.audioLabels.map { SettingsOptionModel(title: $0, value: $0 == "AUDIO GAIN" ? "-12 dB" : "Auto", color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.audioLabels.map { settingRow($0, value: valueForAudioOption($0)) }
         case "LUTs":
             return [
-                SettingsOptionModel(title: "Display LUT", value: "On", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "LUT Selection", value: "Rec 709 Neutral", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Color Space Tag", value: BlackmagicReverseSpec.lutColorSpaces.joined(separator: " / "), color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Import LUT", value: "\(BlackmagicReverseSpec.lutNames.count) built-in names", color: color(for: selectedCategory))
+                settingRow("Display LUT", value: "On"),
+                settingRow("LUT Selection", value: "Rec 709 Neutral")
             ]
         case "Media":
-            return BlackmagicReverseSpec.mediaOptions.map { SettingsOptionModel(title: $0, value: valueForMediaOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.mediaOptions.map { settingRow($0, value: valueForMediaOption($0)) }
         case "Blackmagic Cloud":
-            return BlackmagicReverseSpec.cloudOptions.map { SettingsOptionModel(title: $0, value: valueForCloudOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.cloudOptions.map { settingRow($0, value: valueForCloudOption($0)) }
         case "HDMI Out":
-            return BlackmagicReverseSpec.hdmiOutOptions.map { SettingsOptionModel(title: $0, value: valueForHDMIOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.hdmiOutOptions.map { settingRow($0, value: valueForHDMIOption($0)) }
         case "Presets":
-            return BlackmagicReverseSpec.presetOptions.map { SettingsOptionModel(title: $0, value: valueForPresetOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.presetOptions.map { settingRow($0, value: valueForPresetOption($0)) }
         case "Accessories":
-            return BlackmagicReverseSpec.accessoriesOptions.map { SettingsOptionModel(title: $0, value: valueForAccessoriesOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.accessoriesOptions.map { settingRow($0, value: valueForAccessoriesOption($0)) }
         default:
-            return BlackmagicReverseSpec.aboutOptions.map { SettingsOptionModel(title: $0, value: valueForAboutOption($0), color: color(for: selectedCategory)) }
+            return BlackmagicReverseSpec.aboutOptions.map { settingRow($0, value: valueForAboutOption($0)) }
+        }
+    }
+
+
+    private func settingRow(_ title: String, value: String) -> SettingsOptionModel {
+        SettingsOptionModel(
+            title: title,
+            value: value,
+            choices: BlackmagicReverseSpec.settingsOptionChoices[title] ?? [],
+            color: color(for: selectedCategory)
+        )
+        // Firmware/update note: row choices are generated from `Settings > ... > List Option` comments in F:\Blackmagic Cam_3.2.00.ipa; rerun _extract_settings_comments.py when Blackmagic changes Localizable.strings.
+    }
+
+    private func valueForAudioOption(_ title: String) -> String {
+        switch title {
+        case "Audio Format": return "Linear PCM"
+        case "Audio Metering": return "PPM (-18dBFS)"
+        case "Audio Source": return "iPhone Microphone"
+        case "Record Audio as": return "Stereo"
+        case "Sample Rate": return "48.0 kHz"
+        default: return "Auto"
         }
     }
 
@@ -388,6 +408,7 @@ private struct SettingsCategoryRow: View {
 private struct SettingsOptionModel {
     let title: String
     let value: String
+    let choices: [String]
     let color: Color
 }
 
@@ -396,30 +417,50 @@ private struct SettingsOptionRow: View {
     let compact: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(row.title)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 16, weight: .heavy))
-                    .foregroundStyle(.white)
-                Text("Tap to select \(row.title)")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.38))
+        VStack(alignment: .leading, spacing: compact ? 8 : 10) {
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(row.title)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 16, weight: .heavy))
+                        .foregroundStyle(.white)
+                    Text(row.choices.isEmpty ? "Toggle / value row recovered from Settings > List Option" : "OptionListView choices recovered from IPA")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.38))
+                        .lineLimit(1)
+                }
+                Spacer()
+                Text(row.value.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                    .tracking(0.7)
+                    .foregroundStyle(row.color)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(row.color.opacity(0.12), in: Capsule())
             }
-            Spacer()
-            Text(row.value.uppercased())
-                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                .tracking(0.7)
-                .foregroundStyle(row.color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(row.color.opacity(0.12), in: Capsule())
+
+            if !row.choices.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: compact ? 6 : 8) {
+                        ForEach(Array(row.choices.enumerated()), id: \.offset) { index, choice in
+                            Text(choice)
+                                .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: index == 0 ? .heavy : .bold))
+                                .foregroundStyle(index == 0 ? .white : .white.opacity(0.68))
+                                .lineLimit(1)
+                                .padding(.horizontal, compact ? 8 : 10)
+                                .padding(.vertical, compact ? 5 : 6)
+                                .background(index == 0 ? row.color.opacity(0.24) : .white.opacity(0.055), in: Capsule())
+                                .overlay(Capsule().stroke(index == 0 ? row.color.opacity(0.42) : .white.opacity(0.08), lineWidth: 1))
+                        }
+                    }
+                }
+            }
         }
         .padding(compact ? 12 : 15)
         .background(.black.opacity(0.28), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: choice chips mirror SettingsOptionsPanel + OptionListView evidence from Localizable.strings comments; update via BlackmagicReverseSpec.settingsOptionChoices after app updates.
     }
 }
 
