@@ -265,7 +265,7 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private func guideLayer(metrics: BlackmagicHUDMetrics) -> some View {
         let compact = metrics.compact
-        ZStack {
+        return ZStack {
             RuleOfThirds()
                 .stroke(.white.opacity(0.28), style: StrokeStyle(lineWidth: 1, dash: [compact ? 5 : 7, compact ? 8 : 11]))
                 .padding(.leading, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 42 : 66) : (compact ? 48 : 72))
