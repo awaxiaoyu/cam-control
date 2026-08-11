@@ -152,16 +152,13 @@ struct PhoneCameraWorkspaceView: View {
 
     private var topItems: [ShootingHUDTopItem] {
         [
-            ShootingHUDTopItem(title: "LENS", value: camera.activePosition == .front ? "Front" : "24mm"),
-            ShootingHUDTopItem(title: "Zoom", value: camera.activePosition == .front ? "1.0x" : "1.0x"),
+            ShootingHUDTopItem(title: "LENS", value: camera.activePosition == .front ? "FRONT" : "24mm"),
             ShootingHUDTopItem(title: "FPS", value: "24"),
-            ShootingHUDTopItem(title: "SHUTTER", value: "1/24", isAuto: true, isMonospaced: true),
+            ShootingHUDTopItem(title: "SHUTTER", value: "1/48", isAuto: true, isMonospaced: true),
             ShootingHUDTopItem(title: "IRIS", value: "f1.8", isDimmed: true, isMonospaced: true),
             ShootingHUDTopItem(title: "ISO", value: "Auto", isAuto: true),
-            ShootingHUDTopItem(title: "Exposure", value: "0.0", isMonospaced: true),
             ShootingHUDTopItem(title: "WB", value: "4700K", isAuto: true),
-            ShootingHUDTopItem(title: "TINT", value: "0", isMonospaced: true),
-            ShootingHUDTopItem(title: "Format", value: "4K 16:9")
+            ShootingHUDTopItem(title: "TINT", value: "0", isMonospaced: true)
         ]
     }
 

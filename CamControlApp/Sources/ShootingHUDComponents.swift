@@ -256,32 +256,6 @@ struct ShootingHUDLayout<Preview: View>: View {
         // Firmware/update note: overlays mirror reversed HUDGuides, HUDSafeAreas, HUDFalseColor and HUDWhiteBalanceOverlay strings; only values should change for new camera firmware.
     }
 
-    private func leftQuickAccessRail(compact: Bool) -> some View {
-        VStack(spacing: compact ? 7 : 9) {
-            quickAccessButton(title: "SETTINGS", asset: "ControlIcon", color: BlackmagicCamStyle.cyan, compact: compact) {
-                onNavigate(.settings)
-            }
-            quickAccessButton(title: "MEDIA", asset: "Media", color: .white.opacity(0.86), compact: compact) {
-                onNavigate(.media)
-            }
-            quickAccessButton(title: "CHAT", asset: "Chat", color: BlackmagicCamStyle.activeBlue, compact: compact) {
-                onNavigate(.chat)
-            }
-            quickAccessButton(title: "SLATE", asset: "Slate", color: BlackmagicCamStyle.amber, compact: compact) {
-                withAnimation(.snappy(duration: 0.18)) { showSlate = true }
-            }
-            quickAccessButton(title: "PRESET", asset: "Sync", color: BlackmagicCamStyle.okGreen, compact: compact) {
-                withAnimation(.snappy(duration: 0.18)) { activeScroller = .preset }
-            }
-        }
-        .padding(.vertical, compact ? 7 : 10)
-        .padding(.horizontal, compact ? 4 : 6)
-        .background(.black.opacity(0.54), in: RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
-        .shadow(color: .black.opacity(0.38), radius: 18, x: 0, y: 10)
-        // Firmware/update note: this maps recovered HUDLeftNavMenuIndicator, PresetScrollListView, SlateView and pageCamera/pageMedia/pageChat/pageSettings symbols; update asset order from IPA strings on future app changes.
-    }
-
     private func rightPageNavigationRail(compact: Bool) -> some View {
         VStack(spacing: compact ? 8 : 10) {
             BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: onNavigate)
@@ -299,24 +273,6 @@ struct ShootingHUDLayout<Preview: View>: View {
             .buttonStyle(.plain)
         }
         // Firmware/update note: right rail is the recovered BmdTabView/BmdVTabView pageCamera/pageMedia/pageChat/pageSettings rail with Slate/Preset secondary controls; future IPA changes must be diffed against page symbols before reordering.
-    }
-
-    private func quickAccessButton(title: String, asset: String, color: Color, compact: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            VStack(spacing: compact ? 2 : 3) {
-                BMDAssetIcon(name: asset, active: false, fallback: BlackmagicReverseSpec.assetFallbackSystemImages[asset] ?? "circle", color: color, size: compact ? 15 : 18)
-                Text(title)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
-                    .tracking(0.5)
-                    .foregroundStyle(.white.opacity(0.54))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.55)
-            }
-            .frame(width: compact ? 38 : 48, height: compact ? 38 : 50)
-            .background(.white.opacity(0.052), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
-        }
-        .buttonStyle(.plain)
     }
 
     private func leftMonitorRail(compact: Bool) -> some View {
@@ -356,29 +312,6 @@ struct ShootingHUDLayout<Preview: View>: View {
             .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.58) : .white.opacity(0.052), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.50) : .white.opacity(0.08), lineWidth: 1))
             .contentShape(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-    }
-
-    private func trailingIndicators(compact: Bool) -> some View {
-        VStack(alignment: .trailing, spacing: compact ? 8 : 11) {
-            ForEach(ShootingHUDNavItem.allCases) { item in
-                Button { onNavigate(item) } label: {
-                    FloatingNavPill(item: item, selected: item == navSelection, compact: compact)
-                }
-                .buttonStyle(.plain)
-            }
-            Button {
-                withAnimation(.snappy(duration: 0.18)) { showSlate = true }
-            } label: {
-                FloatingNavPill(title: "SLATE", systemImage: "rectangle.and.pencil.and.ellipsis", selected: showSlate, compact: compact)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.vertical, compact ? 7 : 10)
-        .padding(.horizontal, compact ? 4 : 6)
-        .background(.black.opacity(0.56), in: RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous).stroke(.white.opacity(0.11), lineWidth: 1))
-        .shadow(color: .black.opacity(0.40), radius: 18, x: 0, y: 10)
-        // Firmware/update note: trailing indicators map reversed HUDLeftNavMenuIndicator/HUDRightNavMenuIndicator plus SlateView and page tab layout data.
     }
 
     private func bottomScopeStrip(compact: Bool) -> some View {
@@ -683,46 +616,6 @@ private struct HUDAuxIndicator: View {
     }
 }
 
-private struct FloatingNavPill: View {
-    let title: String
-    let systemImage: String
-    let selected: Bool
-    let compact: Bool
-    init(item: ShootingHUDNavItem, selected: Bool, compact: Bool) {
-        self.title = item.title; self.systemImage = item.systemImage; self.selected = selected; self.compact = compact
-    }
-    init(title: String, systemImage: String, selected: Bool, compact: Bool) {
-        self.title = title; self.systemImage = systemImage; self.selected = selected; self.compact = compact
-    }
-    var body: some View {
-        ZStack(alignment: .trailing) {
-            BMDAssetIcon(name: assetName, active: selected, fallback: systemImage, color: selected ? .white : .white.opacity(0.64), size: compact ? 18 : 22)
-                .frame(width: compact ? 40 : 50, height: compact ? 40 : 52)
-                .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.58) : .white.opacity(0.052), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.48) : .white.opacity(0.08), lineWidth: 1))
-            if selected {
-                Capsule()
-                    .fill(BlackmagicCamStyle.cyan)
-                    .frame(width: 3, height: compact ? 20 : 26)
-                    .offset(x: compact ? 4 : 5)
-            }
-        }
-        .accessibilityLabel(title)
-        // Firmware/update note: page tabs map recovered pageCamera/pageMedia/pageChat/pageSettings and MainViewLayoutData tabButton size; they are icon-first like the 3.2.00 root rail.
-    }
-
-    private var assetName: String {
-        switch title {
-        case "CAMERA": return "Camera"
-        case "MEDIA": return "Media"
-        case "CHAT": return "Cloud"
-        case "SETTINGS": return "ControlIcon"
-        case "SLATE": return "Slate"
-        default: return "Camera"
-        }
-    }
-}
-
 private struct BmdAdjustmentDialCell: View {
     let item: BottomControlItem
     let compact: Bool
@@ -916,14 +809,7 @@ private struct BlackmagicScrollerPanel: View {
                 HStack(spacing: compact ? 7 : 10) {
                     ForEach(Array(scroller.options.enumerated()), id: \.offset) { index, option in
                         Button { onSelect(option) } label: {
-                            VStack(spacing: compact ? 3 : 5) {
-                                Text(option).font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 15, weight: index == 0 ? .heavy : .bold)).foregroundStyle(index == 0 ? .white : .white.opacity(0.82)).lineLimit(1).minimumScaleFactor(0.72)
-                                Capsule().fill(index == 0 ? BlackmagicCamStyle.activeBlue : .white.opacity(0.12)).frame(width: index == 0 ? (compact ? 34 : 44) : (compact ? 20 : 26), height: index == 0 ? 3 : 2)
-                            }
-                            .frame(minWidth: compact ? 86 : 116)
-                            .padding(.horizontal, compact ? 8 : 12).padding(.vertical, compact ? 10 : 13)
-                            .background(index == 0 ? BlackmagicCamStyle.activeBlue.opacity(0.24) : .white.opacity(0.06), in: RoundedRectangle(cornerRadius: compact ? 12 : 16, style: .continuous))
-                            .overlay(RoundedRectangle(cornerRadius: compact ? 12 : 16, style: .continuous).stroke(index == 0 ? BlackmagicCamStyle.cyan.opacity(0.45) : .white.opacity(0.10), lineWidth: 1))
+                            ScrollerOptionDial(option: option, selected: index == 0, compact: compact)
                         }
                         .buttonStyle(.plain)
                     }
@@ -936,6 +822,49 @@ private struct BlackmagicScrollerPanel: View {
         .overlay(RoundedRectangle(cornerRadius: compact ? 18 : 24, style: .continuous).stroke(.white.opacity(0.16), lineWidth: 1))
         .shadow(color: .black.opacity(0.55), radius: 24, x: 0, y: 12)
         // Firmware/update note: option strips mirror recovered FpsOptions, ShutterScroll, IsoScroll, ZoomScroll, ExposureScroll, LutScroller and Monitor scroller families.
+    }
+}
+
+private struct ScrollerOptionDial: View {
+    let option: String
+    let selected: Bool
+    let compact: Bool
+
+    var body: some View {
+        ZStack {
+            BmdAdjustmentDialShape()
+                .fill(selected ? BlackmagicCamStyle.activeBlue.opacity(0.24) : Color.black.opacity(0.56))
+            BmdAdjustmentDialShape()
+                .stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.48) : .white.opacity(0.12), lineWidth: 1)
+            BmdDialHDivider()
+                .stroke(.white.opacity(selected ? 0.20 : 0.09), lineWidth: 1)
+                .padding(.horizontal, compact ? 10 : 12)
+            VStack(spacing: compact ? 6 : 8) {
+                Text(option.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: selected ? .heavy : .bold))
+                    .tracking(0.7)
+                    .foregroundStyle(selected ? .white : .white.opacity(0.80))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.58)
+                BmdDialMarkerRow(active: selected, compact: compact)
+            }
+            .padding(.horizontal, compact ? 10 : 13)
+            if selected {
+                Text("SEL")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
+                    .tracking(0.6)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(BlackmagicCamStyle.activeBlue.opacity(0.95), in: Capsule())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .padding(.top, compact ? 5 : 7)
+                    .padding(.trailing, compact ? 6 : 8)
+            }
+        }
+        .frame(width: compact ? 102 : 136, height: compact ? 58 : 72)
+        .contentShape(BmdAdjustmentDialShape())
+        // Firmware/update note: popup choices are rendered with the recovered BmdAdjustmentDial/BmdAdjustmentDialMarker visual language instead of generic list pills; update from FpsOptions/ShutterScroll/etc symbols when IPA UI changes.
     }
 }
 

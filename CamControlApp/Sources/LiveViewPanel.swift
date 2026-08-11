@@ -177,8 +177,7 @@ struct LiveViewPanel: View {
             ShootingHUDTopItem(title: "IRIS", value: propertyDisplay(.aperture), isDimmed: property(.aperture) == nil, isMonospaced: true),
             ShootingHUDTopItem(title: "ISO", value: propertyDisplay(.iso), isAuto: isReadOnly(.iso), isMonospaced: true),
             ShootingHUDTopItem(title: "WB", value: whiteBalanceValue, isAuto: isReadOnly(.whiteBalance) || isReadOnly(.colorTemperature)),
-            ShootingHUDTopItem(title: "TINT", value: propertyDisplay(.exposureCompensation), isMonospaced: true),
-            ShootingHUDTopItem(title: "Format", value: "4K 16:9")
+            ShootingHUDTopItem(title: "TINT", value: propertyDisplay(.exposureCompensation), isMonospaced: true)
         ]
     }
 

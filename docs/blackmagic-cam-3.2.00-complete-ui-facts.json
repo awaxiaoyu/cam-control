@@ -1,0 +1,2122 @@
+{
+  "source_ipa": "F:\\Blackmagic Cam_3.2.00.ipa",
+  "sha256": "3e6721ce0673432ea4fb21bf7556b0433f2d0f22e3cb6170c1117b8d487e7c28",
+  "bundle": "com.blackmagic-design.DaVinciCamera",
+  "version": "3.2.00",
+  "build": "3.2.000045",
+  "minimum_os": "17.0",
+  "orientations": [
+    "UIInterfaceOrientationLandscapeRight",
+    "UIInterfaceOrientationLandscapeLeft",
+    "UIInterfaceOrientationPortrait"
+  ],
+  "fonts": [
+    "Assets/Fonts/BMD-Lato-Bold-Italic.ttf",
+    "Assets/Fonts/BMD-Lato-Bold.ttf",
+    "Assets/Fonts/BMD-Lato-Heavy.ttf",
+    "Assets/Fonts/BMD-Lato-HeavyItalic.ttf",
+    "Assets/Fonts/BMD-Lato-Italic.ttf",
+    "Assets/Fonts/BMD-Lato-Light-Italic.ttf",
+    "Assets/Fonts/BMD-Lato-Light.ttf",
+    "Assets/Fonts/BMD-Lato-Regular.ttf",
+    "Assets/Fonts/BMD-Lato-Timecode-Heavy.ttf",
+    "Assets/Fonts/BMD-Lato-WP.ttf",
+    "Assets/Fonts/BMD-Lato-WPAC.ttf"
+  ],
+  "resource_counts": {
+    "<none>": 9,
+    ".cube": 52,
+    ".car": 2,
+    ".ttf": 11,
+    ".crt": 1,
+    ".strings": 10,
+    ".actionsdata": 1,
+    ".plist": 9,
+    ".m4a": 1,
+    ".xcprivacy": 1,
+    ".json": 1
+  },
+  "largest_files": [
+    {
+      "path": "Frameworks\\DavCloudClient.framework\\DavCloudClient",
+      "size": 32081072,
+      "ext": "<none>"
+    },
+    {
+      "path": "Frameworks\\DavCloudClientSwift.framework\\DavCloudClientSwift",
+      "size": 25818704,
+      "ext": "<none>"
+    },
+    {
+      "path": "Frameworks\\GStreamer.framework\\GStreamer",
+      "size": 14320672,
+      "ext": "<none>"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Rec 709 Neutral.cube",
+      "size": 12907436,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Rec 709 Neutral.cube",
+      "size": 12632807,
+      "ext": ".cube"
+    },
+    {
+      "path": "BlackmagicCam",
+      "size": 12213248,
+      "ext": "<none>"
+    },
+    {
+      "path": "Frameworks\\DavStream.framework\\DavStream",
+      "size": 8910000,
+      "ext": "<none>"
+    },
+    {
+      "path": "Frameworks\\SwiftProtobuf.framework\\SwiftProtobuf",
+      "size": 4130368,
+      "ext": "<none>"
+    },
+    {
+      "path": "Frameworks\\CameraAppToolbox.framework\\CameraAppToolbox",
+      "size": 2662848,
+      "ext": "<none>"
+    },
+    {
+      "path": "Frameworks\\CameraAppToolbox.framework\\Assets.car",
+      "size": 1594600,
+      "ext": ".car"
+    },
+    {
+      "path": "Assets\\LUTS\\Rec.2020\\Monochrome.cube",
+      "size": 972946,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Cinema Teal.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Day Night.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Dusty.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Nature.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Nostalgic.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Paloma.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Rift.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Vivid.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log\\Warm Fade.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Cinema Teal.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Day Night.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Dusty.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Monochrome.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Nature.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Nostalgic.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Paloma.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Rift.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Vivid.cube",
+      "size": 970343,
+      "ext": ".cube"
+    },
+    {
+      "path": "Assets\\LUTS\\Apple Log 2\\Warm Fade.cube",
+      "size": 970343,
+      "ext": ".cube"
+    }
+  ],
+  "settings_hierarchy": {
+    "About": {
+      "List Option": []
+    },
+    "Accessories": {
+      "List Option": []
+    },
+    "Audio": {
+      "Audio Format": [
+        "List Option"
+      ],
+      "Audio Metering": [
+        "List Option"
+      ],
+      "Audio Source": [
+        "List Option"
+      ],
+      "List Option": [],
+      "Record Audio As": [
+        "List Option"
+      ],
+      "Sample Rate": [
+        "List Option"
+      ],
+      "iPhone Microphone": [
+        "List Option"
+      ]
+    },
+    "Blackmagic Cloud": {
+      "List Option": []
+    },
+    "Camera": {
+      "Anamorphic De-Squeeze": [
+        "List Option"
+      ],
+      "List Option": [],
+      "Shutter Measurement": [
+        "List Option"
+      ],
+      "Trigger Record Indicator": [
+        "List Option"
+      ]
+    },
+    "HDMI Out": {
+      "List Option": []
+    },
+    "LUTs": {
+      "LUT Selection": [
+        "List Option"
+      ],
+      "List Option": []
+    },
+    "Media": {
+      "Filename Convention": [
+        "List Option"
+      ],
+      "List Option": [],
+      "Save Clips to": [
+        "List Option"
+      ],
+      "Upload Clips": [
+        "List Option"
+      ]
+    },
+    "Monitor": {
+      "Focus Assist": [
+        "List Option"
+      ],
+      "Focus Assist Color": [
+        "List Option"
+      ],
+      "List Option": []
+    },
+    "Portrait": {
+      "Title": []
+    },
+    "Preset": {
+      "Preset Selection": [
+        "Option"
+      ]
+    },
+    "Presets": {
+      "List Option": []
+    },
+    "Record": {
+      "Capture 1 Frame Every": [
+        "List Option"
+      ],
+      "Codec": [
+        "List Option"
+      ],
+      "If Media Drops Frame": [
+        "List Option"
+      ],
+      "List Option": [],
+      "Resolution": [
+        "List Option"
+      ],
+      "Timecode Display": [
+        "List Option"
+      ]
+    },
+    "Reset": {
+      "Reset Blackmagic Cam Settings": [
+        "List Option"
+      ]
+    },
+    "Reset Settings": {
+      "List Option": []
+    },
+    "Reset Settings Dialog": {
+      "Body": [],
+      "Title": []
+    },
+    "Settings Category": {
+      "List Option": []
+    }
+  },
+  "settings_rows_sample": [
+    {
+      "category": "Record",
+      "item": "Capture 1 Frame Every",
+      "subpath": "List Option",
+      "key": "%d Frames",
+      "value": "%d Frames"
+    },
+    {
+      "category": "Record",
+      "item": "Capture 1 Frame Every",
+      "subpath": "List Option",
+      "key": "%d Minutes",
+      "value": "%d Minutes"
+    },
+    {
+      "category": "Record",
+      "item": "Capture 1 Frame Every",
+      "subpath": "List Option",
+      "key": "%d Seconds",
+      "value": "%d Seconds"
+    },
+    {
+      "category": "Record",
+      "item": "Capture 1 Frame Every",
+      "subpath": "List Option",
+      "key": "1 Minute",
+      "value": "1 Minute"
+    },
+    {
+      "category": "Record",
+      "item": "Capture 1 Frame Every",
+      "subpath": "List Option",
+      "key": "1 Second",
+      "value": "1 Second"
+    },
+    {
+      "category": "Audio",
+      "item": "Sample Rate",
+      "subpath": "List Option",
+      "key": "192.0 kHz",
+      "value": "192.0 kHz"
+    },
+    {
+      "category": "Audio",
+      "item": "Record Audio As",
+      "subpath": "List Option",
+      "key": "4 Channels",
+      "value": "4 Channels"
+    },
+    {
+      "category": "Audio",
+      "item": "Sample Rate",
+      "subpath": "List Option",
+      "key": "44.1 kHz",
+      "value": "44.1 kHz"
+    },
+    {
+      "category": "Audio",
+      "item": "Sample Rate",
+      "subpath": "List Option",
+      "key": "48.0 kHz",
+      "value": "48.0 kHz"
+    },
+    {
+      "category": "Record",
+      "item": "Resolution",
+      "subpath": "List Option",
+      "key": "4K",
+      "value": "4K"
+    },
+    {
+      "category": "Record",
+      "item": "Resolution",
+      "subpath": "List Option",
+      "key": "720p",
+      "value": "720p"
+    },
+    {
+      "category": "Audio",
+      "item": "Sample Rate",
+      "subpath": "List Option",
+      "key": "96.0 kHz",
+      "value": "96.0 kHz"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Format",
+      "subpath": "List Option",
+      "key": "AAC",
+      "value": "AAC"
+    },
+    {
+      "category": "Record",
+      "item": "If Media Drops Frame",
+      "subpath": "List Option",
+      "key": "Alert ",
+      "value": "Alert "
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Anamorphic De-Squeeze",
+      "value": "Anamorphic De-Squeeze"
+    },
+    {
+      "category": "Camera",
+      "item": "Shutter Measurement",
+      "subpath": "List Option",
+      "key": "Angle",
+      "value": "Angle"
+    },
+    {
+      "category": "About",
+      "item": "List Option",
+      "subpath": "",
+      "key": "App Version",
+      "value": "App Version"
+    },
+    {
+      "category": "Record",
+      "item": "Codec",
+      "subpath": "List Option",
+      "key": "Apple ProRes 422",
+      "value": "Apple ProRes 422"
+    },
+    {
+      "category": "Record",
+      "item": "Codec",
+      "subpath": "List Option",
+      "key": "Apple ProRes 422 HQ",
+      "value": "Apple ProRes 422 HQ"
+    },
+    {
+      "category": "Record",
+      "item": "Codec",
+      "subpath": "List Option",
+      "key": "Apple ProRes 422 LT",
+      "value": "Apple ProRes 422 LT"
+    },
+    {
+      "category": "Record",
+      "item": "Codec",
+      "subpath": "List Option",
+      "key": "Apple ProRes 422 Proxy",
+      "value": "Apple ProRes 422 Proxy"
+    },
+    {
+      "category": "Audio",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Audio Format",
+      "value": "Audio Format"
+    },
+    {
+      "category": "Audio",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Audio Metering",
+      "value": "Audio Metering"
+    },
+    {
+      "category": "Audio",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Audio Source",
+      "value": "Audio Source"
+    },
+    {
+      "category": "Audio",
+      "item": "iPhone Microphone",
+      "subpath": "List Option",
+      "key": "Auto",
+      "value": "Auto"
+    },
+    {
+      "category": "Audio",
+      "item": "Sample Rate",
+      "subpath": "List Option",
+      "key": "Auto",
+      "value": "Auto"
+    },
+    {
+      "category": "Media",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Auto Upload To Selected Project",
+      "value": "Auto Upload To Selected Project"
+    },
+    {
+      "category": "Blackmagic Cloud",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Available Cloud Projects",
+      "value": "Available Cloud Projects"
+    },
+    {
+      "category": "Camera",
+      "item": "Trigger Record Indicator",
+      "subpath": "List Option",
+      "key": "Beeper",
+      "value": "Beeper"
+    },
+    {
+      "category": "Camera",
+      "item": "Trigger Record Indicator",
+      "subpath": "List Option",
+      "key": "Beeper and Flash",
+      "value": "Beeper and Flash"
+    },
+    {
+      "category": "Monitor",
+      "item": "Focus Assist Color",
+      "subpath": "List Option",
+      "key": "Black",
+      "value": "Black"
+    },
+    {
+      "category": "Media",
+      "item": "Filename Convention",
+      "subpath": "List Option",
+      "key": "Blackmagic Camera",
+      "value": "Blackmagic Camera"
+    },
+    {
+      "category": "Monitor",
+      "item": "Focus Assist Color",
+      "subpath": "List Option",
+      "key": "Blue",
+      "value": "Blue"
+    },
+    {
+      "category": "Record",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Capture 1 Frame Every",
+      "value": "Capture 1 Frame Every"
+    },
+    {
+      "category": "HDMI Out",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Clean Feed",
+      "value": "Clean Feed"
+    },
+    {
+      "category": "Record",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Codec",
+      "value": "Codec"
+    },
+    {
+      "category": "Record",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Color Space",
+      "value": "Color Space"
+    },
+    {
+      "category": "Monitor",
+      "item": "Focus Assist",
+      "subpath": "List Option",
+      "key": "Colored Lines",
+      "value": "Colored Lines"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Display Audio Meters",
+      "value": "Display Audio Meters"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Display Battery Indicator",
+      "value": "Display Battery Indicator"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Display Histogram",
+      "value": "Display Histogram"
+    },
+    {
+      "category": "LUTs",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Display LUT",
+      "value": "Display LUT"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Display Storage Status",
+      "value": "Display Storage Status"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Display Upload Status",
+      "value": "Display Upload Status"
+    },
+    {
+      "category": "Audio",
+      "item": "Record Audio As",
+      "subpath": "List Option",
+      "key": "Dual Mono",
+      "value": "Dual Mono"
+    },
+    {
+      "category": "Media",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Enable Upload Only Over Wi-Fi",
+      "value": "Enable Upload Only Over Wi-Fi"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Enable Vertical Video",
+      "value": "Enable Vertical Video"
+    },
+    {
+      "category": "Preset",
+      "item": "Preset Selection",
+      "subpath": "Option",
+      "key": "Export Preset",
+      "value": "Export Preset"
+    },
+    {
+      "category": "Media",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Filename Convention",
+      "value": "Filename Convention"
+    },
+    {
+      "category": "Media",
+      "item": "Save Clips to",
+      "subpath": "List Option",
+      "key": "Files",
+      "value": "Files"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Flicker Free Shutter Based On",
+      "value": "Flicker Free Shutter Based On"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Flip Image for SLR Lens",
+      "value": "Flip Image for SLR Lens"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Focus Assist",
+      "value": "Focus Assist"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Focus Assist Color",
+      "value": "Focus Assist Color"
+    },
+    {
+      "category": "Monitor",
+      "item": "Focus Assist Color",
+      "subpath": "List Option",
+      "key": "Green",
+      "value": "Green"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Guides Color",
+      "value": "Guides Color"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Guides Opacity",
+      "value": "Guides Opacity"
+    },
+    {
+      "category": "Record",
+      "item": "Codec",
+      "subpath": "List Option",
+      "key": "H.264",
+      "value": "H.264"
+    },
+    {
+      "category": "Record",
+      "item": "Resolution",
+      "subpath": "List Option",
+      "key": "HD",
+      "value": "HD"
+    },
+    {
+      "category": "Monitor",
+      "item": "List Option",
+      "subpath": "",
+      "key": "HDMI Out",
+      "value": "HDMI Out"
+    },
+    {
+      "category": "Record",
+      "item": "Codec",
+      "subpath": "List Option",
+      "key": "HEVC (H.265)",
+      "value": "HEVC (H.265)"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Format",
+      "subpath": "List Option",
+      "key": "IEEE Float",
+      "value": "IEEE Float"
+    },
+    {
+      "category": "Record",
+      "item": "List Option",
+      "subpath": "",
+      "key": "If Media Drops Frame",
+      "value": "If Media Drops Frame"
+    },
+    {
+      "category": "LUTs",
+      "item": "LUT Selection",
+      "subpath": "List Option",
+      "key": "Import LUT",
+      "value": "Import LUT"
+    },
+    {
+      "category": "Preset",
+      "item": "Preset Selection",
+      "subpath": "Option",
+      "key": "Import Preset",
+      "value": "Import Preset"
+    },
+    {
+      "category": "Media",
+      "item": "Save Clips to",
+      "subpath": "List Option",
+      "key": "In-App and Photo Library",
+      "value": "In-App and Photo Library"
+    },
+    {
+      "category": "Media",
+      "item": "Save Clips to",
+      "subpath": "List Option",
+      "key": "In-App Only",
+      "value": "In-App Only"
+    },
+    {
+      "category": "Media",
+      "item": "Filename Convention",
+      "subpath": "List Option",
+      "key": "iOS",
+      "value": "iOS"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Source",
+      "subpath": "List Option",
+      "key": "iPhone Microphone",
+      "value": "iPhone Microphone"
+    },
+    {
+      "category": "Audio",
+      "item": "List Option",
+      "subpath": "",
+      "key": "iPhone Microphone",
+      "value": "iPhone Microphone"
+    },
+    {
+      "category": "About",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Learn More at Blackmagicdesign.com",
+      "value": "Learn More at Blackmagicdesign.com"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Lens Correction",
+      "value": "Lens Correction"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Format",
+      "subpath": "List Option",
+      "key": "Linear PCM",
+      "value": "Linear PCM"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Lock Current Orientation",
+      "value": "Lock Current Orientation"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Lock White Balance on Record",
+      "value": "Lock White Balance on Record"
+    },
+    {
+      "category": "Blackmagic Cloud",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Log in to Blackmagic Cloud",
+      "value": "Log in to Blackmagic Cloud"
+    },
+    {
+      "category": "LUTs",
+      "item": "List Option",
+      "subpath": "",
+      "key": "LUT Selection",
+      "value": "LUT Selection"
+    },
+    {
+      "category": "HDMI Out",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Mirror Display",
+      "value": "Mirror Display"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Mirror Front-Facing Camera",
+      "value": "Mirror Front-Facing Camera"
+    },
+    {
+      "category": "Audio",
+      "item": "Record Audio As",
+      "subpath": "List Option",
+      "key": "Mono",
+      "value": "Mono"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Source",
+      "subpath": "List Option",
+      "key": "None",
+      "value": "None"
+    },
+    {
+      "category": "Camera",
+      "item": "Anamorphic De-Squeeze",
+      "subpath": "List Option",
+      "key": "None",
+      "value": "None"
+    },
+    {
+      "category": "Camera",
+      "item": "Trigger Record Indicator",
+      "subpath": "List Option",
+      "key": "None",
+      "value": "None"
+    },
+    {
+      "category": "Accessories",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Nucleus Wireless Lens Control",
+      "value": "Nucleus Wireless Lens Control"
+    },
+    {
+      "category": "Settings Category",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Open Blackmagic Cam Settings",
+      "value": "Open Blackmagic Cam Settings"
+    },
+    {
+      "category": "Settings Category",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Open Cam Settings",
+      "value": "Open Cam Settings"
+    },
+    {
+      "category": "Media",
+      "item": "Upload Clips",
+      "subpath": "List Option",
+      "key": "Originals and Proxies",
+      "value": "Originals and Proxies"
+    },
+    {
+      "category": "Monitor",
+      "item": "Focus Assist",
+      "subpath": "List Option",
+      "key": "Peaking",
+      "value": "Peaking"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Metering",
+      "subpath": "List Option",
+      "key": "PPM (-18dBFS)",
+      "value": "PPM (-18dBFS)"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Metering",
+      "subpath": "List Option",
+      "key": "PPM (-20dBFS)",
+      "value": "PPM (-20dBFS)"
+    },
+    {
+      "category": "Presets",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Preset Selection",
+      "value": "Preset Selection"
+    },
+    {
+      "category": "Media",
+      "item": "Upload Clips",
+      "subpath": "List Option",
+      "key": "Proxies Only",
+      "value": "Proxies Only"
+    },
+    {
+      "category": "Audio",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Record Audio as",
+      "value": "Record Audio as"
+    },
+    {
+      "category": "Record",
+      "item": "Timecode Display",
+      "subpath": "List Option",
+      "key": "Record Run",
+      "value": "Record Run"
+    },
+    {
+      "category": "Monitor",
+      "item": "Focus Assist Color",
+      "subpath": "List Option",
+      "key": "Red",
+      "value": "Red"
+    },
+    {
+      "category": "Reset",
+      "item": "Reset Blackmagic Cam Settings",
+      "subpath": "List Option",
+      "key": "Reset All Settings and Erase All Content",
+      "value": "Reset All Settings and Erase All Content"
+    },
+    {
+      "category": "Reset Settings Dialog",
+      "item": "Title",
+      "subpath": "",
+      "key": "Reset All Settings?",
+      "value": "Reset All Settings?"
+    },
+    {
+      "category": "Reset Settings",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Reset Blackmagic Cam Settings",
+      "value": "Reset Blackmagic Cam Settings"
+    },
+    {
+      "category": "Reset",
+      "item": "Reset Blackmagic Cam Settings",
+      "subpath": "List Option",
+      "key": "Reset Camera and Cloud Settings",
+      "value": "Reset Camera and Cloud Settings"
+    },
+    {
+      "category": "Reset",
+      "item": "Reset Blackmagic Cam Settings",
+      "subpath": "List Option",
+      "key": "Reset Camera Settings",
+      "value": "Reset Camera Settings"
+    },
+    {
+      "category": "Reset Settings Dialog",
+      "item": "Title",
+      "subpath": "",
+      "key": "Reset Camera Settings?",
+      "value": "Reset Camera Settings?"
+    },
+    {
+      "category": "Reset Settings Dialog",
+      "item": "Title",
+      "subpath": "",
+      "key": "Reset Camera\nand Cloud Settings?",
+      "value": "Reset Camera\nand Cloud Settings?"
+    },
+    {
+      "category": "Record",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Resolution",
+      "value": "Resolution"
+    },
+    {
+      "category": "Audio",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Sample Rate",
+      "value": "Sample Rate"
+    },
+    {
+      "category": "Media",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Save Clips to",
+      "value": "Save Clips to"
+    },
+    {
+      "category": "Media",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Save Location Data to Clip",
+      "value": "Save Location Data to Clip"
+    },
+    {
+      "category": "Preset",
+      "item": "Preset Selection",
+      "subpath": "Option",
+      "key": "Save New Preset",
+      "value": "Save New Preset"
+    },
+    {
+      "category": "Portrait",
+      "item": "Title",
+      "subpath": "",
+      "key": "Settings",
+      "value": "Settings"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Shutter Measurement",
+      "value": "Shutter Measurement"
+    },
+    {
+      "category": "Camera",
+      "item": "Shutter Measurement",
+      "subpath": "List Option",
+      "key": "Speed",
+      "value": "Speed"
+    },
+    {
+      "category": "HDMI Out",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Status Text",
+      "value": "Status Text"
+    },
+    {
+      "category": "HDMI Out",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Status Text Surrounds Image",
+      "value": "Status Text Surrounds Image"
+    },
+    {
+      "category": "Audio",
+      "item": "Record Audio As",
+      "subpath": "List Option",
+      "key": "Stereo",
+      "value": "Stereo"
+    },
+    {
+      "category": "Record",
+      "item": "If Media Drops Frame",
+      "subpath": "List Option",
+      "key": "Stop Recording",
+      "value": "Stop Recording"
+    },
+    {
+      "category": "Presets",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Sync Presets to Cloud Project",
+      "value": "Sync Presets to Cloud Project"
+    },
+    {
+      "category": "Record",
+      "item": "Timecode Display",
+      "subpath": "List Option",
+      "key": "Tentacle Sync",
+      "value": "Tentacle Sync"
+    },
+    {
+      "category": "Reset Settings Dialog",
+      "item": "Body",
+      "subpath": "",
+      "key": "This will revert all camera and cloud settings to default and erase all clips, presets and LUTS stored on this iphone. This cannot be undone.",
+      "value": "This will revert all camera and cloud settings to default and erase all clips, presets and LUTS stored on this iphone. This cannot be undone."
+    },
+    {
+      "category": "Reset Settings Dialog",
+      "item": "Body",
+      "subpath": "",
+      "key": "This will revert all camera and cloud settings to default.",
+      "value": "This will revert all camera and cloud settings to default."
+    },
+    {
+      "category": "Reset Settings Dialog",
+      "item": "Body",
+      "subpath": "",
+      "key": "This will revert all settings to default.",
+      "value": "This will revert all settings to default."
+    },
+    {
+      "category": "Record",
+      "item": "Timecode Display",
+      "subpath": "List Option",
+      "key": "Time of Day (TOD)",
+      "value": "Time of Day (TOD)"
+    },
+    {
+      "category": "Record",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Timecode Display",
+      "value": "Timecode Display"
+    },
+    {
+      "category": "Record",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Timelapse Recording",
+      "value": "Timelapse Recording"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Trigger Record Indicator",
+      "value": "Trigger Record Indicator"
+    },
+    {
+      "category": "Media",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Upload Clips",
+      "value": "Upload Clips"
+    },
+    {
+      "category": "Accessories",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Use Bluetooth",
+      "value": "Use Bluetooth"
+    },
+    {
+      "category": "Camera",
+      "item": "List Option",
+      "subpath": "",
+      "key": "Use Volume Button to Trigger Record",
+      "value": "Use Volume Button to Trigger Record"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Metering",
+      "subpath": "List Option",
+      "key": "VU (-18dBFS)",
+      "value": "VU (-18dBFS)"
+    },
+    {
+      "category": "Audio",
+      "item": "Audio Metering",
+      "subpath": "List Option",
+      "key": "VU (-20dBFS)",
+      "value": "VU (-20dBFS)"
+    },
+    {
+      "category": "Monitor",
+      "item": "Focus Assist Color",
+      "subpath": "List Option",
+      "key": "White",
+      "value": "White"
+    }
+  ],
+  "asset_names": [
+    "Apple Watch/IconAf",
+    "Apple Watch/IconAf_active",
+    "Apple Watch/IconAwb",
+    "Apple Watch/IconAwb_active",
+    "Apple Watch/IconLock",
+    "Apple Watch/IconLock_active",
+    "Apple Watch/IconLut",
+    "Apple Watch/IconLut_active",
+    "Apple Watch/IconTimelapse",
+    "Apple Watch/IconTimelapse_active",
+    "Apple Watch/Lut",
+    "Apple Watch/Record",
+    "Apple Watch/Record_active",
+    "Apple Watch/Record_active_disabled",
+    "Apple Watch/Record_disabled",
+    "Apple Watch/RecordOffSpeed",
+    "Apple Watch/RecordOffSpeed_active",
+    "Apple Watch/RecordOffSpeed_active_disabled",
+    "Apple Watch/RecordOffSpeed_disabled",
+    "Apple Watch/RecordTimelapse",
+    "Apple Watch/RecordTimelapse_active",
+    "Apple Watch/RecordTimelapse_disabled",
+    "Apple Watch/RecordTimelapseActive _disabled",
+    "BatteryIndicator",
+    "BatteryIndicatorWarning",
+    "bmd_cloud_logo@3x.png",
+    "bmd_cloud_sidebar@3x.png",
+    "BmdCloudLogo",
+    "BmdCloudSidebar",
+    "Camera",
+    "camera@3x.png",
+    "Camera_active",
+    "camera_active@3x.png",
+    "camera_connected@3x.png",
+    "camera_identify@3x.png",
+    "camera_light@3x.png",
+    "camera_linked@3x.png",
+    "camera_linked_slate@3x.png",
+    "camera_linked_small@3x.png",
+    "CameraConnected",
+    "CameraIdentify",
+    "CameraLight",
+    "CameraLinked",
+    "CameraLinkedSlate",
+    "CameraLinkedSmall",
+    "Cloud",
+    "cloud@3x.png",
+    "ControlIcon",
+    "ControlIconNotConnected",
+    "Exposure",
+    "exposure@3x.png",
+    "Exposure_active",
+    "exposure_active@3x.png",
+    "exposure_auto_zoom@3x.png",
+    "exposure_auto_zoom_active@3x.png",
+    "exposure_lock_zoom@3x.png",
+    "exposure_lock_zoom_active@3x.png",
+    "ExposureAutoZoom",
+    "ExposureAutoZoom_active",
+    "ExposureLockZoom",
+    "ExposureLockZoom_active",
+    "FalseColor",
+    "FalseColorLegend",
+    "Focus",
+    "Focus1",
+    "Focus1_active",
+    "Focus2",
+    "Focus2_active",
+    "Focus3",
+    "Focus3_active",
+    "focus@3x.png",
+    "focus_1@3x.png",
+    "focus_1_active@3x.png",
+    "focus_2@3x.png",
+    "focus_2_active@3x.png",
+    "focus_3@3x.png",
+    "focus_3_active@3x.png",
+    "Focus_active",
+    "focus_active@3x.png",
+    "focus_afc@3x.png",
+    "focus_afs@3x.png",
+    "focus_assist@3x.png",
+    "focus_auto_zoom@3x.png",
+    "focus_auto_zoom_active@3x.png",
+    "focus_delete@3x.png",
+    "focus_delete_disabled@3x.png",
+    "focus_direction_1@3x.png",
+    "focus_direction_2@3x.png",
+    "focus_face@3x.png",
+    "focus_lock_zoom@3x.png",
+    "focus_lock_zoom_active@3x.png",
+    "focus_marker_1@3x.png",
+    "focus_marker_2@3x.png",
+    "focus_marker_3@3x.png",
+    "focus_object@3x.png",
+    "focus_pause@3x.png",
+    "focus_play@3x.png",
+    "focus_play_disabled@3x.png",
+    "focus_reset@3x.png",
+    "FocusAfc",
+    "FocusAfs",
+    "FocusAssist",
+    "FocusAutoZoom",
+    "FocusAutoZoom_active",
+    "FocusDelete",
+    "FocusDelete_disabled",
+    "FocusDirection1",
+    "FocusDirection2",
+    "FocusFace",
+    "FocusLockZoom",
+    "FocusLockZoom_active",
+    "FocusMarker1",
+    "FocusMarker2",
+    "FocusMarker3",
+    "FocusObject",
+    "FocusPause",
+    "FocusPlay",
+    "FocusPlay_disabled",
+    "FocusReset",
+    "follow_focus@3x.png",
+    "follow_focus_disabled@3x.png",
+    "FollowFocus",
+    "FollowFocus_disabled",
+    "Grids",
+    "grids@3x.png",
+    "grids_crosshairs@3x.png",
+    "grids_dot@3x.png",
+    "grids_horizon@3x.png",
+    "grids_thirds@3x.png",
+    "GridsCrosshairs",
+    "GridsDot",
+    "GridsHorizon",
+    "GridsThirds",
+    "Guides",
+    "guides@3x.png",
+    "Hdmi4kAuto",
+    "Hdmi4kBatteryVoltage",
+    "Hdmi4kDropFrame",
+    "Hdmi4kFalseColorLegend",
+    "Hdmi4kHistogramRgb",
+    "Hdmi4kLock",
+    "Hdmi4kLut",
+    "Hdmi4kLutBlue",
+    "Hdmi4kLutRecord",
+    "Hdmi4kNdClear",
+    "Hdmi4kNdFrac1",
+    "Hdmi4kNdFrac2",
+    "Hdmi4kNdFrac3",
+    "Hdmi4kNdFrac4",
+    "Hdmi4kNdNo1",
+    "Hdmi4kNdNo2",
+    "Hdmi4kNdNo3",
+    "Hdmi4kNdNo4",
+    "Hdmi4kNdStop1",
+    "Hdmi4kNdStop2",
+    "Hdmi4kNdStop3",
+    "Hdmi4kNdStop4",
+    "Hdmi4kPlay",
+    "Hdmi4kPlay_active",
+    "Hdmi4kRecord",
+    "Hdmi4kRecord_active",
+    "Hdmi4kRecord_disabled",
+    "Hdmi4kStorageDrive",
+    "Hdmi4kStorageIphone",
+    "Hdmi4kTimelapseRecord",
+    "Hdmi4kTimelapseRecord_active",
+    "Hdmi4kTimelapseRecord_disabled",
+    "HDMI_4K_auto@3x.png",
+    "HDMI_4K_battery_voltage@3x.png",
+    "HDMI_4K_drop_frame@3x.png",
+    "HDMI_4K_false_color_legend@3x.png",
+    "HDMI_4K_histogram_rgb@3x.png",
+    "HDMI_4K_lock@3x.png",
+    "HDMI_4K_LUT@3x.png",
+    "HDMI_4K_LUT_blue@3x.png",
+    "HDMI_4K_LUT_record@3x.png",
+    "HDMI_4K_nd_clear@3x.png",
+    "HDMI_4K_nd_frac_1@3x.png",
+    "HDMI_4K_nd_frac_2@3x.png",
+    "HDMI_4K_nd_frac_3@3x.png",
+    "HDMI_4K_nd_frac_4@3x.png",
+    "HDMI_4K_nd_no_1@3x.png",
+    "HDMI_4K_nd_no_2@3x.png",
+    "HDMI_4K_nd_no_3@3x.png",
+    "HDMI_4K_nd_no_4@3x.png",
+    "HDMI_4K_nd_stop_1@3x.png",
+    "HDMI_4K_nd_stop_2@3x.png",
+    "HDMI_4K_nd_stop_3@3x.png",
+    "HDMI_4K_nd_stop_4@3x.png",
+    "HDMI_4K_play@3x.png",
+    "HDMI_4K_play_active@3x.png",
+    "HDMI_4K_record@3x.png",
+    "HDMI_4K_record_active@3x.png",
+    "HDMI_4K_record_disabled@3x.png",
+    "HDMI_4K_storage_drive@3x.png",
+    "HDMI_4K_storage_iphone@3x.png",
+    "HDMI_4K_timelapse_record@3x.png",
+    "HDMI_4K_timelapse_record_active@3x.png",
+    "HDMI_4K_timelapse_record_disabled@3x.png",
+    "HDMI_auto@3x.png",
+    "HDMI_battery_voltage@3x.png",
+    "HDMI_drop_frame@3x.png",
+    "HDMI_false_color_legend@3x.png",
+    "HDMI_histogram_rgb@3x.png",
+    "HDMI_lock@3x.png",
+    "HDMI_LUT@3x.png",
+    "HDMI_LUT_blue@3x.png",
+    "HDMI_LUT_record@3x.png",
+    "HDMI_nd_clear@3x.png",
+    "HDMI_nd_frac_1@3x.png",
+    "HDMI_nd_frac_2@3x.png",
+    "HDMI_nd_frac_3@3x.png",
+    "HDMI_nd_frac_4@3x.png",
+    "HDMI_nd_no_1@3x.png",
+    "HDMI_nd_no_2@3x.png",
+    "HDMI_nd_no_3@3x.png",
+    "HDMI_nd_no_4@3x.png",
+    "HDMI_nd_stop_1@3x.png",
+    "HDMI_nd_stop_2@3x.png",
+    "HDMI_nd_stop_3@3x.png",
+    "HDMI_nd_stop_4@3x.png",
+    "HDMI_play@3x.png",
+    "HDMI_play_active@3x.png",
+    "HDMI_record@3x.png",
+    "HDMI_record_active@3x.png",
+    "HDMI_record_disabled@3x.png",
+    "HDMI_storage_drive@3x.png",
+    "HDMI_storage_iphone@3x.png",
+    "HDMI_timelapse_record@3x.png",
+    "HDMI_timelapse_record_active@3x.png",
+    "HDMI_timelapse_record_disabled@3x.png",
+    "HdmiAuto",
+    "HdmiBatteryVoltage",
+    "HdmiDropFrame",
+    "HdmiFalseColorLegend",
+    "HdmiHistogramRgb",
+    "HdmiLock",
+    "HdmiLut",
+    "HdmiLutBlue",
+    "HdmiLutRecord",
+    "HdmiNdClear",
+    "HdmiNdFrac1",
+    "HdmiNdFrac2",
+    "HdmiNdFrac3",
+    "HdmiNdFrac4",
+    "HdmiNdNo1",
+    "HdmiNdNo2",
+    "HdmiNdNo3",
+    "HdmiNdNo4",
+    "HdmiNdStop1",
+    "HdmiNdStop2",
+    "HdmiNdStop3",
+    "HdmiNdStop4",
+    "HdmiPlay",
+    "HdmiPlay_active",
+    "HdmiRecord",
+    "HdmiRecord_active",
+    "HdmiRecord_disabled",
+    "HdmiStorageDrive",
+    "HdmiStorageIphone",
+    "HdmiTimelapseRecord",
+    "HdmiTimelapseRecord_active",
+    "HdmiTimelapseRecord_disabled",
+    "icon_LUT@3x.png",
+    "icon_LUT_active@3x.png",
+    "link_cameras@3x.png",
+    "link_cameras_disabled@3x.png",
+    "LinkCameras",
+    "LinkCameras_disabled",
+    "Lut",
+    "lut@3x.png",
+    "LUT@3x.png",
+    "Lut_active",
+    "LUT_active@3x.png",
+    "LUT_display@3x.png",
+    "LUT_record@3x.png",
+    "LUT_record_to_clip@3x.png",
+    "LUT_selector@3x.png",
+    "LUT_selector_active@3x.png",
+    "LUT_selector_disabled@3x.png",
+    "LUT_sidecar@3x.png",
+    "LutDisplay",
+    "LutRecord",
+    "LutRecordToClip",
+    "LutSelector",
+    "LutSelector_active",
+    "LutSelector_disabled",
+    "LutSidecar",
+    "Media",
+    "media@3x.png",
+    "Media_active",
+    "media_active@3x.png",
+    "Media_disabled",
+    "media_disabled@3x.png",
+    "media_sync@3x.png",
+    "media_sync_active@3x.png",
+    "media_sync_disabled@3x.png",
+    "MediaSync",
+    "MediaSync_active",
+    "MediaSync_disabled",
+    "no_cameras_available@3x.png",
+    "NoCamerasAvailable",
+    "project_recording@3x.png",
+    "project_upload@3x.png",
+    "project_upload_failed@3x.png",
+    "project_upload_no_connection@3x.png",
+    "ProjectRecording",
+    "ProjectUpload",
+    "ProjectUploadFailed",
+    "ProjectUploadNoConnection",
+    "Record",
+    "record@3x.png",
+    "Record_active",
+    "record_active@3x.png",
+    "Record_active_disabled",
+    "record_active_disabled@3x.png",
+    "Record_disabled",
+    "record_disabled@3x.png",
+    "record_off_speed@3x.png",
+    "record_off_speed_active@3x.png",
+    "record_off_speed_active_disabled@3x.png",
+    "record_off_speed_disabled@3x.png",
+    "record_sync@3x.png",
+    "record_sync_active@3x.png",
+    "record_sync_active_disabled@3x.png",
+    "record_sync_disabled@3x.png",
+    "record_sync_toggle@3x.png",
+    "record_sync_toggle_disabled@3x.png",
+    "record_timelapse@3x.png",
+    "record_timelapse_active _disabled@3x.png",
+    "record_timelapse_active@3x.png",
+    "record_timelapse_disabled@3x.png",
+    "record_timelapse_zoom@3x.png",
+    "record_timelapse_zoom_active@3x.png",
+    "record_zoom@3x.png",
+    "record_zoom_active@3x.png",
+    "RecordOffSpeed",
+    "RecordOffSpeed_active",
+    "RecordOffSpeed_active_disabled",
+    "RecordOffSpeed_disabled",
+    "RecordSync",
+    "RecordSync_active",
+    "RecordSync_active_disabled",
+    "RecordSync_disabled",
+    "RecordSyncToggle",
+    "RecordSyncToggle_disabled",
+    "RecordTimelapse",
+    "RecordTimelapse_active",
+    "RecordTimelapse_disabled",
+    "RecordTimelapseActive _disabled",
+    "RecordTimelapseZoom",
+    "RecordTimelapseZoom_active",
+    "RecordZoom",
+    "RecordZoom_active",
+    "remote_camera_left_arrow@3x.png",
+    "remote_camera_left_arrow_disabled@3x.png",
+    "remote_camera_right_arrow@3x.png",
+    "remote_camera_right_arrow_disabled@3x.png",
+    "remote_sync@3x.png",
+    "RemoteCameraLeftArrow",
+    "RemoteCameraLeftArrow_disabled",
+    "RemoteCameraRightArrow",
+    "RemoteCameraRightArrow_disabled",
+    "Slate",
+    "slate@3x.png",
+    "Slate_active",
+    "slate_active@3x.png",
+    "slate_close@3x.png",
+    "slate_close_push@3x.png",
+    "SlateClose",
+    "SlateClosePush",
+    "Sort",
+    "sort@3x.png",
+    "Sort_active",
+    "sort_active@3x.png",
+    "sort_clapper@3x.png",
+    "sort_datetime@3x.png",
+    "sort_filename@3x.png",
+    "sort_location@3x.png",
+    "sort_timecode@3x.png",
+    "sort_upload_status@3x.png",
+    "SortClapper",
+    "SortDatetime",
+    "SortFilename",
+    "SortLocation",
+    "SortTimecode",
+    "SortUploadStatus",
+    "storage_drive@3x.png",
+    "storage_iphone@3x.png",
+    "StorageDrive",
+    "StorageIphone",
+    "Sync",
+    "sync@3x.png",
+    "Sync_active",
+    "sync_active@3x.png",
+    "sync_footer@3x.png",
+    "sync_no_connection@3x.png",
+    "sync_sidebar@3x.png",
+    "sync_sidebar_complete@3x.png",
+    "sync_thumbnail@3x.png",
+    "SyncFooter",
+    "syncing_and_recording@3x.png",
+    "SyncingAndRecording",
+    "SyncNoConnection",
+    "SyncSidebar",
+    "SyncSidebarCompleted",
+    "SyncThumbnail",
+    "upload_to_cloud@3x.png",
+    "upload_to_cloud_active@3x.png",
+    "upload_to_cloud_disabled@3x.png",
+    "uploaded_HQ_only@3x.png",
+    "uploaded_to_cloud@3x.png",
+    "uploaded_to_cloud_hq@3x.png",
+    "uploaded_to_cloud_pxy@3x.png",
+    "UploadedHQOnly",
+    "UploadedToCloud",
+    "UploadedToCloudHq",
+    "UploadedToCloudPxy",
+    "Uploading",
+    "uploading@3x.png",
+    "uploading_done@3x.png",
+    "uploading_done_small@3x.png",
+    "uploading_failed_thumbnail@3x.png",
+    "uploading_pause@3x.png",
+    "uploading_pause_disabled@3x.png",
+    "uploading_pause_small@3x.png",
+    "uploading_pause_thumbnail@3x.png",
+    "uploading_small@3x.png",
+    "uploading_thumbnail@3x.png",
+    "UploadingDone",
+    "UploadingDoneSmall",
+    "UploadingFailedThumbnail",
+    "UploadingPause",
+    "UploadingPause_disabled",
+    "UploadingPauseSmall",
+    "UploadingPauseThumbnail",
+    "UploadingSmall",
+    "UploadingThumbnail",
+    "UploadToCloud",
+    "UploadToCloud_active",
+    "UploadToCloud_disabled",
+    "wb_cloudy@3x.png",
+    "wb_cloudy_active@3x.png",
+    "WbCloudy",
+    "WbCloudy_active",
+    "Whats New/Lut",
+    "Whats New/RemoteSync",
+    "Zebra",
+    "zebra@3x.png"
+  ],
+  "appintents": [
+    {
+      "intent": "StartRecordIntent",
+      "evidence": "StartRecordIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "StopRecordIntent",
+      "evidence": "StopRecordIntent\":{\"assistantDefinedSchemaTraits\":[],\"assistantDefinedSchemas\":[],\"authenticationPolicy\":0,\"availabilityAnnotations\":{\"LNPlatformNameWildcard\":{\"introducedVersion\":\"*\"}},\"descriptionMetadata\":{\"categoryNa"
+    },
+    {
+      "intent": "OpenCameraView",
+      "evidence": "OpenCameraView\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "SetLensIntent",
+      "evidence": "SetLensIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "SetFrameRateIntent",
+      "evidence": "SetFrameRateIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "SetShutterSpeedIntent",
+      "evidence": "SetShutterSpeedIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "SetISOIntent",
+      "evidence": "SetISOIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "SetWhiteBalanceIntent",
+      "evidence": "SetWhiteBalanceIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "TintIntent",
+      "evidence": "TintIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "ExposureIntent",
+      "evidence": "ExposureIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "FocusIntent",
+      "evidence": "FocusIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "ZoomIntent",
+      "evidence": "ZoomIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "StabilizationIntent",
+      "evidence": "StabilizationIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "CodecIntent",
+      "evidence": "CodecIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "SetResolutionIntent",
+      "evidence": "SetResolutionIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    },
+    {
+      "intent": "SetProjectIntent",
+      "evidence": "SetProjectIntent\":{\"actionConfiguration\":{\"actionSummary\":{\"wrapper\":{\"otherParameterIdentifiers\":[],\"summaryString\":{\"formatString\":\""
+    }
+  ],
+  "focused_symbol_buckets": {
+    "monitor_overlays": [
+      "FalseColorNode",
+      "HUDFalseColor",
+      "HUDFalseColor_Previews",
+      "HUDGuides",
+      "HUDGuides_Previews",
+      "HUDSafeAreas",
+      "HUDSafeAreas_Previews",
+      "HUDWhiteBalanceOverlay",
+      "HUDWhiteBalanceOverlay_Previews",
+      "StorageStatusHUD",
+      "HdmiStorageStatusHUD",
+      "StorageStatusHUDScalable",
+      "UploadStatusHUD",
+      "UploadStatusHUD_Previews",
+      "AudioMeters",
+      "AudioMeterSingle",
+      "AudioMetersGroup",
+      "FalseColor",
+      "FalseColor_Previews",
+      "FocusAssistScroller",
+      "FocusAssistScroller_Previews",
+      "ZebraScroller",
+      "ZebraScroller_Previews",
+      "zebraShift",
+      "falseColorTable",
+      "_zebraEnabled",
+      "_focusAssistEnabled",
+      "_falseColorEnabled",
+      "audioMeterData",
+      "FalseColorLegend",
+      "Zebra",
+      "FocusAssist",
+      "falseColorEftOptionOn",
+      "focusAssistEftOptionOn",
+      "focusAssistValue",
+      "zebraEftOptionOn",
+      "zebraEftMidGreyOption",
+      "zebraValue",
+      "_zebraValue",
+      "_zebraEftOptionOn",
+      "_zebraEftMidGreyOption",
+      "_focusAssistValue",
+      "_focusAssistEftOptionOn",
+      "_falseColorEftOptionOn",
+      "focusAssistColor",
+      "displayAudioMeters",
+      "focusAssistEnabled",
+      "zebraEnabled",
+      "falseColorEnabled",
+      "zebraRegion",
+      "imageHistogramData",
+      "audioMeterWidth",
+      "_audioMeterData",
+      "HwStorageStatusHUDWidth",
+      "_imageHistogramData",
+      "zebraHwOptions",
+      "minZebraValue",
+      "maxZebraValue",
+      "noneForZebra",
+      "zebra",
+      "focusAssist",
+      "falseColor",
+      "_audioMetering",
+      "_focusAssist",
+      "_focusAssistColor",
+      "_displayAudioMeters",
+      "_hdmiZebra",
+      "_hdmiFocusAssist",
+      "_hdmiFalseColor",
+      "audioMetering",
+      "hdmiZebra",
+      "hdmiFocusAssist",
+      "hdmiFalseColor",
+      "_$s16CameraAppToolbox10AudioMeterV05audioE4Data05hasNoD00F6Source5scale16ignoreBackgroundAcA0deG0C_SbSSSg12CoreGraphics7CGFloatVSbtcfC",
+      "_$s16CameraAppToolbox10AudioMeterV7SwiftUI4ViewAAMc",
+      "_$s16CameraAppToolbox10AudioMeterVMn",
+      "_$s16CameraAppToolbox10AudioMeterVN",
+      "_$s16CameraAppToolbox13AudioMeterBarV11channelDataAcA0D5InputC_tcfC",
+      "_$s16CameraAppToolbox13AudioMeterBarVMn",
+      "_$s16CameraAppToolbox14AudioMeterAxisV7xOffset05widthG08fontSize10isDisabled11notchHeight9withLabel10meterCount0qN0AC12CoreGraphics7CGFloatV_A2NSbANSbSiANtcfC"
+    ],
+    "appintents": [
+      "StartRecordIntent",
+      "StopRecordIntent",
+      "OpenCameraView",
+      "SetResolutionIntent",
+      "SetProjectIntent",
+      "SetFrameRateIntent",
+      "SetLensIntent",
+      "SetShutterSpeedIntent",
+      "SetISOIntent",
+      "SetWhiteBalanceIntent",
+      "TintIntent",
+      "ZoomIntent",
+      "StabilizationIntent",
+      "FocusIntent",
+      "ExposureIntent",
+      "CodecIntent"
+    ],
+    "main_pages": [
+      "MainUIViewControllerImp",
+      "MainUIViewControllerRepresentable",
+      "_TtC13BlackmagicCam23MainUIViewControllerImp",
+      "_$s16CameraAppToolbox13BmdPagingViewV5index7offsetY8maxIndex8geometry7content13swipeUpActionACyxG7SwiftUI7BindingVySiG_AMy12CoreGraphics7CGFloatVGSiSo6CGSizeVxycyyctcfC",
+      "_$s16CameraAppToolbox13BmdPagingViewVMn",
+      "_$s16CameraAppToolbox14BmdPageControlV5index8maxIndex5colorAC7SwiftUI7BindingVySiG_SiAG5ColorV8selected_AL10deselectedttcfC",
+      "_$s16CameraAppToolbox14BmdPageControlVMn",
+      "_$s16CameraAppToolbox20MainUIViewControllerCMa",
+      "_$s16CameraAppToolbox20MainUIViewControllerCMn",
+      "_$s16CameraAppToolbox20MainUIViewControllerC30onCaptureEventInteractionEndedyyFTq",
+      "_$s16CameraAppToolbox20MainUIViewControllerC22setLockToUIOrientation8isLockedySb_tF",
+      "_$s16CameraAppToolbox20MainUIViewControllerC12refreshViewsyyF",
+      "_$s16CameraAppToolbox20MainUIViewControllerC15addContentsView08contentsI0ySo0E0C_tF",
+      "_$s16CameraAppToolbox20MainUIViewControllerC23isLockedToUIOrientationSbvM",
+      "_$s16CameraAppToolbox20MainUIViewControllerC23isLockedToUIOrientationSbvs",
+      "_$s16CameraAppToolbox20MainUIViewControllerC23isLockedToUIOrientationSbvg",
+      "_$s16CameraAppToolbox20MainUIViewControllerC12rotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0CvM",
+      "_$s16CameraAppToolbox20MainUIViewControllerC12rotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvs",
+      "_$s16CameraAppToolbox20MainUIViewControllerC12rotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvg",
+      "_$s16CameraAppToolbox20MainUIViewControllerC15nonRotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0CvM",
+      "_$s16CameraAppToolbox20MainUIViewControllerC15nonRotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvs",
+      "_$s16CameraAppToolbox20MainUIViewControllerC15nonRotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvg",
+      "_$s16CameraAppToolbox20MainUIViewControllerC3appSo13UIApplicationCSgvM",
+      "_$s16CameraAppToolbox20MainUIViewControllerC3appSo13UIApplicationCSgvs",
+      "_$s16CameraAppToolbox20MainUIViewControllerC3appSo13UIApplicationCSgvg",
+      "_$s16CameraAppToolbox20MainUIViewControllerCN",
+      "_OBJC_METACLASS_$__TtC16CameraAppToolbox20MainUIViewController",
+      "CameraAppToolbox/MainUIView.swift",
+      "CameraAppToolbox.MainUIView",
+      "_TtC16CameraAppToolbox10MainUIView",
+      "_TtC16CameraAppToolbox20MainUIViewController",
+      "BmdPagingView",
+      "BmdPageControl",
+      "MainUIView",
+      "MainUIViewController",
+      "pageSettings",
+      "pageChat",
+      "pageMedia",
+      "pageCamera",
+      "MainUIViewC",
+      "MainUIViewControllerC",
+      "0MainUIView",
+      "0MainUIViewController",
+      "_OBJC_CLASS_$__TtC16CameraAppToolbox10MainUIView",
+      "_OBJC_CLASS_$__TtC16CameraAppToolbox20MainUIViewController",
+      "_OBJC_METACLASS_$__TtC16CameraAppToolbox10MainUIView",
+      "_OBJC_METACLASS_$__TtC16CameraAppToolbox20MainUIViewController",
+      "__INSTANCE_METHODS__TtC16CameraAppToolbox10MainUIView",
+      "__INSTANCE_METHODS__TtC16CameraAppToolbox20MainUIViewController",
+      "_symbolic _____yxG 16CameraAppToolbox13BmdPagingViewV",
+      "_symbolic _____ 16CameraAppToolbox14BmdPageControlV",
+      "_associated conformance 16CameraAppToolbox13BmdPagingViewV13DragDirectionOyx_GSHAASQ",
+      "_associated conformance 16CameraAppToolbox13BmdPagingViewVyxG7SwiftUI0F0AA4BodyAeFP_AeF",
+      "_symbolic _____ 16CameraAppToolbox13BmdPagingViewV",
+      "_associated conformance 16CameraAppToolbox14BmdPageControlV7SwiftUI4ViewAA4BodyAdEP_AdE",
+      "_symbolic _____y_____yx_GG 7SwiftUI5StateV 16CameraAppToolbox13BmdPagingViewV13DragDirectionO",
+      "_symbolic _____ 16CameraAppToolbox13BmdPagingViewV13DragDirectionO",
+      "_symbolic _____SgXw 16CameraAppToolbox20MainUIViewControllerC",
+      "_symbolic _____ 16CameraAppToolbox20MainUIViewControllerC",
+      "_symbolic _____ 16CameraAppToolbox10MainUIViewC",
+      "__METACLASS_DATA__TtC16CameraAppToolbox10MainUIView",
+      "__PROPERTIES__TtC16CameraAppToolbox10MainUIView",
+      "__METACLASS_DATA__TtC16CameraAppToolbox20MainUIViewController",
+      "__IVARS__TtC16CameraAppToolbox20MainUIViewController",
+      "__DATA__TtC16CameraAppToolbox10MainUIView",
+      "__DATA__TtC16CameraAppToolbox20MainUIViewController"
+    ],
+    "camera_hud": [
+      "HUDTopLeftIndicators",
+      "HUDTopIndicators",
+      "HUDTrailingIndicators",
+      "HUDLeadingIndicators",
+      "HUDCameraControls",
+      "PHUDCameraControls",
+      "SHUDCameraControls",
+      "PLHUDCameraControls",
+      "HUDTallyIndicator",
+      "HUDTimelapseIndicator",
+      "LutRecordButton",
+      "RecordTimerTextIndicator",
+      "RecordButton",
+      "_$s16CameraAppToolbox24HUDTimelapseIndicatorImpV17timelapseInterval8timecodeAcA023SettingsOptionTimelapseH0O_SStcfC",
+      "_$s16CameraAppToolbox24HUDTimelapseIndicatorImpV7SwiftUI4ViewAAMc",
+      "_$s16CameraAppToolbox24HUDTimelapseIndicatorImpVMn",
+      "_$s16CameraAppToolbox24HUDTimelapseIndicatorImpVN",
+      "HUDTimelapseIndicatorImp",
+      "HUDTimelapseIndicatorImpV",
+      "_associated conformance 16CameraAppToolbox24HUDTimelapseIndicatorImpV7SwiftUI4ViewAA4BodyAdEP_AdE",
+      "_symbolic _____ 16CameraAppToolbox24HUDTimelapseIndicatorImpV"
+    ],
+    "footer_controls": [
+      "LHUDFooterElements",
+      "PHUDFooterElements",
+      "PLHUDFooterElements",
+      "FpsOptions",
+      "FpsOptions_Previews",
+      "IrisScroll",
+      "IrisScroll_Previews",
+      "IsoScroll",
+      "IsoScroll_Previews",
+      "LensOptions",
+      "LensOptions_Previews",
+      "ShutterScroll",
+      "ShutterScroll_Previews",
+      "TintScroll",
+      "TintScroll_Previews",
+      "WhiteBalanceScroll",
+      "WhiteBalanceScroll_Previews",
+      "_$s16CameraAppToolbox03BmdA5IndexO4lensAA11LensOptionsOvg",
+      "_$s16CameraAppToolbox11LensOptionsO05frontD11DescriptionSSvg",
+      "_$s16CameraAppToolbox11LensOptionsO11cameraIndexAA03BmdaG0Ovg",
+      "_$s16CameraAppToolbox11LensOptionsO14getZoomPresets8focalLenSayAA0G6PresetOGSi_tF",
+      "_$s16CameraAppToolbox11LensOptionsO2idSSvg",
+      "_$s16CameraAppToolbox11LensOptionsO9imageName11focalLengthSSs6UInt32V_tF",
+      "_$s16CameraAppToolbox11LensOptionsOMn",
+      "_$s16CameraAppToolbox11LensOptionsON",
+      "_$s16CameraAppToolbox11LensOptionsOSEAAMc",
+      "_$s16CameraAppToolbox11LensOptionsOSHAAMc",
+      "_$s16CameraAppToolbox11LensOptionsOSeAAMc",
+      "_$s16CameraAppToolbox15BmdDialHDividerV7SwiftUI4ViewAAMc",
+      "_$s16CameraAppToolbox15BmdDialHDividerVMn",
+      "_$s16CameraAppToolbox15BmdDialHDividerVN",
+      "_$s16CameraAppToolbox15BmdDialHDividerV_12xStartOffset04xEndH0AC7SwiftUI5ColorV_12CoreGraphics7CGFloatVAKtcfC",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV01hE9IconWidth12CoreGraphics7CGFloatVvgZ",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV10isDraggingSbvau",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV11isAnimatingSbvau",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV13stopAnimationyyFZ",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV18getFormattedStringySSAA0F6PrefixO_12CoreGraphics7CGFloatVSaySSGSgtFZ",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV27vZebraExtraOptionIconHeight12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV28vZebraExtraOptionTotalHeight12CoreGraphics7CGFloatVvgZ",
+      "_$s16CameraAppToolbox17BmdAdjustmentDialV9isClampedSbvau",
+      "_$s16CameraAppToolbox21BmdAdjustmentDialMaskV5color12xStartOffset04xEndJ0AC7SwiftUI5ColorV_12CoreGraphics7CGFloatVALtcfC",
+      "_$s16CameraAppToolbox21BmdAdjustmentDialMaskV7SwiftUI4ViewAAMc",
+      "_$s16CameraAppToolbox21BmdAdjustmentDialMaskVMn",
+      "_$s16CameraAppToolbox21BmdAdjustmentDialMaskVN",
+      "_$s16CameraAppToolbox27BmdAdjustmentDialAutoButtonV7SwiftUI4ViewAAMc",
+      "_$s16CameraAppToolbox27BmdAdjustmentDialAutoButtonV8isActive5width0I8Disabled11buttonShape6actionAC7SwiftUI7BindingVySbG_12CoreGraphics7CGFloatVSbAI22UnevenRoundedRectangleVSgyyctcfC",
+      "_$s16CameraAppToolbox27BmdAdjustmentDialAutoButtonVMa",
+      "_$s16CameraAppToolbox27BmdAdjustmentDialAutoButtonVMn",
+      "BmdAdjustmentDialAutoButton",
+      "BmdAdjustmentDialMarker",
+      "BmdAdjustmentDial",
+      "BmdAdjustmentDialShape",
+      "BmdAdjustmentDialMask",
+      "BmdAdjustmentDial_Previews",
+      "BmdAdjustmentDialUtil",
+      "BmdDialVDividerShape",
+      "BmdDialVDivider",
+      "BmdDialHDivider",
+      "BmdDialHDividerShape",
+      "LensOptions",
+      "lensAA11LensOptionsOv",
+      "lensOptionAA11LensOptionsOv",
+      "033_09D3D51DD64B09797CA25C39C37424B7LLAA11LensOptionsOSgvpfi",
+      "BmdAdjustmentDialDualPanelShape11isLandscape12xStartOffset04xEndM0AA0defI0VSb_12CoreGraphics7CGFloatVAJtF",
+      "_symbolic _____Sg 16CameraAppToolbox11LensOptionsO",
+      "_symbolic _____ 16CameraAppToolbox27BmdAdjustmentDialAutoButtonV",
+      "_associated conformance 16CameraAppToolbox27BmdAdjustmentDialAutoButtonV7SwiftUI4ViewAA4BodyAdEP_AdE",
+      "_associated conformance 16CameraAppToolbox23BmdAdjustmentDialMarkerV7SwiftUI4ViewAA4BodyAdEP_AdE",
+      "_symbolic _____ 16CameraAppToolbox23BmdAdjustmentDialMarkerV",
+      "_associated conformance 16CameraAppToolbox22BmdAdjustmentDialShapeV7SwiftUI0G0AaD10Animatable",
+      "_associated conformance 16CameraAppToolbox22BmdAdjustmentDialShapeV7SwiftUI0G0AaD4View",
+      "_associated conformance 16CameraAppToolbox22BmdAdjustmentDialShapeV7SwiftUI10AnimatableAA0J4DataAdEP_AD16VectorArithmetic",
+      "_symbolic _____ 16CameraAppToolbox22BmdAdjustmentDialShapeV",
+      "_symbolic _____y__________G 7SwiftUI10_ShapeViewV 16CameraAppToolbox017BmdAdjustmentDialC0V AA15ForegroundStyleV",
+      "_associated conformance 16CameraAppToolbox22BmdAdjustmentDialShapeV7SwiftUI4ViewAA4BodyAdEP_AdE",
+      "_associated conformance 16CameraAppToolbox21BmdAdjustmentDialMaskV7SwiftUI4ViewAA4BodyAdEP_AdE",
+      "_symbolic _____y__________G 7SwiftUI10_ShapeViewV 16CameraAppToolbox017BmdAdjustmentDialC0V AA5ColorV",
+      "_symbolic _____ 16CameraAppToolbox21BmdAdjustmentDialMaskV",
+      "_associated conformance 16CameraAppToolbox26BmdAdjustmentDial_PreviewsV7SwiftUI15PreviewProviderAaD01_jK0",
+      "_associated conformance 16CameraAppToolbox26BmdAdjustmentDial_PreviewsV7SwiftUI15PreviewProviderAA0G0AdEP_AD4View"
+    ],
+    "settings_media_chat": [
+      "ChatTableView",
+      "ChatTableViewControllerRepresentable",
+      "ChatViewSidebarItem",
+      "ChatViewSidebar",
+      "ChatViewSidebar_Previews",
+      "CloudLoginView",
+      "CloudLoginView_Previews",
+      "MediaClipDetailsLandscapePanel",
+      "MediaClipDetailsLandscapePanel_Previews",
+      "MediaSortPanelSortTypeItem",
+      "MediaSortPanelSortOrderItem",
+      "MediaSortPanel",
+      "MediaSortPanel_Previews",
+      "MediaViewToolbar",
+      "MediaViewToolbars_Previews",
+      "MediaUploadToCloudPanel",
+      "MediaUploadToCloudPanel_Previews",
+      "MediaViewSidebarItem",
+      "MediaViewSidebarCloudLogIn",
+      "MediaViewSidebar",
+      "MediaViewSidebar_Previews",
+      "RemoteSettingsCategoryPanel",
+      "RemoteSettingsOptionsPanel",
+      "OptionListView",
+      "RemoteHwSettingsCategoryPanel",
+      "HwSettingsOptionsPanel",
+      "SettingsCategoryPanel",
+      "SettingsOptionsPanel",
+      "SlateViewClipInfoSpecialKeysType",
+      "SlateViewClipInfoMidSelection",
+      "SlateViewProjectInfoFieldSelection",
+      "SlateViewLensInfoFieldSelection",
+      "LSlateViewClipInfo",
+      "PSlateViewClipInfo",
+      "SlateViewClipInfo",
+      "SlateViewClipInfo_Previews",
+      "LSlateViewLensInfo",
+      "SlateViewLensInfo",
+      "$s13BlackmagicCam0028SlateViewLensInfoswift_IxAFhfMX61_0_33_9E573813D58DCB80F29DB72ED9855B54Ll7PreviewfMf_15PreviewRegistryfMu_",
+      "LSlateViewProjectInfo",
+      "PSlateViewProjectInfo",
+      "SlateViewProjectInfo",
+      "SlateViewProjectInfo_Previews",
+      "BlackmagicCam/ChatTableView.swift",
+      "BlackmagicCam/SlateViewLensInfo.swift",
+      "Error: Unidentified enum for SlateViewLensInfoFieldSelection encountered",
+      "Error: Unidentified enum for SlateViewProjectInfoFieldSelection encountered"
+    ],
+    "layout_metrics": [
+      "_$s16CameraAppToolbox18MainViewLayoutDataV018hudControlPortraitF7Padding7SwiftUI10EdgeInsetsVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV03getafG08geomSize19PSTimecodebarHeightAA0afG0VSo6CGSizeV_12CoreGraphics7CGFloatVtFZ",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV03tabE15PaddingFromEdge12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV04mainE8SafeArea7SwiftUI10EdgeInsetsVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV06cachedafG0AA0afG0Vvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV07stealthfG0AA07StealthfG0Vvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV08portraitfG0AA08PortraitfG0Vvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV09landscapefG0AA09LandscapefG0Vvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV10isShowIrisSbvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV12footerHeight12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV12pageTabWidth12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV13hideStatusBarSbvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV13isSmallScreenSbvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV13pageTabHeight12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV13setScreenSize_4geom15isZoomedDisplayySo6CGSizeV_7SwiftUI13GeometryProxyVSbtFZ",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV15cameraLViewSizeSo6CGSizeVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV15cameraSViewSizeSo6CGSizeVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV15isZoomedDisplaySbvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV16actualScreenSizeSo6CGSizeVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV16getRecordBarSize12CoreGraphics7CGFloatVyFZ",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV16getTabButtonSizeSo6CGSizeVyFZ",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV16recordBarSpacing12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV17hudControlsHeight12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV18navMenuEdgePadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV19footerBottomPadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV21iPadHUDSidebarPadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV21mediaTabToolbarHeight12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV23hudControlButtonPadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV23recordBarLeadingPadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV24leftNavMenuSwipeThresold12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV24recordBarTrailingPadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV25leftNavMenuSwipeWidthArea12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV25mainControlLeadingPadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV25rightNavMenuSwipeThresold12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV26mainControlTrailingPadding12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV26rightNavMenuSwipeWidthArea12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV31getPageTabWidthForLandscapeModey12CoreGraphics7CGFloatVSo6CGSizeVFZ",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV32isWhiteBalanceFormatMustShowUnitSbvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV32maxRemoteItemsDisplayedForDialogSivau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV35leftNavMenuSwipeWidthAreaForStealth12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV36rightNavMenuSwipeWidthAreaForStealth12CoreGraphics7CGFloatVvau",
+      "_$s16CameraAppToolbox18MainViewLayoutDataV9isIPadResSbvau",
+      "MainViewLayoutData",
+      "footerHeight12CoreGraphics7CGFloatVv",
+      "pageTabWidth12CoreGraphics7CGFloatVv",
+      "pageTabHeight12CoreGraphics7CGFloatVv",
+      "recordBarSpacing12CoreGraphics7CGFloatVv",
+      "7hudControlsHeight12CoreGraphics7CGFloatVv",
+      "8navMenuEdgePadding12CoreGraphics7CGFloatVv",
+      "leftNavMenuSwipeWidthArea12CoreGraphics7CGFloatVv",
+      "rightNavMenuSwipeWidthArea12CoreGraphics7CGFloatVv",
+      "1getPageTabWidthForLandscapeModey12CoreGraphics7CGFloatVSo6CGSizeVFZ",
+      "5leftNavMenuSwipeWidthAreaForStealth12CoreGraphics7CGFloatVv",
+      "6rightNavMenuSwipeWidthAreaForStealth12CoreGraphics7CGFloatVv",
+      "MainViewLayoutDataV",
+      "_symbolic _____ 16CameraAppToolbox18MainViewLayoutDataV"
+    ]
+  },
+  "requirements": [
+    "Full-screen monitor-first camera page; no app title banner over preview.",
+    "Right edge page rail uses pageCamera/pageMedia/pageChat/pageSettings order.",
+    "Left edge is icon-only monitor/control rail: false color, focus assist, guides, zebra, LUT/clean feed.",
+    "Footer controls are exactly LENS, FPS, SHUTTER, IRIS, ISO, WB, TINT; secondary controls live in scrollers.",
+    "Top overlay is compact status/timecode/storage/upload, using BMD Lato fonts.",
+    "Settings, Media, Chat use Blackmagic side-panel layouts, not iOS grouped list chrome.",
+    "Use recovered CameraAppToolbox Assets.car names and documented aliases before SF Symbol fallback."
+  ]
+}
