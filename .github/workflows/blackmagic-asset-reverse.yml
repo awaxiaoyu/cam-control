@@ -2,6 +2,12 @@
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - blackmagic-ui-redesign-action
+    paths:
+      - .github/workflows/blackmagic-asset-reverse.yml
+      - CamControlApp/Resources/**
 
 jobs:
   assetutil:
