@@ -15,7 +15,7 @@ enum BlackmagicReverseSpec {
     static let controlScrollerNames = [
         "FpsOptions", "ShutterScroll", "IrisScroll", "IsoScroll", "WhiteBalanceScroll", "TintScroll",
         "FocusAdjustmentDial", "FocusAssistScroller", "LensOptions", "IsoPresetOptions", "ShutterPresetOptions",
-        "WhiteBalancePresetOptions", "ZoomPresetOptions", "StabilizationIntent", "LutScroller", "ZebraScroller", "FramingGuidesScroller",
+        "WhiteBalancePresetOptions", "ZoomPresetOptions", "NDFilterOptions", "StabilisationOptions", "StabilizationIntent", "LutScroller", "ZebraScroller", "FramingGuidesScroller",
         "SafeAreaScroller", "FocusAssistScroller"
     ]
 
@@ -53,6 +53,7 @@ enum BlackmagicReverseSpec {
     static let recordCodecOptions = ["Apple ProRes 422", "Apple ProRes 422 HQ", "Apple ProRes 422 LT", "Apple ProRes 422 Proxy", "H.264", "HEVC (H.265)"]
     static let recordResolutionOptions = ["4K", "720p", "HD"]
     static let recordTimecodeOptions = ["Record Run", "Tentacle Sync", "Time of Day (TOD)"]
+    static let ndFilterOptions = ["Clear", "1 Stop", "2 Stops", "3 Stops", "4 Stops", "ND 0.3", "ND 0.6", "ND 0.9", "ND 1.2"]
 
     static let cameraOptions = [
         "Anamorphic De-Squeeze", "Enable Vertical Video", "Flicker Free Shutter Based On", "Flip Image for SLR Lens",
@@ -107,7 +108,7 @@ enum BlackmagicReverseSpec {
         "Apple Watch/IconAe", "Apple Watch/IconAe_active", "Apple Watch/IconAf", "Apple Watch/IconAf_active", "Apple Watch/IconAwb", "Apple Watch/IconAwb_active",
         "Apple Watch/IconLock", "Apple Watch/IconLock_active", "Apple Watch/IconLut", "Apple Watch/IconLut_active", "Apple Watch/IconStream", "Apple Watch/IconStream_active", "Apple Watch/IconTimelapse", "Apple Watch/IconTimelapse_active",
         "BatteryIndicator", "BatteryIndicatorWarning", "StorageIphone", "StorageDrive",
-        "Exposure", "Exposure_active", "FocusAutoZoom", "FocusAutoZoom_active", "ExposureAutoZoom", "ExposureAutoZoom_active", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
+        "Exposure", "Exposure_active", "ExposureAutoZoom", "ExposureAutoZoom_active", "ExposureLockZoom", "ExposureLockZoom_active", "FocusAutoZoom", "FocusAutoZoom_active", "HdmiNdClear", "HdmiNdFrac1", "HdmiNdFrac2", "HdmiNdFrac3", "HdmiNdFrac4", "HdmiNdStop1", "HdmiNdStop2", "HdmiNdStop3", "HdmiNdStop4", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
         "Lut", "LutDisplay", "LutRecord", "LutSelector", "LutSelector_active",
         "Media", "Media_active", "MediaSync", "MediaSync_active", "MediaSync_disabled", "Sort", "Sort_active", "SortDatetime", "SortFilename", "SortLocation", "SortTimecode", "SortUploadStatus", "UploadToCloud", "UploadToCloud_active", "UploadToCloud_disabled", "UploadedToCloud", "UploadedToCloudHq", "UploadedToCloudPxy", "Uploading", "UploadingSmall", "UploadingPause", "UploadingDone", "UploadingFailedThumbnail", "ProjectUpload", "ProjectUploadFailed", "ProjectUploadNoConnection", "Sync", "Sync_active", "SyncFooter", "SyncSidebar",
         "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate", "CameraLinkedSmall",
@@ -120,7 +121,8 @@ enum BlackmagicReverseSpec {
         "Chat tab glyph": "3.2.00 has pageChat symbols but no bare Chat asset; use recovered Cloud/BmdCloudSidebar glyphs.",
         "HUD auto icons": "IconAf/IconAwb/IconLock/IconLut/IconTimelapse are recovered under Apple Watch/* plus png rendition aliases.",
         "Lens footer glyph": "3.2.00 exposes LensOptions as UI symbols but no bare Lens asset; use Camera glyph while preserving LENS label.",
-        "Zoom/function rail glyph": "3.2.00 screenshots show a zoom/function icon in the camera-control rail; use recovered FocusAutoZoom/ExposureAutoZoom assets because no bare Zoom asset exists in 3.2.00."
+        "Zoom/function rail glyph": "3.2.00 screenshots show a zoom/function icon in the camera-control rail; use recovered FocusAutoZoom/ExposureAutoZoom assets because no bare Zoom asset exists in 3.2.00.",
+        "ND/stabilisation rail glyphs": "3.2.00 exposes NDFilterOptions/StabilisationOptions plus HdmiNd*/ExposureLockZoom assets; keep them as secondary rail scrollers, never as footer controls."
     ]
 
     static let implementationRules = [
@@ -157,6 +159,10 @@ enum BlackmagicReverseSpec {
         "Hdmi4kPlay": "play.fill",
         "Hdmi4kRecord": "record.circle",
         "Hdmi4kHistogramRgb": "waveform.path.ecg",
+        "ExposureLockZoom": "lock.circle",
+        "HdmiNdClear": "circle.slash",
+        "HdmiNdFrac1": "circle.dotted",
+        "HdmiNdStop1": "1.circle",
         "BatteryIndicator": "battery.75percent",
         "StorageIphone": "iphone",
         "StorageDrive": "externaldrive.fill",

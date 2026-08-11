@@ -218,6 +218,8 @@ struct ShootingHUDLayout<Preview: View>: View {
     private func topStatusIcons(compact: Bool) -> some View {
         HStack(spacing: compact ? 4 : 6) {
             TopHudGlyph(asset: "IconLock", text: "TC", color: .white.opacity(0.70), compact: compact)
+            TopHudGlyph(asset: "IconStream", text: "OFF", color: .white.opacity(0.68), compact: compact)
+            TopHudGlyph(asset: "IconTimelapse", text: "TL", color: BlackmagicCamStyle.amber.opacity(0.82), compact: compact)
             TopHudGlyph(asset: "BatteryIndicator", text: "82", color: BlackmagicCamStyle.okGreen, compact: compact)
             TopHudGlyph(asset: "StorageIphone", text: "09", color: .white.opacity(0.82), compact: compact)
             TopHudGlyph(asset: "UploadToCloud", text: "--", color: BlackmagicCamStyle.amber, compact: compact)
@@ -297,6 +299,18 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
             .buttonStyle(.plain)
             Button {
+                withAnimation(.snappy(duration: 0.18)) { activeScroller = .ndFilter }
+            } label: {
+                monitorIconShell(asset: "HdmiNdClear", color: .white.opacity(0.74), active: activeScroller == .ndFilter, compact: compact)
+            }
+            .buttonStyle(.plain)
+            Button {
+                withAnimation(.snappy(duration: 0.18)) { activeScroller = .stabilization }
+            } label: {
+                monitorIconShell(asset: "ExposureLockZoom", color: .white.opacity(0.74), active: activeScroller == .stabilization, compact: compact)
+            }
+            .buttonStyle(.plain)
+            Button {
                 withAnimation(.snappy(duration: 0.18)) { activeScroller = .monitor }
             } label: {
                 monitorIconShell(asset: "HdmiHistogramRgb", color: .white.opacity(0.74), active: activeScroller == .monitor, compact: compact)
@@ -306,7 +320,7 @@ struct ShootingHUDLayout<Preview: View>: View {
         .padding(.vertical, compact ? 4 : 6)
         .background(.black.opacity(0.36), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
-        // Firmware/update note: this column mirrors the screenshot's camera function stack between the preview and page tabs; do not merge with pageCamera/pageMedia/pageChat/pageSettings.
+        // Firmware/update note: this column mirrors the screenshot's camera function stack between the preview and page tabs; ND/stabilisation buttons come from recovered NDFilterOptions/StabilisationOptions symbols, and this rail must not merge with pageCamera/pageMedia/pageChat/pageSettings.
     }
 
     private func leftMonitorRail(compact: Bool) -> some View {
@@ -499,7 +513,7 @@ enum ShootingHUDNavItem: String, CaseIterable, Identifiable {
 }
 
 private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
-    case lens, zoom, fps, shutter, iris, iso, exposure, whiteBalance, tint, codec, lut, focus, focusAssist, falseColor, guides, zebra, monitor, audio, stabilization, preset
+    case lens, zoom, fps, shutter, iris, iso, exposure, whiteBalance, tint, codec, lut, focus, focusAssist, falseColor, guides, zebra, ndFilter, monitor, audio, stabilization, preset
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -519,6 +533,7 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
         case .falseColor: return "FALSE COLOR"
         case .guides: return "FRAMING GUIDES"
         case .zebra: return "ZEBRA"
+        case .ndFilter: return "ND FILTER"
         case .monitor: return "MONITOR"
         case .audio: return "AUDIO METERS"
         case .stabilization: return "STABILIZATION"
@@ -530,7 +545,7 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
         case .lens, .zoom, .fps, .shutter, .iris, .iso, .exposure, .whiteBalance, .tint, .focus, .stabilization: return "Camera"
         case .codec: return "Record"
         case .lut: return "LUTs"
-        case .focusAssist, .falseColor, .guides, .zebra, .monitor: return "Monitor"
+        case .focusAssist, .falseColor, .guides, .zebra, .ndFilter, .monitor: return "Monitor"
         case .audio: return "Audio"
         case .preset: return "Presets"
         }
@@ -553,6 +568,7 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
         case .falseColor: return ["Off", "On", "False Color", "Exposure", "Skin", "Mid Grey", "Highlight"]
         case .guides: return ["Off", "Thirds", "Crosshair", "Safe Area", "2.39:1", "1.85:1", "4:3", "Guides Opacity", "Guides Color"]
         case .zebra: return ["Off", "50%", "60%", "70%", "75%", "80%", "90%", "95%", "100%"]
+        case .ndFilter: return BlackmagicReverseSpec.ndFilterOptions
         case .monitor: return BlackmagicReverseSpec.monitorOptions
         case .audio: return BlackmagicReverseSpec.audioLabels + ["None", "iPhone Microphone"]
         case .stabilization: return ["Off", "Standard", "Cinematic", "Extreme", "Optical"]

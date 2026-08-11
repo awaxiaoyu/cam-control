@@ -37,6 +37,10 @@ REQUIRED_SOURCE_PATTERNS = {
     'slate_close_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetIcon\(name: "SlateClose"'),
     'settings_option_list_cells': (SRC / 'PropertyPanel.swift', r'SettingsChoiceCell|OptionListView/BmdTextListSelector'),
     'chat_cloud_asset': (SRC / 'ShootingHUDComponents.swift', r'case \.chat: return "Cloud"'),
+    'nd_filter_scroller': (SRC / 'ShootingHUDComponents.swift', r'case \.ndFilter: return BlackmagicReverseSpec\.ndFilterOptions'),
+    'nd_filter_options_spec': (SRC / 'BlackmagicReverseSpec.swift', r'static let ndFilterOptions'),
+    'stream_timelapse_top_status': (SRC / 'ShootingHUDComponents.swift', r'TopHudGlyph\(asset: "IconStream"[\s\S]*TopHudGlyph\(asset: "IconTimelapse"'),
+    'stabilisation_reverse_anchor': (SRC / 'BlackmagicReverseSpec.swift', r'StabilisationOptions'),
     'complete_reverse_script': (ROOT / 'scripts' / 'reverse_blackmagic_complete_ui.py', r'UI_BUCKETS'),
 }
 FORBIDDEN_SOURCE_PATTERNS = {
