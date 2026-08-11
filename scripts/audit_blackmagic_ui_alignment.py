@@ -118,6 +118,16 @@ def check_info_plist_parity():
     assert info.get('NSMicrophoneUsageDescription') == 'Access is required to monitor audio levels and record.', info.get('NSMicrophoneUsageDescription')
     assert info.get('NSPhotoLibraryUsageDescription') == 'Access is required to save videos to the Photo Library.', info.get('NSPhotoLibraryUsageDescription')
     assert info.get('NSBluetoothAlwaysUsageDescription') == 'Bluetooth access is required to support peripherals.', info.get('NSBluetoothAlwaysUsageDescription')
+    expected_fonts = [
+        'BMD-Lato-Bold-Italic.ttf', 'BMD-Lato-Bold.ttf', 'BMD-Lato-Heavy.ttf', 'BMD-Lato-HeavyItalic.ttf',
+        'BMD-Lato-Italic.ttf', 'BMD-Lato-Light-Italic.ttf', 'BMD-Lato-Light.ttf', 'BMD-Lato-Regular.ttf',
+        'BMD-Lato-Timecode-Heavy.ttf', 'BMD-Lato-WP.ttf', 'BMD-Lato-WPAC.ttf'
+    ]
+    assert info.get('UIAppFonts') == expected_fonts, info.get('UIAppFonts')
+    project_yml = read(ROOT / 'project.yml')
+    assert 'CamControlAppUITests' in project_yml and 'bundle.ui-testing' in project_yml, 'launch UI smoke-test target missing from project.yml'
+    for font in expected_fonts:
+        assert f'- {font}' in project_yml, f'{font} missing from generated Info.plist properties'
     # Firmware/update note: these keys mirror the repo-local Blackmagic Cam_3.2.00.ipa Info.plist; rerun reverse_blackmagic_complete_ui.py before changing launch/status-bar behavior or permission UI text.
 
 def check_source_patterns():

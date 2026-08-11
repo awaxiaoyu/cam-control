@@ -53,6 +53,18 @@ targets:
         NSMicrophoneUsageDescription: "Access is required to monitor audio levels and record."
         NSPhotoLibraryUsageDescription: "Access is required to save videos to the Photo Library."
         NSPhotoLibraryAddUsageDescription: "Access is required to save videos to the Photo Library."
+        UIAppFonts:
+          - BMD-Lato-Bold-Italic.ttf
+          - BMD-Lato-Bold.ttf
+          - BMD-Lato-Heavy.ttf
+          - BMD-Lato-HeavyItalic.ttf
+          - BMD-Lato-Italic.ttf
+          - BMD-Lato-Light-Italic.ttf
+          - BMD-Lato-Light.ttf
+          - BMD-Lato-Regular.ttf
+          - BMD-Lato-Timecode-Heavy.ttf
+          - BMD-Lato-WP.ttf
+          - BMD-Lato-WPAC.ttf
         LSApplicationCategoryType: public.app-category.video
         LSSupportsOpeningDocumentsInPlace: true
         UIFileSharingEnabled: true
@@ -86,6 +98,16 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.aicomposition.camcontrol.tests
+  CamControlAppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: CamControlAppUITests/Sources
+    dependencies:
+      - target: CamControlApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aicomposition.camcontrol.uitests
 schemes:
   CamControl:
     build:
@@ -96,3 +118,4 @@ schemes:
     test:
       targets:
         - CamControlCoreTests
+        - CamControlAppUITests
