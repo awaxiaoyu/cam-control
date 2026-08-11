@@ -4,14 +4,14 @@ import SwiftUI
 
 struct PropertyPanel: View {
     @EnvironmentObject private var controller: CameraController
-    @State private var selectedCategory = "Camera"
+    @State private var selectedCategory = "Record"
 
     var body: some View {
         GeometryReader { proxy in
             let compact = proxy.size.width < 900
             HStack(spacing: 0) {
                 settingsCategoryPanel(compact: compact)
-                    .frame(width: compact ? 176 : 238)
+                    .frame(width: compact ? 150 : 210)
                 Divider().overlay(.white.opacity(0.10))
                 settingsOptionsPanel(compact: compact)
             }
@@ -24,26 +24,16 @@ struct PropertyPanel: View {
     }
 
     private func settingsCategoryPanel(compact: Bool) -> some View {
-        VStack(alignment: .leading, spacing: compact ? 8 : 10) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("SETTINGS")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                    .tracking(1.6)
-                    .foregroundStyle(BlackmagicCamStyle.cyan)
-                Text("Blackmagic Camera")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 18 : 22, weight: .heavy))
-                    .foregroundStyle(.white)
-                Text("Record / Camera / Monitor / Audio / LUTs")
-                    .font(BlackmagicCamStyle.labelFont(size: 9, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.38))
-                    .lineLimit(2)
-            }
-            .padding(.horizontal, compact ? 12 : 18)
-            .padding(.top, compact ? 14 : 20)
-            .padding(.bottom, compact ? 10 : 14)
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Settings")
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 16, weight: .heavy))
+                .foregroundStyle(.white)
+                .padding(.horizontal, compact ? 10 : 14)
+                .padding(.top, compact ? 10 : 14)
+                .padding(.bottom, compact ? 8 : 10)
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: compact ? 6 : 8) {
+                VStack(spacing: 0) {
                     ForEach(BlackmagicReverseSpec.settingsCategories, id: \.self) { category in
                         Button {
                             withAnimation(.snappy(duration: 0.16)) { selectedCategory = category }
@@ -60,52 +50,46 @@ struct PropertyPanel: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, compact ? 8 : 12)
-                .padding(.bottom, 18)
+                .padding(.horizontal, compact ? 4 : 6)
+                .padding(.bottom, 10)
             }
         }
-        .background(
-            LinearGradient(
-                colors: [Color.black.opacity(0.92), BlackmagicCamStyle.rail.opacity(0.92)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        .background(Color.black.opacity(0.92))
+        // Firmware/update note: matches 3.2.00 Settings screenshot left rail: simple dark category list with blue active row, not iOS grouped settings chrome.
     }
 
     private func settingsOptionsPanel(compact: Bool) -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: compact ? 16 : 22) {
-                HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text("SETTINGS")
-                            .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                            .tracking(1.5)
-                            .foregroundStyle(color(for: selectedCategory))
-                        Text(selectedCategory)
-                            .font(BlackmagicCamStyle.labelFont(size: compact ? 30 : 42, weight: .heavy))
-                            .foregroundStyle(.white)
-                        Text(description(for: selectedCategory))
-                            .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 14, weight: .medium))
-                            .foregroundStyle(BlackmagicCamStyle.mutedText)
-                    }
+            VStack(alignment: .leading, spacing: compact ? 10 : 14) {
+                HStack {
+                    Spacer()
+                    Text(selectedCategory)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 16, weight: .heavy))
+                        .foregroundStyle(.white)
                     Spacer()
                     BMStatusPill(title: "Props", value: "\(controller.snapshot.properties.count)", color: controller.snapshot.properties.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
+                        .scaleEffect(compact ? 0.72 : 0.82)
+                        .opacity(0.72)
                 }
+                .padding(.horizontal, compact ? 8 : 12)
+                .padding(.top, compact ? 7 : 10)
 
                 settingsRows(compact: compact)
 
                 if selectedCategory == "Camera" {
                     SlateMetadataPanel(compact: compact)
+                        .padding(.horizontal, compact ? 8 : 12)
                 }
 
                 if selectedCategory == "Camera" || selectedCategory == "Record" {
                     livePropertyGrid(compact: compact)
+                        .padding(.horizontal, compact ? 8 : 12)
                 }
             }
-            .padding(compact ? 18 : 28)
+            .padding(.bottom, compact ? 12 : 18)
         }
-        .background(BlackmagicCamStyle.studioGradient)
+        .background(Color(red: 0.035, green: 0.038, blue: 0.044))
+        // Firmware/update note: right panel follows SettingsOptionsPanel screenshot: dark table, centered category title, row values right-aligned.
     }
 
     private func livePropertyGrid(compact: Bool) -> some View {
@@ -154,20 +138,19 @@ struct PropertyPanel: View {
     }
 
     private func settingsRows(compact: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(selectedCategory.uppercased())
-                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                .tracking(1.3)
-                .foregroundStyle(color(for: selectedCategory))
-
-            VStack(spacing: 8) {
-                ForEach(categoryRows, id: \.title) { row in
-                    SettingsOptionRow(row: row, compact: compact)
+        let rows = categoryRows
+        return VStack(spacing: 0) {
+            ForEach(Array(rows.enumerated()), id: \.element.title) { index, row in
+                SettingsOptionRow(row: row, compact: compact)
+                if index < rows.count - 1 {
+                    Rectangle().fill(.white.opacity(0.07)).frame(height: 1)
                 }
             }
         }
-        .padding(compact ? 14 : 18)
-        .blackmagicPanel(cornerRadius: 22, borderOpacity: 0.14)
+        .background(Color.black.opacity(0.26), in: RoundedRectangle(cornerRadius: compact ? 3 : 4, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 3 : 4, style: .continuous).stroke(.white.opacity(0.07), lineWidth: 1))
+        .padding(.horizontal, compact ? 8 : 12)
+        // Firmware/update note: Settings rows are an OptionListView-style table; choices remain in BlackmagicReverseSpec but are not sprayed inline.
     }
 
     private var categoryRows: [SettingsOptionModel] {
@@ -381,27 +364,22 @@ private struct SettingsCategoryRow: View {
     let compact: Bool
 
     var body: some View {
-        HStack(spacing: compact ? 9 : 12) {
-            BMDAssetIcon(name: icon, active: active, fallback: BlackmagicReverseSpec.assetFallbackSystemImages[icon] ?? "slider.horizontal.3", color: active ? .white : color, size: compact ? 17 : 20)
-                .frame(width: compact ? 30 : 36, height: compact ? 30 : 36)
-                .background((active ? color : color.opacity(0.14)), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title.uppercased())
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                    .tracking(0.8)
-                    .foregroundStyle(.white)
-                Text(subtitle)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(active ? 0.78 : 0.44))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-            }
+        HStack(spacing: compact ? 7 : 9) {
+            Rectangle()
+                .fill(active ? BlackmagicCamStyle.activeBlue : .clear)
+                .frame(width: compact ? 2 : 3, height: compact ? 18 : 22)
+            Text(title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: active ? .heavy : .bold))
+                .foregroundStyle(active ? .white : .white.opacity(0.78))
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, compact ? 9 : 12)
-        .padding(.vertical, compact ? 9 : 12)
-        .background(active ? color.opacity(0.22) : .white.opacity(0.045), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(active ? color.opacity(0.55) : .white.opacity(0.08), lineWidth: 1))
+        .padding(.horizontal, compact ? 7 : 9)
+        .padding(.vertical, compact ? 7 : 9)
+        .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.95) : Color.clear, in: RoundedRectangle(cornerRadius: 2, style: .continuous))
+        .overlay(alignment: .bottom) { Rectangle().fill(.white.opacity(0.06)).frame(height: 1) }
+        // Firmware/update note: category row intentionally text-first like the recovered SettingsCategoryPanel screenshot; icons remain available in spec for future panel variants.
     }
 }
 
@@ -416,45 +394,55 @@ private struct SettingsOptionRow: View {
     let row: SettingsOptionModel
     let compact: Bool
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 8 : 10) {
-            HStack(alignment: .center, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(row.title)
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 16, weight: .heavy))
-                        .foregroundStyle(.white)
-                    Text(row.choices.isEmpty ? "Toggle / value row recovered from Settings > List Option" : "OptionListView choices recovered from IPA")
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.38))
-                        .lineLimit(1)
-                }
-                Spacer()
-                Text(row.value.uppercased())
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                    .tracking(0.7)
-                    .foregroundStyle(row.color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 7)
-                    .background(row.color.opacity(0.12), in: Capsule())
-            }
+    private var isToggleRow: Bool {
+        row.value == "On" || row.value == "Off"
+    }
 
-            if !row.choices.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: compact ? 7 : 9) {
-                        ForEach(Array(row.choices.enumerated()), id: \.offset) { index, choice in
-                            SettingsChoiceCell(choice: choice, selected: index == 0, color: row.color, compact: compact)
-                        }
-                    }
-                    .padding(.vertical, 1)
-                }
+    var body: some View {
+        HStack(alignment: .center, spacing: compact ? 8 : 12) {
+            Text(row.title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .bold))
+                .foregroundStyle(.white.opacity(0.88))
+                .lineLimit(1)
+                .minimumScaleFactor(0.66)
+            Spacer(minLength: 12)
+            if isToggleRow {
+                BmdSettingsToggle(on: row.value == "On", color: row.color, compact: compact)
+            } else {
+                Text(row.value)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.55))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.62)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: compact ? 7 : 9, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.32))
             }
         }
-        .padding(compact ? 12 : 15)
-        .background(.black.opacity(0.34), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
-        // Firmware/update note: option selectors mirror SettingsOptionsPanel + OptionListView/BmdTextListSelector evidence from Localizable.strings comments; update via BlackmagicReverseSpec.settingsOptionChoices after app updates.
+        .padding(.horizontal, compact ? 10 : 14)
+        .padding(.vertical, compact ? 8 : 11)
+        .contentShape(Rectangle())
+        // Firmware/update note: row presentation matches SettingsOptionsPanel/OptionListView table cells in Blackmagic Cam 3.2.x screenshots; selections open deeper option lists instead of inline chips.
+    }
+}
+
+private struct BmdSettingsToggle: View {
+    let on: Bool
+    let color: Color
+    let compact: Bool
+
+    var body: some View {
+        Capsule()
+            .fill(on ? BlackmagicCamStyle.activeBlue : .white.opacity(0.18))
+            .frame(width: compact ? 30 : 38, height: compact ? 17 : 21)
+            .overlay(alignment: on ? .trailing : .leading) {
+                Circle()
+                    .fill(.white)
+                    .frame(width: compact ? 13 : 17, height: compact ? 13 : 17)
+                    .padding(2)
+            }
+            .overlay(Capsule().stroke(.white.opacity(0.12), lineWidth: 1))
+        // Firmware/update note: toggle proportions follow the Settings screenshot blue iOS-style switch used inside Blackmagic's custom dark table.
     }
 }
 
