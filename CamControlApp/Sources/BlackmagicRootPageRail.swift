@@ -8,7 +8,7 @@ struct BlackmagicRootPageRail: View {
     let onNavigate: (ShootingHUDNavItem) -> Void
 
     var body: some View {
-        VStack(spacing: compact ? 7 : 9) {
+        VStack(spacing: compact ? 8 : 11) {
             ForEach(ShootingHUDNavItem.allCases) { item in
                 Button { onNavigate(item) } label: {
                     RootPageRailButton(item: item, selected: item == selection, compact: compact)
@@ -16,11 +16,12 @@ struct BlackmagicRootPageRail: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.vertical, compact ? 7 : 10)
-        .padding(.horizontal, compact ? 4 : 6)
-        .background(.black.opacity(0.58), in: RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous).stroke(.white.opacity(0.11), lineWidth: 1))
-        .shadow(color: .black.opacity(0.40), radius: 18, x: 0, y: 10)
+        .padding(.vertical, compact ? 5 : 8)
+        .padding(.horizontal, compact ? 2 : 3)
+        .background(.black.opacity(0.72), in: RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        .shadow(color: .black.opacity(0.42), radius: 14, x: 0, y: 8)
+        // Firmware/update note: visual proportions follow 3.2.00 screenshots: a black right-edge page strip with icon + tiny label for Camera/Media/Chat/Settings.
     }
 }
 
@@ -32,21 +33,29 @@ private struct RootPageRailButton: View {
     private var iconColor: Color { selected ? .white : .white.opacity(0.64) }
     private var fillColor: Color { selected ? BlackmagicCamStyle.activeBlue.opacity(0.58) : .white.opacity(0.052) }
     private var strokeColor: Color { selected ? BlackmagicCamStyle.cyan.opacity(0.48) : .white.opacity(0.08) }
-    private var cornerRadius: CGFloat { compact ? 10 : 13 }
-    private var buttonSize: CGSize { CGSize(width: compact ? 40 : 50, height: compact ? 40 : 52) }
-    private var iconSize: CGFloat { compact ? 18 : 22 }
+    private var cornerRadius: CGFloat { compact ? 6 : 8 }
+    private var buttonSize: CGSize { CGSize(width: compact ? 38 : 50, height: compact ? 42 : 56) }
+    private var iconSize: CGFloat { compact ? 13 : 16 }
 
     var body: some View {
         ZStack(alignment: .trailing) {
-            BMDAssetIcon(name: item.assetName, active: selected, fallback: item.systemImage, color: iconColor, size: iconSize)
-                .frame(width: buttonSize.width, height: buttonSize.height)
-                .background(fillColor, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).stroke(strokeColor, lineWidth: 1))
+            VStack(spacing: compact ? 2 : 3) {
+                BMDAssetIcon(name: item.assetName, active: selected, fallback: item.systemImage, color: iconColor, size: iconSize)
+                Text(item.title.capitalized)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5.5 : 7, weight: .heavy))
+                    .tracking(0.15)
+                    .foregroundStyle(selected ? .white : .white.opacity(0.62))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+            }
+            .frame(width: buttonSize.width, height: buttonSize.height)
+            .background(fillColor, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).stroke(strokeColor, lineWidth: 1))
             if selected {
                 Capsule()
                     .fill(BlackmagicCamStyle.cyan)
-                    .frame(width: 3, height: compact ? 20 : 26)
-                    .offset(x: compact ? 4 : 5)
+                    .frame(width: 2, height: compact ? 22 : 28)
+                    .offset(x: compact ? 3 : 4)
             }
         }
         .accessibilityLabel(item.title)

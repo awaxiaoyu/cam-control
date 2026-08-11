@@ -80,8 +80,8 @@ struct ShootingHUDLayout<Preview: View>: View {
                                 withAnimation(.snappy(duration: 0.18)) { self.activeScroller = nil }
                             }
                             .padding(.leading, metrics.safePad)
-                            .padding(.trailing, metrics.safePad + (metrics.isLandscape ? metrics.pageTabWidth + 18 : 0))
-                            .padding(.bottom, metrics.footerBottomPadding + metrics.footerHeight + 10)
+                            .padding(.trailing, metrics.safePad + (metrics.isLandscape ? metrics.pageTabWidth + 8 : 0))
+                            .padding(.bottom, metrics.footerBottomPadding + metrics.footerHeight + 4)
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .zIndex(6)
@@ -137,90 +137,91 @@ struct ShootingHUDLayout<Preview: View>: View {
         ZStack {
             VStack(spacing: 0) {
                 topHUD(compact: metrics.compact)
-                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? 70 : 0))
-                    .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 10)
-                    .padding(.top, metrics.safePad)
+                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.leftHudWidth + 6 : 0))
+                    .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 6)
+                    .padding(.top, metrics.safePad + 2)
                 Spacer()
                 bottomScopeStrip(compact: metrics.compact)
-                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? 70 : 0))
-                    .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 10)
-                    .padding(.bottom, metrics.compact ? 6 : 8)
+                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.leftHudWidth + 18 : 0))
+                    .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 12)
+                    .padding(.bottom, metrics.compact ? 6 : 10)
                 bottomControls(compact: metrics.compact)
-                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? 70 : 0))
-                    .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 10)
+                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.leftHudWidth + 6 : 0))
+                    .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 6)
                     .padding(.bottom, metrics.footerBottomPadding)
             }
 
-            HStack(alignment: .top) {
+            HStack(alignment: .top, spacing: metrics.compact ? 5 : 7) {
                 leftMonitorRail(compact: metrics.compact)
+                    .frame(width: metrics.leftHudWidth)
                     .padding(.leading, metrics.safePad)
                 Spacer()
+                rightControlRail(compact: metrics.compact)
+                    .frame(width: metrics.rightControlRailWidth)
                 rightPageNavigationRail(compact: metrics.compact)
-                    .frame(width: metrics.pageTabWidth)
+                    .frame(width: metrics.rightPageRailWidth)
                     .padding(.trailing, metrics.safePad)
             }
-            .padding(.top, metrics.isLandscape ? (metrics.compact ? 76 : 104) : metrics.size.height * 0.24)
+            .padding(.top, metrics.isLandscape ? (metrics.compact ? 24 : 34) : metrics.size.height * 0.22)
         }
-        // Firmware/update note: layout follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors; 3.2.00 uses right-edge pageCamera/pageMedia/pageChat/pageSettings and left-edge HUD monitor functions, so do not move page navigation back to the left rail on future IPA updates.
+        // Firmware/update note: layout follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors and the 3.2.00 landscape screenshots: HUD icons live in a thin left strip, camera/media/chat/settings stay in a separate right page rail, and camera-control icons sit immediately to its left.
     }
 
     private func topHUD(compact: Bool) -> some View {
         HStack(alignment: .top, spacing: compact ? 8 : 12) {
-            topLeftIndicators(compact: compact)
-            Spacer(minLength: 8)
+            topCameraReadouts(compact: compact)
+            Spacer(minLength: compact ? 8 : 16)
             recordTimerBar(compact: compact)
-            Spacer(minLength: 8)
-            topRightIndicators(compact: compact)
+            Spacer(minLength: compact ? 8 : 16)
+            topStatusIcons(compact: compact)
         }
     }
 
-    private func topLeftIndicators(compact: Bool) -> some View {
-        HStack(spacing: compact ? 6 : 8) {
-            HUDStatusChip(title: "CAM", value: subtitle.uppercased(), asset: "Camera", color: .white.opacity(0.82), compact: compact)
-            HUDStatusChip(title: "LUT", value: "Rec.709", asset: "IconLut", color: BlackmagicCamStyle.activeBlue, compact: compact)
-            HUDStatusChip(title: "TC", value: "TOD", asset: "IconLock", color: .white.opacity(0.74), compact: compact)
+    private func topCameraReadouts(compact: Bool) -> some View {
+        HStack(alignment: .top, spacing: compact ? 8 : 13) {
+            ForEach(bottomControlItems) { item in
+                CameraTopReadout(item: item, compact: compact, active: activeScroller == item.scroller)
+                    .onTapGesture { withAnimation(.snappy(duration: 0.18)) { activeScroller = item.scroller } }
+            }
         }
-        .padding(.horizontal, compact ? 6 : 9)
-        .padding(.vertical, compact ? 5 : 7)
-        .background(.black.opacity(0.34), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
-        // Firmware/update note: top-left cluster follows recovered HUDTopLeftIndicators, HUDLutIndicator and timecode mode labels; keep it as compact operator readouts rather than an app title banner when updating for a new IPA.
+        .padding(.horizontal, compact ? 4 : 6)
+        .padding(.vertical, compact ? 2 : 4)
+        .background(.black.opacity(0.08), in: RoundedRectangle(cornerRadius: compact ? 5 : 7, style: .continuous))
+        // Firmware/update note: matches 3.2.00 Camera HUD readouts LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT as tiny transparent top overlay labels, not boxed tiles.
     }
 
     private func recordTimerBar(compact: Bool) -> some View {
-        VStack(spacing: compact ? 2 : 3) {
-            Text(timecode)
-                .font(BlackmagicCamStyle.timecodeFont(size: compact ? 34 : 58))
-                .foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.85), radius: 2, x: 0, y: 1)
-                .lineLimit(1)
-                .minimumScaleFactor(0.58)
-            HStack(spacing: 8) {
+        VStack(spacing: compact ? 1 : 2) {
+            HStack(spacing: compact ? 3 : 5) {
                 HUDTallyDot(active: isCaptureActive, compact: compact)
-                Text(isCaptureActive ? "REC" : "STBY")
-                Text("REC RUN").foregroundStyle(.white.opacity(0.42))
-                Text("24 FPS").foregroundStyle(.white.opacity(0.42))
+                Text(timecode)
+                    .font(BlackmagicCamStyle.timecodeFont(size: compact ? 17 : 24))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.95), radius: 1, x: 0, y: 1)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.58)
             }
-            .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-            .tracking(1.55)
-            .foregroundStyle(isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.74))
+            Text(isCaptureActive ? "REC" : "00:00:00:00")
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                .tracking(0.8)
+                .foregroundStyle(isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.48))
         }
-        .padding(.horizontal, compact ? 8 : 14)
-        .padding(.vertical, compact ? 3 : 5)
-        // Firmware/update note: this is the visible MainControlRecordTimer/RecordTimerTextIndicator mapping; 3.2.00 renders it as monitor overlay text, not an iOS capsule control.
+        .padding(.horizontal, compact ? 3 : 5)
+        .padding(.vertical, compact ? 1 : 2)
+        // Firmware/update note: MainControlRecordTimer/RecordTimerTextIndicator is a monitor overlay centered near the top; keep it transparent and compact.
     }
 
-    private func topRightIndicators(compact: Bool) -> some View {
-        HStack(spacing: compact ? 6 : 8) {
-            HUDStatusChip(title: "BAT", value: "82%", asset: "BatteryIndicator", color: BlackmagicCamStyle.okGreen, compact: compact)
-            HUDStatusChip(title: "STOR", value: "09:00", asset: "StorageIphone", color: .white.opacity(0.80), compact: compact)
-            HUDStatusChip(title: "UP", value: "WAIT", asset: "UploadToCloud", color: BlackmagicCamStyle.amber, compact: compact)
+    private func topStatusIcons(compact: Bool) -> some View {
+        HStack(spacing: compact ? 4 : 6) {
+            TopHudGlyph(asset: "IconLock", text: "TC", color: .white.opacity(0.70), compact: compact)
+            TopHudGlyph(asset: "BatteryIndicator", text: "82", color: BlackmagicCamStyle.okGreen, compact: compact)
+            TopHudGlyph(asset: "StorageIphone", text: "09", color: .white.opacity(0.82), compact: compact)
+            TopHudGlyph(asset: "UploadToCloud", text: "--", color: BlackmagicCamStyle.amber, compact: compact)
         }
-        .padding(.horizontal, compact ? 8 : 11)
-        .padding(.vertical, compact ? 6 : 8)
-        .background(.black.opacity(0.38), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
-        // Firmware/update note: right cluster follows StorageStatusHUD, UploadStatusHUD and BatteryIndicator assets recovered from the IPA.
+        .padding(.horizontal, compact ? 3 : 5)
+        .padding(.vertical, compact ? 2 : 3)
+        .background(.black.opacity(0.18), in: Capsule())
+        // Firmware/update note: top-right cluster maps StorageStatusHUD/UploadStatusHUD/BatteryIndicator from the IPA; Blackmagic screenshots show tiny status glyphs rather than pill cards.
     }
 
     private func guideLayer(metrics: BlackmagicHUDMetrics) -> some View {
@@ -228,9 +229,9 @@ struct ShootingHUDLayout<Preview: View>: View {
         return ZStack {
             RuleOfThirds()
                 .stroke(.white.opacity(0.28), style: StrokeStyle(lineWidth: 1, dash: [compact ? 5 : 7, compact ? 8 : 11]))
-                .padding(.leading, metrics.isLandscape ? metrics.safePad + (compact ? 42 : 66) : (compact ? 48 : 72))
-                .padding(.trailing, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 78 : 104) : (compact ? 48 : 72))
-                .padding(.vertical, metrics.isLandscape ? (compact ? 58 : 86) : (compact ? 108 : 132))
+                .padding(.leading, metrics.isLandscape ? metrics.safePad + metrics.leftHudWidth + (compact ? 8 : 12) : (compact ? 48 : 72))
+                .padding(.trailing, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 8 : 14) : (compact ? 48 : 72))
+                .padding(.vertical, metrics.isLandscape ? (compact ? 42 : 62) : (compact ? 108 : 132))
             RoundedRectangle(cornerRadius: 2)
                 .stroke(BlackmagicCamStyle.activeBlue.opacity(0.42), lineWidth: 1)
                 .frame(width: compact ? 120 : 184, height: compact ? 72 : 108)
@@ -247,18 +248,38 @@ struct ShootingHUDLayout<Preview: View>: View {
                     WhiteBalanceOverlay(compact: compact, value: value(forAny: ["WB", "White Balance"]))
                 }
             }
-            .padding(.leading, metrics.isLandscape ? metrics.safePad + (compact ? 10 : 16) : (compact ? 18 : 28))
-            .padding(.trailing, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 84 : 112) : (compact ? 18 : 28))
-            .padding(.top, metrics.isLandscape ? (compact ? 70 : 106) : (compact ? 126 : 154))
-            .padding(.bottom, metrics.isLandscape ? (compact ? 96 : 128) : (compact ? 126 : 154))
+            .padding(.leading, metrics.isLandscape ? metrics.safePad + metrics.leftHudWidth + (compact ? 6 : 10) : (compact ? 18 : 28))
+            .padding(.trailing, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 8 : 14) : (compact ? 18 : 28))
+            .padding(.top, metrics.isLandscape ? (compact ? 44 : 64) : (compact ? 126 : 154))
+            .padding(.bottom, metrics.isLandscape ? (compact ? 62 : 84) : (compact ? 126 : 154))
         }
         .allowsHitTesting(false)
         // Firmware/update note: overlays mirror reversed HUDGuides, HUDSafeAreas, HUDFalseColor and HUDWhiteBalanceOverlay strings; only values should change for new camera firmware.
     }
 
     private func rightPageNavigationRail(compact: Bool) -> some View {
-        VStack(spacing: compact ? 8 : 10) {
+        VStack(spacing: compact ? 10 : 13) {
             BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: onNavigate)
+        }
+        // Firmware/update note: right rail is the recovered BmdTabView/BmdVTabView pageCamera/pageMedia/pageChat/pageSettings rail; keep page glyphs separate from camera function icons.
+    }
+
+    private func rightControlRail(compact: Bool) -> some View {
+        VStack(spacing: compact ? 7 : 9) {
+            monitorIconButton(asset: "Camera", color: .white.opacity(0.78), scroller: .lens, compact: compact)
+            Button {
+                withAnimation(.snappy(duration: 0.18)) { activeScroller = .focus }
+            } label: {
+                monitorIconShell(asset: "IconAf", color: BlackmagicCamStyle.cyan, active: activeScroller == .focus, compact: compact)
+            }
+            .buttonStyle(.plain)
+            Button(action: onCapture) {
+                RecordButtonView(active: isCaptureActive, enabled: canCapture, compact: true)
+                    .scaleEffect(compact ? 0.62 : 0.72)
+                    .frame(width: compact ? 34 : 44, height: compact ? 34 : 44)
+            }
+            .buttonStyle(.plain)
+            .disabled(!canCapture)
             Button {
                 withAnimation(.snappy(duration: 0.18)) { showSlate = true }
             } label: {
@@ -266,17 +287,26 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
             .buttonStyle(.plain)
             Button {
-                withAnimation(.snappy(duration: 0.18)) { activeScroller = .preset }
+                withAnimation(.snappy(duration: 0.18)) { activeScroller = .zoom }
             } label: {
-                monitorIconShell(asset: "Sync", color: BlackmagicCamStyle.okGreen, active: activeScroller == .preset, compact: compact)
+                monitorIconShell(asset: "FocusAutoZoom", color: .white.opacity(0.74), active: activeScroller == .zoom, compact: compact)
+            }
+            .buttonStyle(.plain)
+            Button {
+                withAnimation(.snappy(duration: 0.18)) { activeScroller = .monitor }
+            } label: {
+                monitorIconShell(asset: "HdmiHistogramRgb", color: .white.opacity(0.74), active: activeScroller == .monitor, compact: compact)
             }
             .buttonStyle(.plain)
         }
-        // Firmware/update note: right rail is the recovered BmdTabView/BmdVTabView pageCamera/pageMedia/pageChat/pageSettings rail with Slate/Preset secondary controls; future IPA changes must be diffed against page symbols before reordering.
+        .padding(.vertical, compact ? 4 : 6)
+        .background(.black.opacity(0.36), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: this column mirrors the screenshot's camera function stack between the preview and page tabs; do not merge with pageCamera/pageMedia/pageChat/pageSettings.
     }
 
     private func leftMonitorRail(compact: Bool) -> some View {
-        VStack(spacing: compact ? 7 : 9) {
+        VStack(spacing: compact ? 5 : 7) {
             monitorIconButton(asset: "FalseColor", color: BlackmagicCamStyle.amber, scroller: .falseColor, compact: compact)
             monitorIconButton(asset: "FocusAssist", color: BlackmagicCamStyle.cyan, scroller: .focusAssist, compact: compact)
             monitorIconButton(asset: "Guides", color: .white.opacity(0.82), scroller: .guides, compact: compact)
@@ -289,12 +319,11 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(.vertical, compact ? 7 : 10)
-        .padding(.horizontal, compact ? 4 : 6)
-        .background(.black.opacity(0.50), in: RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
-        .shadow(color: .black.opacity(0.38), radius: 18, x: 0, y: 10)
-        // Firmware/update note: icon-only monitor rail maps HUDLeadingIndicators plus FocusAssistScroller/FramingGuidesScroller/SafeAreaScroller/ZebraScroller/LutScroller; update asset names from asset_ui_names_unique.txt for new IPA versions.
+        .padding(.vertical, compact ? 4 : 6)
+        .padding(.horizontal, compact ? 2 : 3)
+        .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous).stroke(.white.opacity(0.06), lineWidth: 1))
+        // Firmware/update note: icon-only left monitor rail maps HUDLeadingIndicators plus FocusAssistScroller/FramingGuidesScroller/SafeAreaScroller/ZebraScroller/LutScroller; 3.2.00 screenshots keep it very narrow and translucent.
     }
 
     private func monitorIconButton(asset: String, color: Color, scroller: BlackmagicHUDScroller, compact: Bool) -> some View {
@@ -307,41 +336,36 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func monitorIconShell(asset: String, color: Color, active: Bool, compact: Bool) -> some View {
-        BMDAssetIcon(name: asset, active: active, color: active ? .white : color, size: compact ? 17 : 20)
-            .frame(width: compact ? 38 : 48, height: compact ? 38 : 50)
-            .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.58) : .white.opacity(0.052), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.50) : .white.opacity(0.08), lineWidth: 1))
-            .contentShape(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
+        BMDAssetIcon(name: asset, active: active, color: active ? .white : color, size: compact ? 13 : 16)
+            .frame(width: compact ? 26 : 34, height: compact ? 26 : 34)
+            .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.68) : .black.opacity(0.24), in: RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.50) : .white.opacity(0.07), lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous))
     }
 
     private func bottomScopeStrip(compact: Bool) -> some View {
-        HStack(spacing: compact ? 7 : 10) {
+        HStack(alignment: .bottom, spacing: compact ? 8 : 12) {
             ForEach(0..<3, id: \.self) { index in
                 if bottomCards.indices.contains(index) {
                     BottomHUDPreviewCard(card: bottomCards[index], compact: compact)
                 }
             }
             Spacer(minLength: 8)
-            HUDAuxIndicator(title: "LUT", value: "Rec.709", color: BlackmagicCamStyle.activeBlue, compact: compact)
-            HUDAuxIndicator(title: "FOCUS", value: canFocus ? "ASSIST" : "LOCK", color: BlackmagicCamStyle.cyan, compact: compact)
-            HUDAuxIndicator(title: "CLEAN", value: cleanFeed ? "ON" : "FEED", color: cleanFeed ? BlackmagicCamStyle.okGreen : .white.opacity(0.74), compact: compact)
         }
-        .padding(.horizontal, compact ? 8 : 12)
-        .padding(.vertical, compact ? 5 : 7)
-        .background(.black.opacity(0.36), in: RoundedRectangle(cornerRadius: compact ? 13 : 16, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 13 : 16, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
-        // Firmware/update note: bottom scope strip maps HUDHistogramPopUpView, HUDAudioLevelPopUpView, StorageStatusHUD and UploadStatusHUD without app-style labeled monitor buttons.
+        .padding(.horizontal, compact ? 3 : 5)
+        .padding(.vertical, compact ? 2 : 3)
+        // Firmware/update note: bottom monitor widgets map HUDHistogramPopUpView/HUDAudioLevelPopUpView/StorageStatusHUD and are small translucent overlays, not a full-width toolbar.
     }
 
     private func bottomControls(compact: Bool) -> some View {
-        HStack(alignment: .center, spacing: compact ? 7 : 11) {
+        HStack(alignment: .center, spacing: compact ? 7 : 10) {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .center, spacing: compact ? 6 : 10) {
+                HStack(alignment: .center, spacing: compact ? 6 : 9) {
                     ForEach(bottomControlItems) { item in
                         Button {
                             withAnimation(.snappy(duration: 0.18)) { activeScroller = item.scroller }
                         } label: {
-                            BmdAdjustmentDialCell(item: item, compact: compact, active: activeScroller == item.scroller)
+                            MiniFooterReadout(item: item, compact: compact, active: activeScroller == item.scroller)
                         }
                         .buttonStyle(.plain)
                     }
@@ -349,22 +373,12 @@ struct ShootingHUDLayout<Preview: View>: View {
                 .padding(.horizontal, compact ? 2 : 4)
             }
             .frame(maxWidth: .infinity)
-
-            Divider().overlay(.white.opacity(0.14)).frame(height: compact ? 52 : 76)
-
-            Button(action: onToggleLive) { LiveToggleButton(active: isLiveActive, enabled: canToggleLive, compact: compact) }
-                .buttonStyle(.plain).disabled(!canToggleLive)
-            Button(action: onFocus) { FocusAutoButton(enabled: canFocus, compact: compact) }
-                .buttonStyle(.plain).disabled(!canFocus)
-            Button(action: onCapture) { RecordButtonView(active: isCaptureActive, enabled: canCapture, compact: compact) }
-                .buttonStyle(.plain).disabled(!canCapture)
         }
-        .padding(.horizontal, compact ? 8 : 12)
-        .padding(.vertical, compact ? 7 : 10)
-        .background(.black.opacity(0.78), in: RoundedRectangle(cornerRadius: compact ? 14 : 18, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 14 : 18, style: .continuous).stroke(.white.opacity(0.14), lineWidth: 1))
-        .shadow(color: .black.opacity(0.45), radius: 20, x: 0, y: 10)
-        // Firmware/update note: footer split maps L/PHUD footer elements plus persistent RecordButton; keep record/live/focus fixed while control dials scroll.
+        .padding(.horizontal, compact ? 4 : 6)
+        .padding(.vertical, compact ? 3 : 4)
+        .background(.black.opacity(0.18), in: RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous).stroke(.white.opacity(0.05), lineWidth: 1))
+        // Firmware/update note: screenshot evidence shows capture/AF controls in the right function rail; footer remains a minimal value strip for LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT.
     }
 
     private var bottomControlItems: [BottomControlItem] {
@@ -416,11 +430,14 @@ private struct BlackmagicHUDMetrics {
     let size: CGSize
     var isLandscape: Bool { size.width >= size.height }
     var compact: Bool { size.width < 980 || size.height < 620 }
-    var safePad: CGFloat { compact ? 8 : 14 }
-    var pageTabWidth: CGFloat { compact ? 52 : 64 }
-    var footerHeight: CGFloat { compact ? 74 : 96 }
-    var footerBottomPadding: CGFloat { compact ? 8 : 14 }
-    // Firmware/update note: values are reverse-derived approximations of MainViewLayoutData pageTabWidth/footerHeight/navMenuEdgePadding; refresh from IPA symbols when Blackmagic changes layout data.
+    var safePad: CGFloat { compact ? 6 : 10 }
+    var pageTabWidth: CGFloat { compact ? 82 : 110 }
+    var footerHeight: CGFloat { compact ? 48 : 60 }
+    var footerBottomPadding: CGFloat { compact ? 6 : 10 }
+    var leftHudWidth: CGFloat { compact ? 26 : 34 }
+    var rightControlRailWidth: CGFloat { compact ? 34 : 44 }
+    var rightPageRailWidth: CGFloat { compact ? 44 : 58 }
+    // Firmware/update note: values are reverse-derived from 3.2.00 MainViewLayoutData plus App Store 3.x landscape screenshots: compact top readouts, narrow left HUD strip, icon rail + page rail on the right, and no card-like bottom footer.
 }
 
 struct ShootingHUDTopItem: Identifiable, Equatable {
@@ -613,6 +630,74 @@ private struct HUDAuxIndicator: View {
         .padding(.horizontal, compact ? 7 : 9).padding(.vertical, compact ? 6 : 8)
         .background(.black.opacity(0.44), in: RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
+    }
+}
+
+private struct CameraTopReadout: View {
+    let item: BottomControlItem
+    let compact: Bool
+    let active: Bool
+
+    var body: some View {
+        VStack(alignment: .center, spacing: compact ? 1 : 2) {
+            Text(item.title)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 4.8 : 6, weight: .heavy))
+                .tracking(0.35)
+                .foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.58))
+            Text(item.value)
+                .font(BlackmagicCamStyle.readoutFont(size: compact ? 7.2 : 9.5, weight: .heavy))
+                .foregroundStyle(.white.opacity(active ? 1.0 : 0.86))
+                .lineLimit(1)
+                .minimumScaleFactor(0.45)
+        }
+        .frame(minWidth: compact ? 24 : 34)
+        .padding(.horizontal, compact ? 1 : 2)
+        .padding(.vertical, compact ? 1 : 2)
+        .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.42) : .clear, in: RoundedRectangle(cornerRadius: compact ? 3 : 4, style: .continuous))
+        // Firmware/update note: copied from 3.2.00 landscape screenshots where camera readouts are top-aligned tiny text: LENS 77mm, FPS 30, SHUTTER 1/120, IRIS f8.0, ISO 800, WB 5600K, TINT -10.
+    }
+}
+
+private struct TopHudGlyph: View {
+    let asset: String
+    let text: String
+    let color: Color
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 2 : 3) {
+            BMDAssetIcon(name: asset, active: true, color: color, size: compact ? 8 : 10)
+            Text(text)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 7, weight: .heavy))
+                .foregroundStyle(.white.opacity(0.68))
+        }
+    }
+}
+
+private struct MiniFooterReadout: View {
+    let item: BottomControlItem
+    let compact: Bool
+    let active: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 4 : 6) {
+            BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.60), size: compact ? 9 : 11)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(item.title)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5.5 : 7, weight: .heavy))
+                    .tracking(0.5)
+                    .foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.50))
+                Text(item.value)
+                    .font(BlackmagicCamStyle.readoutFont(size: compact ? 8.5 : 11, weight: .heavy))
+                    .foregroundStyle(.white.opacity(0.90))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+        }
+        .padding(.horizontal, compact ? 5 : 7)
+        .padding(.vertical, compact ? 3 : 4)
+        .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.32) : .black.opacity(0.22), in: RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 6 : 8, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.35) : .white.opacity(0.06), lineWidth: 1))
     }
 }
 

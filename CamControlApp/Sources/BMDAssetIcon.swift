@@ -94,6 +94,12 @@ private enum BMDAssetImageLoader {
         case "IconTimelapse_active": return ["Apple Watch/IconTimelapse_active", "icon_timelapse_active"]
         case "Chat", "Chat_active": return ["Cloud", "BmdCloudSidebar"]
         case "Lens", "Lens_active": return ["Camera", "Camera_active"]
+        case "Zoom", "Zoom_active": return ["Hdmi4kPlay", "HdmiPlay", "FocusAutoZoom", "ExposureAutoZoom"]
+        case "HdmiHistogramRgb": return ["Hdmi4kHistogramRgb", "HDMI_4K_histogram_rgb"]
+        case "HdmiPlay", "HdmiPlay_active": return ["Hdmi4kPlay", "Hdmi4kPlay_active", "HDMI_4K_play"]
+        case "HdmiRecord", "HdmiRecord_active": return ["Hdmi4kRecord", "Hdmi4kRecord_active", "HDMI_4K_record"]
+        case "StorageIphone": return ["Hdmi4kStorageIphone", "HDMI_4K_storage_iPhone"]
+        case "StorageDrive": return ["Hdmi4kStorageDrive", "HDMI_4K_storage_drive"]
         default: return []
         }
         // Firmware/update note: aliases are reverse-derived from assetutil rendition names in CameraAppToolbox.framework/Assets.car; rerun the asset reverse workflow before changing them for a new IPA.
