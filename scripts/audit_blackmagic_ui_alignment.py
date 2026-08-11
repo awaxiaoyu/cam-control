@@ -1,4 +1,5 @@
 ﻿import json
+import plistlib
 import re
 import sys
 from pathlib import Path
@@ -7,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / 'CamControlApp' / 'Sources'
 DOC_SPEC = ROOT / 'docs' / 'blackmagic-cam-3.2.00-complete-ui-spec.md'
 DOC_FACTS = ROOT / 'docs' / 'blackmagic-cam-3.2.00-complete-ui-facts.json'
+ASSET_DIMENSIONS = ROOT / 'docs' / 'blackmagic-cam-3.2.00-asset-dimensions.tsv'
 ARTIFACT_FACTS = ROOT / 'artifacts' / 'blackmagic_complete_ui_3_2_00' / 'complete_ui_facts.json'
 SPEC_JSON = DOC_FACTS if DOC_FACTS.exists() else ARTIFACT_FACTS
 
@@ -18,6 +20,8 @@ REQUIRED_SOURCE_PATTERNS = {
     'root_page_rail': (SRC / 'ShootingHUDComponents.swift', r'BlackmagicRootPageRail\(selection:'),
     'dial_scroller_options': (SRC / 'ShootingHUDComponents.swift', r'ScrollerOptionDial\('),
     'asset_aliases': (SRC / 'BMDAssetIcon.swift', r'Apple Watch/IconAf'),
+    'false_color_original_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetImage\(name: "FalseColorLegend".*preserveOriginalColors: true'),
+    'bmd_cloud_logo_asset': (SRC / 'CloudChatPanel.swift', r'BMDAssetImage\(name: "BmdCloudLogo".*preserveOriginalColors: true'),
     'chat_cloud_asset': (SRC / 'ShootingHUDComponents.swift', r'case \.chat: return "Cloud"'),
     'complete_reverse_script': (ROOT / 'scripts' / 'reverse_blackmagic_complete_ui.py', r'UI_BUCKETS'),
 }
@@ -44,7 +48,31 @@ def check_spec():
     assert len(facts.get('settings_rows_sample', [])) >= 100, len(facts.get('settings_rows_sample', []))
     assert len(facts.get('appintents', [])) >= 15, len(facts.get('appintents', []))
     assert DOC_SPEC.exists(), f'missing doc spec: {DOC_SPEC}'
+    assert ASSET_DIMENSIONS.exists(), f'missing asset dimension evidence: {ASSET_DIMENSIONS}'
+    dims = read(ASSET_DIMENSIONS)
+    assert 'FalseColorLegend' in dims and '	150	603	' in dims, 'FalseColorLegend dimensions missing from assetutil evidence'
+    assert 'BmdCloudLogo' in dims and '	853	276	' in dims, 'BmdCloudLogo dimensions missing from assetutil evidence'
 
+
+
+def check_info_plist_parity():
+    info_path = ROOT / 'CamControlApp' / 'Resources' / 'Info.plist'
+    info = plistlib.loads(info_path.read_bytes())
+    assert info.get('CFBundleDisplayName') == 'Blackmagic Cam', info.get('CFBundleDisplayName')
+    assert info.get('CFBundleName') == 'BlackmagicCam', info.get('CFBundleName')
+    assert info.get('CFBundleShortVersionString') == '3.2.00', info.get('CFBundleShortVersionString')
+    assert info.get('CFBundleVersion') == '3.2.000045', info.get('CFBundleVersion')
+    assert info.get('LSApplicationCategoryType') == 'public.app-category.video', info.get('LSApplicationCategoryType')
+    assert info.get('UIStatusBarHidden') is False, info.get('UIStatusBarHidden')
+    assert info.get('UIViewControllerBasedStatusBarAppearance') is True, info.get('UIViewControllerBasedStatusBarAppearance')
+    assert info.get('UIRequiresFullScreen') is True, info.get('UIRequiresFullScreen')
+    assert info.get('UIFileSharingEnabled') is True, info.get('UIFileSharingEnabled')
+    assert info.get('LSSupportsOpeningDocumentsInPlace') is True, info.get('LSSupportsOpeningDocumentsInPlace')
+    assert info.get('NSCameraUsageDescription') == 'Access is required to preview and capture video.', info.get('NSCameraUsageDescription')
+    assert info.get('NSMicrophoneUsageDescription') == 'Access is required to monitor audio levels and record.', info.get('NSMicrophoneUsageDescription')
+    assert info.get('NSPhotoLibraryUsageDescription') == 'Access is required to save videos to the Photo Library.', info.get('NSPhotoLibraryUsageDescription')
+    assert info.get('NSBluetoothAlwaysUsageDescription') == 'Bluetooth access is required to support peripherals.', info.get('NSBluetoothAlwaysUsageDescription')
+    # Firmware/update note: these keys mirror F:\Blackmagic Cam_3.2.00.ipa Info.plist; rerun reverse_blackmagic_complete_ui.py before changing launch/status-bar behavior or permission UI text.
 
 def check_source_patterns():
     for name, (path, pattern) in REQUIRED_SOURCE_PATTERNS.items():
@@ -80,8 +108,8 @@ def check_hud_labels():
 def check_asset_coverage():
     facts = json.loads(read(SPEC_JSON))
     assets = set(facts.get('asset_names', []))
-    source = ''.join(read(p) for p in [SRC/'BlackmagicReverseSpec.swift', SRC/'BMDAssetIcon.swift', SRC/'ShootingHUDComponents.swift', SRC/'BlackmagicRootPageRail.swift'])
-    names = set(re.findall(r'BMDAssetIcon\(name:\s*"([^"]+)"', source))
+    source = ''.join(read(path) for path in SRC.glob('*.swift'))
+    names = set(re.findall(r'BMDAsset(?:Icon|Image)\(name:\s*"([^"]+)"', source))
     names.update(re.findall(r'asset:\s*"([^"]+)"', source))
     names.update(re.findall(r'monitorIcon(?:Shell|Button)\(asset:\s*"([^"]+)"', source))
     aliases = {
@@ -98,7 +126,7 @@ def check_asset_coverage():
 
 
 def main():
-    checks = [check_spec, check_source_patterns, check_hud_labels, check_asset_coverage]
+    checks = [check_spec, check_info_plist_parity, check_source_patterns, check_hud_labels, check_asset_coverage]
     for check in checks:
         check()
     print('blackmagic-ui-alignment: PASS')

@@ -10,11 +10,12 @@ struct BMDAssetIcon: View {
     var fallback: String? = nil
     var color: Color = .white
     var size: CGFloat = 20
+    var preserveOriginalColors = false
 
     var body: some View {
         if let image = loadedImage {
             Image(uiImage: image)
-                .renderingMode(.template)
+                .renderingMode(preserveOriginalColors ? .original : .template)
                 .resizable()
                 .scaledToFit()
                 .foregroundStyle(color)
@@ -28,13 +29,43 @@ struct BMDAssetIcon: View {
     }
 
     private var loadedImage: UIImage? {
+        BMDAssetImageLoader.image(name: name, activeName: activeName, active: active)
+    }
+}
+
+struct BMDAssetImage: View {
+    let name: String
+    var activeName: String?
+    var active = false
+    var fallback: String? = nil
+    var color: Color = .white
+    var preserveOriginalColors = false
+
+    var body: some View {
+        if let image = BMDAssetImageLoader.image(name: name, activeName: activeName, active: active) {
+            Image(uiImage: image)
+                .renderingMode(preserveOriginalColors ? .original : .template)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(color)
+        } else {
+            Image(systemName: fallback ?? BlackmagicReverseSpec.assetFallbackSystemImages[name] ?? "circle")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(color)
+        }
+        // Firmware/update note: use this flexible image for non-square recovered assets such as FalseColorLegend and BmdCloudLogo; keep BMDAssetIcon for 96x96/132x132 icon slots.
+    }
+}
+
+private enum BMDAssetImageLoader {
+    static func image(name: String, activeName: String? = nil, active: Bool = false) -> UIImage? {
         let preferredName = active ? (activeName ?? "\(name)_active") : name
         var names: [String] = []
         for assetName in ([preferredName, name] + aliases(for: preferredName) + aliases(for: name)) where !assetName.isEmpty && !names.contains(assetName) {
             names.append(assetName)
         }
-        let bundles = BMDAssetBundleStore.imageBundles
-        for bundle in bundles {
+        for bundle in BMDAssetBundleStore.imageBundles {
             for assetName in names {
                 if let image = UIImage(named: assetName, in: bundle, compatibleWith: nil) {
                     return image
@@ -49,7 +80,7 @@ struct BMDAssetIcon: View {
         return nil
     }
 
-    private func aliases(for assetName: String) -> [String] {
+    private static func aliases(for assetName: String) -> [String] {
         switch assetName {
         case "IconAf": return ["Apple Watch/IconAf", "icon_AF"]
         case "IconAf_active": return ["Apple Watch/IconAf_active", "icon_AF_active"]

@@ -1,0 +1,467 @@
+car	name	rendition	idiom	scale	width	height	subtype
+CamControlApp/Resources/Assets.car	AppIconLarge	app_icon_large@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	AppIconSmall	app_icon_small@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	Apple Watch/Battery	battery@3x.png	universal	3	81	48	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAe	icon_AE@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAe_active	icon_AE_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAf	icon_AF@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAf_active	icon_AF_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAuto	icon_Auto@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAuto_active	icon_Auto_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAwb	icon_AWB@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconAwb_active	icon_AWB_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconLight	icon_light@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconLight_active	icon_light_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconLock	icon_lock@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconLock_active	icon_lock_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconLut	icon_LUT@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconLut_active	icon_LUT_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconStream	icon_stream@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconStream_active	icon_stream_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconTimelapse	icon_timelapse@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/IconTimelapse_active	icon_timelapse_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Apple Watch/Lut	LUT@3x.png	universal	3	69	48	
+CamControlApp/Resources/Assets.car	Apple Watch/Record	record@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/Record_active	record_active@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/Record_active_disabled	record_active_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/Record_disabled	record_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordOffSpeed	record_off_speed@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordOffSpeed_active	record_off_speed_active@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordOffSpeed_active_disabled	record_off_speed_active_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordOffSpeed_disabled	record_off_speed_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordTimelapse	record_timelapse@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordTimelapse_active	record_timelapse_active@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordTimelapse_disabled	record_timelapse_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	Apple Watch/RecordTimelapseActive _disabled	record_timelapse_active _disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/Assets.car	BatteryIndicator	battery_indicator@3x.png	universal	3	66	42	
+CamControlApp/Resources/Assets.car	BatteryIndicatorWarning	battery_indicator_warning@3x.png	universal	3	66	42	
+CamControlApp/Resources/Assets.car	BmdCloudLogo	bmd_cloud_logo@3x.png	universal	3	853	276	
+CamControlApp/Resources/Assets.car	BmdCloudSidebar	bmd_cloud_sidebar@3x.png	universal	3	720	642	
+CamControlApp/Resources/Assets.car	Camera	camera@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Camera_active	camera_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	CameraConnected	camera_connected@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	CameraIdentify	camera_identify@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	CameraLight	camera_light@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	CameraLinked	camera_linked@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	CameraLinkedSlate	camera_linked_slate@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	CameraLinkedSmall	camera_linked_small@3x.png	universal	3	36	36	
+CamControlApp/Resources/Assets.car	Cloud	cloud@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	ControlIcon	control_icon@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	ControlIconNotConnected	control_icon_not_connected@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	FalseColor	false_color@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	FalseColorLegend	false_color_legend@3x.png	universal	3	150	603	
+CamControlApp/Resources/Assets.car	Focus	focus@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	Focus1	focus_1@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Focus1_active	focus_1_active@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Focus2	focus_2@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Focus2_active	focus_2_active@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Focus3	focus_3@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Focus3_active	focus_3_active@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Focus_active	focus_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	FocusAfc	focus_afc@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	FocusAfs	focus_afs@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	FocusAssist	focus_assist@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	FocusAutoZoom	focus_auto_zoom@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	FocusAutoZoom_active	focus_auto_zoom_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	FocusDelete	focus_delete@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FocusDelete_disabled	focus_delete_disabled@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FocusDirection1	focus_direction_1@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FocusDirection2	focus_direction_2@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FocusFace	focus_face@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	FocusLockZoom	focus_lock_zoom@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	FocusLockZoom_active	focus_lock_zoom_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	FocusMarker1	focus_marker_1@3x.png	universal	3	60	69	
+CamControlApp/Resources/Assets.car	FocusMarker2	focus_marker_2@3x.png	universal	3	60	69	
+CamControlApp/Resources/Assets.car	FocusMarker3	focus_marker_3@3x.png	universal	3	60	69	
+CamControlApp/Resources/Assets.car	FocusObject	focus_object@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	FocusPause	focus_pause@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FocusPlay	focus_play@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FocusPlay_disabled	focus_play_disabled@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FocusReset	focus_reset@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FollowFocus	follow_focus@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	FollowFocus_disabled	follow_focus_disabled@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Guides	guides@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Hdmi4kAuto	HDMI_4K_auto@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Hdmi4kBatteryVoltage	HDMI_4K_battery_voltage@3x.png	universal	3	420	228	
+CamControlApp/Resources/Assets.car	Hdmi4kDropFrame	HDMI_4K_drop_frame@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kFalseColorLegend	HDMI_4K_false_color_legend@3x.png	universal	3	630	2802	
+CamControlApp/Resources/Assets.car	Hdmi4kHistogramRgb	HDMI_4K_histogram_rgb@3x.png	universal	3	2244	462	
+CamControlApp/Resources/Assets.car	Hdmi4kLock	HDMI_4K_lock@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	Hdmi4kLut	HDMI_4K_LUT@3x.png	universal	3	252	192	
+CamControlApp/Resources/Assets.car	Hdmi4kLutBlue	HDMI_4K_LUT_blue@3x.png	universal	3	252	192	
+CamControlApp/Resources/Assets.car	Hdmi4kLutRecord	HDMI_4K_LUT_record@3x.png	universal	3	252	192	
+CamControlApp/Resources/Assets.car	Hdmi4kNdClear	HDMI_4K_nd_clear@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdFrac1	HDMI_4K_nd_frac_1@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdFrac2	HDMI_4K_nd_frac_2@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdFrac3	HDMI_4K_nd_frac_3@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdFrac4	HDMI_4K_nd_frac_4@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdNo1	HDMI_4K_nd_no_1@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdNo2	HDMI_4K_nd_no_2@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdNo3	HDMI_4K_nd_no_3@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdNo4	HDMI_4K_nd_no_4@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdStop1	HDMI_4K_nd_stop_1@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdStop2	HDMI_4K_nd_stop_2@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdStop3	HDMI_4K_nd_stop_3@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kNdStop4	HDMI_4K_nd_stop_4@3x.png	universal	3	384	300	
+CamControlApp/Resources/Assets.car	Hdmi4kPlay	HDMI_4K_play@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kPlay_active	HDMI_4K_play_active@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kRecord	HDMI_4K_record@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kRecord_active	HDMI_4K_record_active@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kRecord_disabled	HDMI_4K_record_disabled@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kStorageDrive	HDMI_4K_storage_drive@3x.png	universal	3	372	372	
+CamControlApp/Resources/Assets.car	Hdmi4kStorageIphone	HDMI_4K_storage_iphone@3x.png	universal	3	372	372	
+CamControlApp/Resources/Assets.car	Hdmi4kTimelapseRecord	HDMI_4K_timelapse_record@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kTimelapseRecord_active	HDMI_4K_timelapse_record_active@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	Hdmi4kTimelapseRecord_disabled	HDMI_4K_timelapse_record_disabled@3x.png	universal	3	384	384	
+CamControlApp/Resources/Assets.car	HdmiAuto	HDMI_auto@3x.png	universal	3	60	60	
+CamControlApp/Resources/Assets.car	HdmiBatteryVoltage	HDMI_battery_voltage@3x.png	universal	3	210	114	
+CamControlApp/Resources/Assets.car	HdmiDropFrame	HDMI_drop_frame@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiFalseColorLegend	HDMI_false_color_legend@3x.png	universal	3	315	1401	
+CamControlApp/Resources/Assets.car	HdmiHistogramRgb	HDMI_histogram_rgb@3x.png	universal	3	1122	231	
+CamControlApp/Resources/Assets.car	HdmiLock	HDMI_lock@3x.png	universal	3	60	60	
+CamControlApp/Resources/Assets.car	HdmiLut	HDMI_LUT@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	HdmiLutBlue	HDMI_LUT_blue@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	HdmiLutRecord	HDMI_LUT_record@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	HdmiNdClear	HDMI_nd_clear@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdFrac1	HDMI_nd_frac_1@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdFrac2	HDMI_nd_frac_2@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdFrac3	HDMI_nd_frac_3@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdFrac4	HDMI_nd_frac_4@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdNo1	HDMI_nd_no_1@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdNo2	HDMI_nd_no_2@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdNo3	HDMI_nd_no_3@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdNo4	HDMI_nd_no_4@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdStop1	HDMI_nd_stop_1@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdStop2	HDMI_nd_stop_2@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdStop3	HDMI_nd_stop_3@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiNdStop4	HDMI_nd_stop_4@3x.png	universal	3	192	150	
+CamControlApp/Resources/Assets.car	HdmiPlay	HDMI_play@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiPlay_active	HDMI_play_active@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiRecord	HDMI_record@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiRecord_active	HDMI_record_active@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiRecord_disabled	HDMI_record_disabled@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiStorageDrive	HDMI_storage_drive@3x.png	universal	3	186	186	
+CamControlApp/Resources/Assets.car	HdmiStorageIphone	HDMI_storage_iphone@3x.png	universal	3	186	186	
+CamControlApp/Resources/Assets.car	HdmiTimelapseRecord	HDMI_timelapse_record@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiTimelapseRecord_active	HDMI_timelapse_record_active@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	HdmiTimelapseRecord_disabled	HDMI_timelapse_record_disabled@3x.png	universal	3	192	192	
+CamControlApp/Resources/Assets.car	LinkCameras	link_cameras@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	LinkCameras_disabled	link_cameras_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Lut	LUT@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	Lut_active	LUT_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	LutDisplay	LUT_display@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	LutRecord	LUT_record@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	LutRecordToClip	LUT_record_to_clip@3x.png	universal	3	120	120	
+CamControlApp/Resources/Assets.car	LutSelector	LUT_selector@3x.png	universal	3	144	108	
+CamControlApp/Resources/Assets.car	LutSelector_active	LUT_selector_active@3x.png	universal	3	144	108	
+CamControlApp/Resources/Assets.car	LutSelector_disabled	LUT_selector_disabled@3x.png	universal	3	144	108	
+CamControlApp/Resources/Assets.car	LutSidecar	LUT_sidecar@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Media	media@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Media_active	media_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Media_disabled	media_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	MediaSync	media_sync@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	MediaSync_active	media_sync_active@3x.png	universal	3	96	97	
+CamControlApp/Resources/Assets.car	MediaSync_disabled	media_sync_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	NoCamerasAvailable	no_cameras_available@3x.png	universal	3	270	354	
+CamControlApp/Resources/Assets.car	ProjectRecording	project_recording@3x.png	universal	3	72	72	
+CamControlApp/Resources/Assets.car	ProjectUpload	project_upload@3x.png	universal	3	39	39	
+CamControlApp/Resources/Assets.car	ProjectUploadFailed	project_upload_failed@3x.png	universal	3	39	39	
+CamControlApp/Resources/Assets.car	ProjectUploadNoConnection	project_upload_no_connection@3x.png	universal	3	39	39	
+CamControlApp/Resources/Assets.car	ReceivingIcon	receiving_icon@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	ReceivingIcon_disabled	receiving_icon_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Record	record@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	Record_active	record_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	Record_active_disabled	record_active_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	Record_disabled	record_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordOffSpeed	record_off_speed@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordOffSpeed_active	record_off_speed_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordOffSpeed_active_disabled	record_off_speed_active_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordOffSpeed_disabled	record_off_speed_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordSync	record_sync@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordSync_active	record_sync_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordSync_active_disabled	record_sync_active_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordSync_disabled	record_sync_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordSyncToggle	record_sync_toggle@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	RecordSyncToggle_disabled	record_sync_toggle_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	RecordTimelapse	record_timelapse@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordTimelapse_active	record_timelapse_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordTimelapse_disabled	record_timelapse_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordTimelapseActive _disabled	record_timelapse_active _disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/Assets.car	RecordTimelapseZoom	record_timelapse_zoom@3x.png	universal	3	144	144	
+CamControlApp/Resources/Assets.car	RecordTimelapseZoom_active	record_timelapse_zoom_active@3x.png	universal	3	144	144	
+CamControlApp/Resources/Assets.car	RecordZoom	record_zoom@3x.png	universal	3	144	144	
+CamControlApp/Resources/Assets.car	RecordZoom_active	record_zoom_active@3x.png	universal	3	144	144	
+CamControlApp/Resources/Assets.car	RemoteCameraLeftArrow	remote_camera_left_arrow@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	RemoteCameraLeftArrow_disabled	remote_camera_left_arrow_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	RemoteCameraRightArrow	remote_camera_right_arrow@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	RemoteCameraRightArrow_disabled	remote_camera_right_arrow_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Slate	slate@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Slate_active	slate_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/Assets.car	SlateClose	slate_close@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	SlateClosePush	slate_close_push@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	SortUploadStatus	sort_upload_status@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	StorageDrive	storage_drive@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	StorageIphone	storage_iphone@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Sync	sync@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Sync_active	sync_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	SyncFooter	sync_footer@3x.png	universal	3	30	30	
+CamControlApp/Resources/Assets.car	SyncingAndRecording	syncing_and_recording@3x.png	universal	3	78	78	
+CamControlApp/Resources/Assets.car	SyncNoConnection	sync_no_connection@3x.png	universal	3	39	39	
+CamControlApp/Resources/Assets.car	SyncSidebar	sync_sidebar@3x.png	universal	3	39	39	
+CamControlApp/Resources/Assets.car	SyncSidebarCompleted	sync_sidebar_complete@3x.png	universal	3	39	39	
+CamControlApp/Resources/Assets.car	SyncThumbnail	sync_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/Assets.car	UploadedHQOnly	uploaded_HQ_only@3x.png	universal	3	165	78	
+CamControlApp/Resources/Assets.car	UploadedToCloud	uploaded_to_cloud@3x.png	universal	3	78	78	
+CamControlApp/Resources/Assets.car	UploadedToCloudHq	uploaded_to_cloud_hq@3x.png	universal	3	165	78	
+CamControlApp/Resources/Assets.car	UploadedToCloudPxy	uploaded_to_cloud_pxy@3x.png	universal	3	165	78	
+CamControlApp/Resources/Assets.car	Uploading	uploading@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	UploadingDone	uploading_done@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	UploadingDoneSmall	uploading_done_small@3x.png	universal	3	45	45	
+CamControlApp/Resources/Assets.car	UploadingFailedThumbnail	uploading_failed_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/Assets.car	UploadingPause	uploading_pause@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	UploadingPause_disabled	uploading_pause_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	UploadingPauseSmall	uploading_pause_small@3x.png	universal	3	45	45	
+CamControlApp/Resources/Assets.car	UploadingPauseThumbnail	uploading_pause_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/Assets.car	UploadingSmall	uploading_small@3x.png	universal	3	45	45	
+CamControlApp/Resources/Assets.car	UploadingThumbnail	uploading_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/Assets.car	UploadToCloud	upload_to_cloud@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	UploadToCloud_active	upload_to_cloud_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	UploadToCloud_disabled	upload_to_cloud_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	WbCloudy	wb_cloudy@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	WbCloudy_active	wb_cloudy_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/Assets.car	Whats New/Lut	lut@3x.png	phone	3	180	180	
+CamControlApp/Resources/Assets.car	Whats New/RemoteSync	remote_sync@3x.png	phone	3	180	180	
+CamControlApp/Resources/Assets.car	Zebra	zebra@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	AppIconLarge	app_icon_large@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	AppIconSmall	app_icon_small@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/Battery	battery@3x.png	universal	3	81	48	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAe	icon_AE@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAe_active	icon_AE_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAf	icon_AF@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAf_active	icon_AF_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAuto	icon_Auto@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAuto_active	icon_Auto_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAwb	icon_AWB@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconAwb_active	icon_AWB_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconLight	icon_light@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconLight_active	icon_light_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconLock	icon_lock@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconLock_active	icon_lock_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconLut	icon_LUT@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconLut_active	icon_LUT_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconStream	icon_stream@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconStream_active	icon_stream_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconTimelapse	icon_timelapse@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/IconTimelapse_active	icon_timelapse_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/Lut	LUT@3x.png	universal	3	69	48	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/Record	record@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/Record_active	record_active@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/Record_active_disabled	record_active_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/Record_disabled	record_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordOffSpeed	record_off_speed@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordOffSpeed_active	record_off_speed_active@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordOffSpeed_active_disabled	record_off_speed_active_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordOffSpeed_disabled	record_off_speed_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordTimelapse	record_timelapse@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordTimelapse_active	record_timelapse_active@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordTimelapse_disabled	record_timelapse_disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Apple Watch/RecordTimelapseActive _disabled	record_timelapse_active _disabled@3x.png	universal	3	132	132	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	BatteryIndicator	battery_indicator@3x.png	universal	3	66	42	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	BatteryIndicatorWarning	battery_indicator_warning@3x.png	universal	3	66	42	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	BmdCloudLogo	bmd_cloud_logo@3x.png	universal	3	853	276	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	BmdCloudSidebar	bmd_cloud_sidebar@3x.png	universal	3	720	642	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Camera	camera@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Camera_active	camera_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	CameraConnected	camera_connected@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	CameraIdentify	camera_identify@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	CameraLight	camera_light@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	CameraLinked	camera_linked@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	CameraLinkedSlate	camera_linked_slate@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	CameraLinkedSmall	camera_linked_small@3x.png	universal	3	36	36	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Cloud	cloud@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ControlIcon	control_icon@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ControlIconNotConnected	control_icon_not_connected@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FalseColor	false_color@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FalseColorLegend	false_color_legend@3x.png	universal	3	150	603	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus	focus@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus1	focus_1@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus1_active	focus_1_active@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus2	focus_2@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus2_active	focus_2_active@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus3	focus_3@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus3_active	focus_3_active@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Focus_active	focus_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusAfc	focus_afc@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusAfs	focus_afs@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusAssist	focus_assist@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusAutoZoom	focus_auto_zoom@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusAutoZoom_active	focus_auto_zoom_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusDelete	focus_delete@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusDelete_disabled	focus_delete_disabled@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusDirection1	focus_direction_1@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusDirection2	focus_direction_2@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusFace	focus_face@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusLockZoom	focus_lock_zoom@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusLockZoom_active	focus_lock_zoom_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusMarker1	focus_marker_1@3x.png	universal	3	60	69	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusMarker2	focus_marker_2@3x.png	universal	3	60	69	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusMarker3	focus_marker_3@3x.png	universal	3	60	69	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusObject	focus_object@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusPause	focus_pause@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusPlay	focus_play@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusPlay_disabled	focus_play_disabled@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FocusReset	focus_reset@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FollowFocus	follow_focus@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	FollowFocus_disabled	follow_focus_disabled@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Guides	guides@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kAuto	HDMI_4K_auto@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kBatteryVoltage	HDMI_4K_battery_voltage@3x.png	universal	3	420	228	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kDropFrame	HDMI_4K_drop_frame@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kFalseColorLegend	HDMI_4K_false_color_legend@3x.png	universal	3	630	2802	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kHistogramRgb	HDMI_4K_histogram_rgb@3x.png	universal	3	2244	462	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kLock	HDMI_4K_lock@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kLut	HDMI_4K_LUT@3x.png	universal	3	252	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kLutBlue	HDMI_4K_LUT_blue@3x.png	universal	3	252	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kLutRecord	HDMI_4K_LUT_record@3x.png	universal	3	252	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdClear	HDMI_4K_nd_clear@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdFrac1	HDMI_4K_nd_frac_1@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdFrac2	HDMI_4K_nd_frac_2@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdFrac3	HDMI_4K_nd_frac_3@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdFrac4	HDMI_4K_nd_frac_4@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdNo1	HDMI_4K_nd_no_1@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdNo2	HDMI_4K_nd_no_2@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdNo3	HDMI_4K_nd_no_3@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdNo4	HDMI_4K_nd_no_4@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdStop1	HDMI_4K_nd_stop_1@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdStop2	HDMI_4K_nd_stop_2@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdStop3	HDMI_4K_nd_stop_3@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kNdStop4	HDMI_4K_nd_stop_4@3x.png	universal	3	384	300	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kPlay	HDMI_4K_play@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kPlay_active	HDMI_4K_play_active@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kRecord	HDMI_4K_record@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kRecord_active	HDMI_4K_record_active@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kRecord_disabled	HDMI_4K_record_disabled@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kStorageDrive	HDMI_4K_storage_drive@3x.png	universal	3	372	372	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kStorageIphone	HDMI_4K_storage_iphone@3x.png	universal	3	372	372	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kTimelapseRecord	HDMI_4K_timelapse_record@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kTimelapseRecord_active	HDMI_4K_timelapse_record_active@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Hdmi4kTimelapseRecord_disabled	HDMI_4K_timelapse_record_disabled@3x.png	universal	3	384	384	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiAuto	HDMI_auto@3x.png	universal	3	60	60	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiBatteryVoltage	HDMI_battery_voltage@3x.png	universal	3	210	114	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiDropFrame	HDMI_drop_frame@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiFalseColorLegend	HDMI_false_color_legend@3x.png	universal	3	315	1401	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiHistogramRgb	HDMI_histogram_rgb@3x.png	universal	3	1122	231	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiLock	HDMI_lock@3x.png	universal	3	60	60	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiLut	HDMI_LUT@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiLutBlue	HDMI_LUT_blue@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiLutRecord	HDMI_LUT_record@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdClear	HDMI_nd_clear@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdFrac1	HDMI_nd_frac_1@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdFrac2	HDMI_nd_frac_2@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdFrac3	HDMI_nd_frac_3@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdFrac4	HDMI_nd_frac_4@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdNo1	HDMI_nd_no_1@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdNo2	HDMI_nd_no_2@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdNo3	HDMI_nd_no_3@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdNo4	HDMI_nd_no_4@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdStop1	HDMI_nd_stop_1@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdStop2	HDMI_nd_stop_2@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdStop3	HDMI_nd_stop_3@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiNdStop4	HDMI_nd_stop_4@3x.png	universal	3	192	150	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiPlay	HDMI_play@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiPlay_active	HDMI_play_active@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiRecord	HDMI_record@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiRecord_active	HDMI_record_active@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiRecord_disabled	HDMI_record_disabled@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiStorageDrive	HDMI_storage_drive@3x.png	universal	3	186	186	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiStorageIphone	HDMI_storage_iphone@3x.png	universal	3	186	186	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiTimelapseRecord	HDMI_timelapse_record@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiTimelapseRecord_active	HDMI_timelapse_record_active@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	HdmiTimelapseRecord_disabled	HDMI_timelapse_record_disabled@3x.png	universal	3	192	192	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LinkCameras	link_cameras@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LinkCameras_disabled	link_cameras_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Lut	LUT@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Lut_active	LUT_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LutDisplay	LUT_display@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LutRecord	LUT_record@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LutRecordToClip	LUT_record_to_clip@3x.png	universal	3	120	120	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LutSelector	LUT_selector@3x.png	universal	3	144	108	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LutSelector_active	LUT_selector_active@3x.png	universal	3	144	108	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LutSelector_disabled	LUT_selector_disabled@3x.png	universal	3	144	108	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	LutSidecar	LUT_sidecar@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Media	media@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Media_active	media_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Media_disabled	media_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	MediaSync	media_sync@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	MediaSync_active	media_sync_active@3x.png	universal	3	96	97	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	MediaSync_disabled	media_sync_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	NoCamerasAvailable	no_cameras_available@3x.png	universal	3	270	354	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ProjectRecording	project_recording@3x.png	universal	3	72	72	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ProjectUpload	project_upload@3x.png	universal	3	39	39	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ProjectUploadFailed	project_upload_failed@3x.png	universal	3	39	39	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ProjectUploadNoConnection	project_upload_no_connection@3x.png	universal	3	39	39	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ReceivingIcon	receiving_icon@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	ReceivingIcon_disabled	receiving_icon_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Record	record@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Record_active	record_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Record_active_disabled	record_active_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Record_disabled	record_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordOffSpeed	record_off_speed@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordOffSpeed_active	record_off_speed_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordOffSpeed_active_disabled	record_off_speed_active_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordOffSpeed_disabled	record_off_speed_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordSync	record_sync@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordSync_active	record_sync_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordSync_active_disabled	record_sync_active_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordSync_disabled	record_sync_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordSyncToggle	record_sync_toggle@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordSyncToggle_disabled	record_sync_toggle_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordTimelapse	record_timelapse@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordTimelapse_active	record_timelapse_active@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordTimelapse_disabled	record_timelapse_disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordTimelapseActive _disabled	record_timelapse_active _disabled@3x.png	universal	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordTimelapseZoom	record_timelapse_zoom@3x.png	universal	3	144	144	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordTimelapseZoom_active	record_timelapse_zoom_active@3x.png	universal	3	144	144	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordZoom	record_zoom@3x.png	universal	3	144	144	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RecordZoom_active	record_zoom_active@3x.png	universal	3	144	144	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RemoteCameraLeftArrow	remote_camera_left_arrow@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RemoteCameraLeftArrow_disabled	remote_camera_left_arrow_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RemoteCameraRightArrow	remote_camera_right_arrow@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	RemoteCameraRightArrow_disabled	remote_camera_right_arrow_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Slate	slate@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Slate_active	slate_active@3x.png	universal	3	126	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SlateClose	slate_close@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SlateClosePush	slate_close_push@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SortUploadStatus	sort_upload_status@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	StorageDrive	storage_drive@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	StorageIphone	storage_iphone@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Sync	sync@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Sync_active	sync_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SyncFooter	sync_footer@3x.png	universal	3	30	30	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SyncingAndRecording	syncing_and_recording@3x.png	universal	3	78	78	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SyncNoConnection	sync_no_connection@3x.png	universal	3	39	39	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SyncSidebar	sync_sidebar@3x.png	universal	3	39	39	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SyncSidebarCompleted	sync_sidebar_complete@3x.png	universal	3	39	39	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	SyncThumbnail	sync_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadedHQOnly	uploaded_HQ_only@3x.png	universal	3	165	78	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadedToCloud	uploaded_to_cloud@3x.png	universal	3	78	78	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadedToCloudHq	uploaded_to_cloud_hq@3x.png	universal	3	165	78	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadedToCloudPxy	uploaded_to_cloud_pxy@3x.png	universal	3	165	78	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Uploading	uploading@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingDone	uploading_done@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingDoneSmall	uploading_done_small@3x.png	universal	3	45	45	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingFailedThumbnail	uploading_failed_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingPause	uploading_pause@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingPause_disabled	uploading_pause_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingPauseSmall	uploading_pause_small@3x.png	universal	3	45	45	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingPauseThumbnail	uploading_pause_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingSmall	uploading_small@3x.png	universal	3	45	45	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadingThumbnail	uploading_thumbnail@3x.png	universal	3	60	60	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadToCloud	upload_to_cloud@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadToCloud_active	upload_to_cloud_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	UploadToCloud_disabled	upload_to_cloud_disabled@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	WbCloudy	wb_cloudy@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	WbCloudy_active	wb_cloudy_active@3x.png	universal	3	96	96	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Whats New/Lut	lut@3x.png	phone	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Whats New/RemoteSync	remote_sync@3x.png	phone	3	180	180	
+CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car	Zebra	zebra@3x.png	universal	3	96	96	

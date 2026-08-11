@@ -38,17 +38,27 @@ targets:
       path: CamControlApp/Resources/Info.plist
       properties:
         CFBundleDevelopmentRegion: "$(DEVELOPMENT_LANGUAGE)"
+        CFBundleDisplayName: Blackmagic Cam
         CFBundleExecutable: "$(EXECUTABLE_NAME)"
         CFBundleIdentifier: "$(PRODUCT_BUNDLE_IDENTIFIER)"
         CFBundleInfoDictionaryVersion: "6.0"
-        CFBundleName: CamControl
+        CFBundleName: BlackmagicCam
         CFBundlePackageType: "$(PRODUCT_BUNDLE_PACKAGE_TYPE)"
-        CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "1"
-        NSCameraUsageDescription: "CamControl uses the built-in camera for phone-camera mode and tethered access to control connected Nikon and Canon cameras."
-        NSPhotoLibraryAddUsageDescription: "CamControl saves selected captured images to your photo library."
-        UIStatusBarHidden: true
-        UIViewControllerBasedStatusBarAppearance: false
+        CFBundleShortVersionString: "3.2.00"
+        CFBundleVersion: "3.2.000045"
+        NSBluetoothAlwaysUsageDescription: "Bluetooth access is required to support peripherals."
+        NSCameraUsageDescription: "Access is required to preview and capture video."
+        NSLocalNetworkUsageDescription: "Access is required to enable camera remote control."
+        NSLocationWhenInUseUsageDescription: "Location access is needed to tag the GPS location of recorded videos."
+        NSMicrophoneUsageDescription: "Access is required to monitor audio levels and record."
+        NSPhotoLibraryUsageDescription: "Access is required to save videos to the Photo Library."
+        NSPhotoLibraryAddUsageDescription: "Access is required to save videos to the Photo Library."
+        LSApplicationCategoryType: public.app-category.video
+        LSSupportsOpeningDocumentsInPlace: true
+        UIFileSharingEnabled: true
+        UIRequiresFullScreen: true
+        UIStatusBarHidden: false
+        UIViewControllerBasedStatusBarAppearance: true
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft

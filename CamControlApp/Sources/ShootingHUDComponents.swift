@@ -903,18 +903,26 @@ private struct FramingGuideLabel: View {
 
 private struct FalseColorLegend: View {
     let compact: Bool
-    private let stops: [(Color, String)] = [(.purple, "LOW"), (.blue, "18%"), (.green, "MID"), (.yellow, "SKIN"), (.red, "HIGH")]
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(Array(stops.enumerated()), id: \.offset) { _, stop in
-                VStack(spacing: 3) {
-                    Rectangle().fill(stop.0).frame(width: compact ? 24 : 34, height: compact ? 5 : 6)
-                    Text(stop.1).font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 7, weight: .heavy)).foregroundStyle(.white.opacity(0.62))
+        HStack(spacing: compact ? 6 : 8) {
+            BMDAssetImage(name: "FalseColorLegend", fallback: "circle.lefthalf.filled", preserveOriginalColors: true)
+                .frame(width: compact ? 30 : 40, height: compact ? 121 : 161)
+            VStack(alignment: .leading, spacing: compact ? 6 : 8) {
+                Text("FALSE COLOR")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
+                    .tracking(1.0)
+                    .foregroundStyle(.white.opacity(0.68))
+                ForEach(["HIGH", "SKIN", "MID", "18%", "LOW"], id: \.self) { label in
+                    Text(label)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 7, weight: .heavy))
+                        .foregroundStyle(.white.opacity(0.56))
                 }
             }
         }
-        .padding(6)
-        .background(.black.opacity(0.30), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .padding(compact ? 6 : 8)
+        .background(.black.opacity(0.30), in: RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 8 : 10, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: uses the real recovered FalseColorLegend asset (150x603 @3x) instead of a synthetic color strip; refresh asset dimensions via assetutil when IPA updates.
     }
 }
 

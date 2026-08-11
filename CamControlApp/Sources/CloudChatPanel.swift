@@ -26,17 +26,17 @@ struct CloudChatPanel: View {
 
     private func cloudSidebar(compact: Bool) -> some View {
         VStack(alignment: .leading, spacing: compact ? 8 : 10) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("BLACKMAGIC CLOUD")
+            VStack(alignment: .leading, spacing: 6) {
+                BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
+                    .frame(width: compact ? 136 : 172, height: compact ? 44 : 56)
+                Text("CHAT")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
                     .tracking(1.5)
                     .foregroundStyle(BlackmagicCamStyle.cyan)
-                Text("Project Chat")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 18 : 22, weight: .heavy))
-                    .foregroundStyle(.white)
-                Text("Project / Members / Upload")
-                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.46))
+                Text("No project selected - All Clips")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 11, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.50))
+                    .lineLimit(2)
             }
             .padding(.horizontal, compact ? 12 : 18)
             .padding(.top, compact ? 14 : 20)
@@ -61,7 +61,13 @@ struct CloudChatPanel: View {
             .padding(compact ? 12 : 18)
         }
         .background(
-            LinearGradient(colors: [.black.opacity(0.94), BlackmagicCamStyle.rail.opacity(0.94)], startPoint: .top, endPoint: .bottom)
+            ZStack(alignment: .bottomTrailing) {
+                LinearGradient(colors: [.black.opacity(0.94), BlackmagicCamStyle.rail.opacity(0.94)], startPoint: .top, endPoint: .bottom)
+                BMDAssetImage(name: "BmdCloudSidebar", fallback: "cloud.fill", preserveOriginalColors: true)
+                    .frame(width: compact ? 122 : 164, height: compact ? 110 : 148)
+                    .opacity(0.12)
+                    .padding(compact ? 12 : 18)
+            }
         )
     }
 

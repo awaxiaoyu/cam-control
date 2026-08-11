@@ -265,6 +265,15 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - `ExposureIntent`
 - `CodecIntent`
 
+
+## Assetutil Dimension Evidence
+
+Dimension source: `docs/blackmagic-cam-3.2.00-asset-dimensions.tsv` generated from `CameraAppToolbox.framework/Assets.car` via `xcrun assetutil --info`.
+
+- `FalseColorLegend` renders from the recovered original-color 150x603 asset; do not replace it with synthetic color rectangles.
+- `BmdCloudLogo` renders from the recovered original-color 853x276 asset; Chat/Cloud pages should use this asset instead of text-only branding.
+- Core page/HUD icons are 96x96 assets; record controls are 132x132 assets; battery readout is 66x42 and should not be styled as a generic SF Symbol.
+
 ## Settings Categories
 - **About**: List Option
 - **Accessories**: List Option
