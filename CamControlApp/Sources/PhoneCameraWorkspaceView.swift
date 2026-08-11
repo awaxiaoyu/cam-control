@@ -92,6 +92,7 @@ struct PhoneCameraWorkspaceView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             selectedSourceRaw = CameraSourceKind.phone.rawValue
+            camera.start()
         }
         .onDisappear {
             camera.stop()
@@ -202,14 +203,11 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
         if let lastError {
             return lastError
         }
-        if session == nil && !hasAttemptedStart {
-            return "Tap VIEW or Refresh to start phone camera."
-        }
         switch authorizationStatus {
         case .authorized:
             return isSessionRunning ? nil : "Starting phone camera..."
         case .notDetermined:
-            return hasAttemptedStart ? "Requesting camera permission..." : "Tap VIEW or Refresh to start phone camera."
+            return "Requesting camera permission..."
         case .denied, .restricted:
             return "Camera permission is disabled. Enable Camera access in Settings."
         @unknown default:
@@ -316,7 +314,7 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
             self.isSessionRunning = captureSession.isRunning
             self.lastError = nil
         }
-        // Firmware/update note: phone camera hardware is created only after user action; keep this lazy path so future iOS camera or game-version updates cannot crash the first rendered Blackmagic HUD frame.
+        // Firmware/update note: phone camera startup is allowed on appear because duplicate reverse-spec dictionary keys are now audited; if future iOS camera APIs change, keep failures inside this adapter instead of the HUD shell.
     }
 
     private func reconfigureInput(position: AVCaptureDevice.Position, commitConfiguration: Bool = true) {
