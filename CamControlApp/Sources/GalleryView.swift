@@ -25,7 +25,7 @@ struct GalleryView: View {
             PicturePreview(item: item)
                 .environmentObject(controller)
         }
-        // Firmware/update note: this shell follows recovered MediaTab, MediaView, MediaViewSidebar, MediaViewToolbar, MediaSortPanel, MediaUploadToCloudPanel and MediaClipDetails*Panel anchors; add future clip formats/status states in GalleryItem mapping, not layout chrome.
+        // Firmware/update note: this shell follows recovered MediaTab, MediaView, MediaViewSidebar, MediaViewToolbar, MediaSortPanel, MediaUploadToCloudPanel and MediaClipDetails*Panel anchors; media icons use recovered asset names, and future clip formats/status states belong in GalleryItem mapping, not layout chrome.
     }
 
     private func mediaSidebar(compact: Bool) -> some View {
@@ -377,7 +377,7 @@ private struct MediaClipDetailsPanel: View {
                         HStack {
                             Text("OPEN CLIP")
                             Spacer()
-                            Image(systemName: "play.fill")
+                            BMDAssetIcon(name: "HdmiPlay", activeName: "HdmiPlay_active", active: true, fallback: "play.fill", color: .white, size: 18)
                         }
                         .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
                         .tracking(1.1)
@@ -493,7 +493,7 @@ private struct GalleryCard: View {
                 HStack {
                     Text(ByteCountFormatter.string(fromByteCount: Int64(item.compressedSize), countStyle: .file))
                     Spacer()
-                    Image(systemName: item.cachedURL == nil ? "arrow.down.circle" : "checkmark.circle.fill")
+                    BMDAssetIcon(name: item.cachedURL == nil ? "UploadToCloud" : "UploadedToCloud", activeName: item.cachedURL == nil ? "UploadToCloud_active" : "UploadedToCloud", active: item.cachedURL != nil, fallback: item.cachedURL == nil ? "arrow.down.circle" : "checkmark.circle.fill", color: item.cachedURL == nil ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen, size: 16)
                 }
                 .font(BlackmagicCamStyle.readoutFont(size: compact ? 9 : 11, weight: .medium))
                 .foregroundStyle(item.cachedURL == nil ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
@@ -555,7 +555,10 @@ private struct PicturePreview: View {
                     Button {
                         saveToPhotos()
                     } label: {
-                        Label("SAVE", systemImage: "square.and.arrow.down")
+                        HStack(spacing: 7) {
+                            BMDAssetIcon(name: "MediaSync", activeName: "MediaSync_active", active: true, fallback: "square.and.arrow.down", color: .white, size: 14)
+                            Text("SAVE")
+                        }
                     }
                     .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
                     .tracking(1.1)

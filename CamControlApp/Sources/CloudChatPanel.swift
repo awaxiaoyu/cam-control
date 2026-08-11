@@ -21,7 +21,7 @@ struct CloudChatPanel: View {
             }
             .background(BlackmagicCamStyle.canvas)
         }
-        // Firmware/update note: CloudChatPanel mirrors reversed ChatViewSidebar, ChatViewToolbar, ChatTableView, CloudLoginView and upload strings; future protocol support should bind values without changing this hierarchy.
+        // Firmware/update note: CloudChatPanel mirrors reversed ChatViewSidebar, ChatViewToolbar, ChatTableView, CloudLoginView and upload strings; use recovered Cloud/Upload/Project assets, and future protocol support should bind values without changing this hierarchy.
     }
 
     private func cloudSidebar(compact: Bool) -> some View {
@@ -92,9 +92,9 @@ struct CloudChatPanel: View {
                     .foregroundStyle(.white)
             }
             Spacer()
-            cloudToolbarPill("Project", "All Clips", icon: "folder")
-            cloudToolbarPill("Upload", "Proxy", icon: "arrow.up.circle")
-            cloudToolbarPill("Login", "Offline", icon: "person.crop.circle")
+            cloudToolbarPill("Project", "All Clips", icon: "ProjectUpload")
+            cloudToolbarPill("Upload", "Proxy", icon: "UploadToCloud")
+            cloudToolbarPill("Login", "Offline", icon: "Cloud")
         }
         .padding(.horizontal, compact ? 14 : 22)
         .padding(.vertical, compact ? 10 : 14)
@@ -127,7 +127,7 @@ struct CloudChatPanel: View {
                     .overlay(Capsule().stroke(.white.opacity(0.10), lineWidth: 1))
                 Button {
                 } label: {
-                    Image(systemName: "paperplane.fill")
+                    BMDAssetIcon(name: "UploadToCloud", activeName: "UploadToCloud_active", active: true, fallback: "paperplane.fill", color: .white, size: 16)
                         .font(.system(size: compact ? 14 : 16, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: compact ? 40 : 46, height: compact ? 40 : 46)
@@ -174,7 +174,7 @@ struct CloudChatPanel: View {
 
     private func cloudToolbarPill(_ title: String, _ value: String, icon: String) -> some View {
         HStack(spacing: 7) {
-            Image(systemName: icon)
+            BMDAssetIcon(name: icon, active: true, fallback: BlackmagicReverseSpec.assetFallbackSystemImages[icon] ?? "cloud.fill", color: .white, size: 16)
             VStack(alignment: .leading, spacing: 1) {
                 Text(title.uppercased())
                     .font(BlackmagicCamStyle.labelFont(size: 8, weight: .heavy))

@@ -44,7 +44,7 @@ Primary mapped assets:
 - Page/control: `Camera`, `Camera_active`, `Media`, `Media_active`, `Media_disabled`, `Cloud`, `ControlIcon`, `ControlIconNotConnected`, `Slate`, `Slate_active`.
 - Record: `Record`, `Record_active`, `Record_disabled`, `RecordOffSpeed`.
 - HUD toggles: `IconAe`, `IconAf`, `IconAwb`, `IconLock`, `IconLut`, `IconStream`, `IconTimelapse` and `_active` variants.
-- Monitor/status: `BatteryIndicator`, `BatteryIndicatorWarning`, `StorageIphone`, `StorageDrive`, `FalseColor`, `FalseColorLegend`, `Focus`, `FocusAssist`, `Grids`, `Guides`, `Zebra`, `UploadToCloud`, `UploadedToCloud`.
+- Monitor/status: `BatteryIndicator`, `BatteryIndicatorWarning`, `StorageIphone`, `StorageDrive`, `FalseColor`, `FalseColorLegend`, `Focus`, `FocusAssist`, `Grids`, `Guides`, `Zebra`, `UploadToCloud`, `UploadedToCloud`, `ProjectUpload`, `MediaSync`, `Sync`.
 - HDMI/clean feed: `HdmiRecord`, `HdmiPlay`, `HdmiHistogramRgb`, `HdmiStorageIphone`, `HdmiStorageDrive`, `HdmiFalseColorLegend`, `HudStream`.
 
 `Chat` and `Settings` glyph asset names are not present in the recovered 3.2.00 asset catalog; implementation keeps the page names from AppIntents and uses recovered `Cloud` and `ControlIcon` glyphs for those tabs.

@@ -20,7 +20,7 @@ struct PropertyPanel: View {
         .refreshable {
             await controller.refreshProperties()
         }
-        // Firmware/update note: SettingsView/RemoteHwSettingsCategoryPanel structure is reverse-derived; new firmware properties should be mapped into CameraPropertyKey and categoryRows instead of changing the shell.
+        // Firmware/update note: SettingsView/RemoteHwSettingsCategoryPanel structure is reverse-derived; category glyphs use recovered CameraAppToolbox assets, and new firmware properties should be mapped into CameraPropertyKey/categoryRows instead of changing the shell.
     }
 
     private func settingsCategoryPanel(compact: Bool) -> some View {
@@ -119,9 +119,12 @@ struct PropertyPanel: View {
                 Button {
                     Task { await controller.refreshProperties() }
                 } label: {
-                    Label("REFRESH", systemImage: "arrow.clockwise")
-                        .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
-                        .tracking(1.0)
+                    HStack(spacing: 7) {
+                        BMDAssetIcon(name: "Sync", activeName: "Sync_active", active: true, fallback: "arrow.clockwise", color: .white, size: 13)
+                        Text("REFRESH")
+                    }
+                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                    .tracking(1.0)
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.white)
@@ -320,17 +323,17 @@ struct PropertyPanel: View {
 
     private func icon(for category: String) -> String {
         switch category {
-        case "Record": return "record.circle"
-        case "Camera": return "camera.fill"
-        case "Monitor": return "rectangle.inset.filled"
-        case "Audio": return "waveform"
-        case "LUTs": return "camera.filters"
-        case "Media": return "photo.on.rectangle"
-        case "Blackmagic Cloud": return "cloud.fill"
-        case "HDMI Out": return "display"
-        case "Presets": return "tray.full.fill"
-        case "Accessories": return "dot.radiowaves.left.and.right"
-        default: return "info.circle"
+        case "Record": return "Record"
+        case "Camera": return "Camera"
+        case "Monitor": return "HdmiHistogramRgb"
+        case "Audio": return "IconStream"
+        case "LUTs": return "IconLut"
+        case "Media": return "Media"
+        case "Blackmagic Cloud": return "Cloud"
+        case "HDMI Out": return "HdmiPlay"
+        case "Presets": return "Sync"
+        case "Accessories": return "ControlIcon"
+        default: return "ControlIcon"
         }
     }
 
@@ -359,9 +362,7 @@ private struct SettingsCategoryRow: View {
 
     var body: some View {
         HStack(spacing: compact ? 9 : 12) {
-            Image(systemName: icon)
-                .font(.system(size: compact ? 15 : 18, weight: .bold))
-                .foregroundStyle(active ? .white : color)
+            BMDAssetIcon(name: icon, active: active, fallback: BlackmagicReverseSpec.assetFallbackSystemImages[icon] ?? "slider.horizontal.3", color: active ? .white : color, size: compact ? 17 : 20)
                 .frame(width: compact ? 30 : 36, height: compact ? 30 : 36)
                 .background((active ? color : color.opacity(0.14)), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             VStack(alignment: .leading, spacing: 3) {
@@ -428,10 +429,13 @@ private struct SlateMetadataPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Label("SLATE FOR", systemImage: "clapperboard.fill")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
-                    .tracking(1.4)
-                    .foregroundStyle(BlackmagicCamStyle.amber)
+                HStack(spacing: 8) {
+                    BMDAssetIcon(name: "Slate", activeName: "Slate_active", active: true, fallback: "clapperboard.fill", color: BlackmagicCamStyle.amber, size: compact ? 15 : 18)
+                    Text("SLATE FOR")
+                }
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy))
+                .tracking(1.4)
+                .foregroundStyle(BlackmagicCamStyle.amber)
                 Spacer()
                 Text("Project / Clip / Lens Info")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
@@ -540,8 +544,11 @@ private struct PropertyControl: View {
                     }
                 }
             } label: {
-                Label("SET", systemImage: "chevron.up.chevron.down")
-                    .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                HStack(spacing: 6) {
+                    BMDAssetIcon(name: "ControlIcon", active: true, fallback: "chevron.up.chevron.down", color: .white, size: 13)
+                    Text("SET")
+                }
+                .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 7)
