@@ -187,7 +187,6 @@ enum BlackmagicReverseSpec {
         "Sort": "arrow.up.arrow.down",
         "Sort_active": "arrow.up.arrow.down",
         "UploadToCloud": "arrow.up.circle.fill",
-        "Cloud": "cloud.fill",
         "Slate": "rectangle.and.pencil.and.ellipsis",
         "HdmiRecord": "record.circle",
         "HdmiPlay": "play.fill",

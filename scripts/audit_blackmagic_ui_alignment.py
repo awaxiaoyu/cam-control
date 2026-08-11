@@ -133,6 +133,25 @@ def check_info_plist_parity():
         assert f'- {font}' in project_yml, f'{font} missing from generated Info.plist properties'
     # Firmware/update note: these keys mirror the repo-local Blackmagic Cam_3.2.00.ipa Info.plist; rerun reverse_blackmagic_complete_ui.py before changing launch/status-bar behavior or permission UI text.
 
+
+def check_swift_dictionary_literal_uniqueness():
+    source = read(SRC / 'BlackmagicReverseSpec.swift')
+    pattern = re.compile(r'static let (\w+)(?:\s*:\s*\[[^\]]+\])?\s*=\s*\[(.*?)\n\s*\]', re.S)
+    duplicates = []
+    for name, body in pattern.findall(source):
+        if ':' not in body:
+            continue
+        keys = re.findall(r'"([^"]+)"\s*:', body)
+        seen = set()
+        for key in keys:
+            if key in seen:
+                duplicates.append(f'{name}.{key}')
+            seen.add(key)
+    if duplicates:
+        raise AssertionError(f'duplicate Swift dictionary literal keys can SIGTRAP at launch: {duplicates}')
+    # Firmware/update note: Swift dictionary literals trap on duplicate keys during one-time initialization; keep reverse-spec maps unique after each IPA refresh.
+
+
 def check_source_patterns():
     for name, (path, pattern) in REQUIRED_SOURCE_PATTERNS.items():
         txt = read(path)
@@ -218,7 +237,7 @@ def check_media_fixture_resources():
     # Firmware/update note: these crops come from the official 3.2.00 MediaView screenshot and should be regenerated when screenshots/IPA evidence changes.
 
 def main():
-    checks = [check_spec, check_info_plist_parity, check_source_patterns, check_hud_labels, check_asset_coverage, check_page_rail_orientation_rules, check_online_features_deferred, check_media_fixture_resources]
+    checks = [check_spec, check_info_plist_parity, check_swift_dictionary_literal_uniqueness, check_source_patterns, check_hud_labels, check_asset_coverage, check_page_rail_orientation_rules, check_online_features_deferred, check_media_fixture_resources]
     for check in checks:
         check()
     print('blackmagic-ui-alignment: PASS')
