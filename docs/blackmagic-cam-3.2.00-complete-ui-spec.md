@@ -1,0 +1,488 @@
+# Blackmagic Cam 3.2.00 Complete UI Reverse Spec
+
+Source: `F:\Blackmagic Cam_3.2.00.ipa`
+SHA256: `3e6721ce0673432ea4fb21bf7556b0433f2d0f22e3cb6170c1117b8d487e7c28`
+Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
+
+## Hard Requirements
+- Full-screen monitor-first camera page; no app title banner over preview.
+- Right edge page rail uses pageCamera/pageMedia/pageChat/pageSettings order.
+- Left edge is icon-only monitor/control rail: false color, focus assist, guides, zebra, LUT/clean feed.
+- Footer controls are exactly LENS, FPS, SHUTTER, IRIS, ISO, WB, TINT; secondary controls live in scrollers.
+- Top overlay is compact status/timecode/storage/upload, using BMD Lato fonts.
+- Settings, Media, Chat use Blackmagic side-panel layouts, not iOS grouped list chrome.
+- Use recovered CameraAppToolbox Assets.car names and documented aliases before SF Symbol fallback.
+
+## Evidence Buckets
+### main_pages
+- `MainUIViewControllerImp`
+- `MainUIViewControllerRepresentable`
+- `_TtC13BlackmagicCam23MainUIViewControllerImp`
+- `_$s16CameraAppToolbox13BmdPagingViewV5index7offsetY8maxIndex8geometry7content13swipeUpActionACyxG7SwiftUI7BindingVySiG_AMy12CoreGraphics7CGFloatVGSiSo6CGSizeVxycyyctcfC`
+- `_$s16CameraAppToolbox13BmdPagingViewVMn`
+- `_$s16CameraAppToolbox14BmdPageControlV5index8maxIndex5colorAC7SwiftUI7BindingVySiG_SiAG5ColorV8selected_AL10deselectedttcfC`
+- `_$s16CameraAppToolbox14BmdPageControlVMn`
+- `_$s16CameraAppToolbox20MainUIViewControllerCMa`
+- `_$s16CameraAppToolbox20MainUIViewControllerCMn`
+- `_$s16CameraAppToolbox20MainUIViewControllerC30onCaptureEventInteractionEndedyyFTq`
+- `_$s16CameraAppToolbox20MainUIViewControllerC22setLockToUIOrientation8isLockedySb_tF`
+- `_$s16CameraAppToolbox20MainUIViewControllerC12refreshViewsyyF`
+- `_$s16CameraAppToolbox20MainUIViewControllerC15addContentsView08contentsI0ySo0E0C_tF`
+- `_$s16CameraAppToolbox20MainUIViewControllerC23isLockedToUIOrientationSbvM`
+- `_$s16CameraAppToolbox20MainUIViewControllerC23isLockedToUIOrientationSbvs`
+- `_$s16CameraAppToolbox20MainUIViewControllerC23isLockedToUIOrientationSbvg`
+- `_$s16CameraAppToolbox20MainUIViewControllerC12rotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0CvM`
+- `_$s16CameraAppToolbox20MainUIViewControllerC12rotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvs`
+- `_$s16CameraAppToolbox20MainUIViewControllerC12rotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvg`
+- `_$s16CameraAppToolbox20MainUIViewControllerC15nonRotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0CvM`
+- `_$s16CameraAppToolbox20MainUIViewControllerC15nonRotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvs`
+- `_$s16CameraAppToolbox20MainUIViewControllerC15nonRotatingView33_76559B088F47121A7C7C35AB43646513LLAA0dE0Cvg`
+- `_$s16CameraAppToolbox20MainUIViewControllerC3appSo13UIApplicationCSgvM`
+- `_$s16CameraAppToolbox20MainUIViewControllerC3appSo13UIApplicationCSgvs`
+- `_$s16CameraAppToolbox20MainUIViewControllerC3appSo13UIApplicationCSgvg`
+- `_$s16CameraAppToolbox20MainUIViewControllerCN`
+- `_OBJC_METACLASS_$__TtC16CameraAppToolbox20MainUIViewController`
+- `CameraAppToolbox/MainUIView.swift`
+- `CameraAppToolbox.MainUIView`
+- `_TtC16CameraAppToolbox10MainUIView`
+- `_TtC16CameraAppToolbox20MainUIViewController`
+- `BmdPagingView`
+- `BmdPageControl`
+- `MainUIView`
+- `MainUIViewController`
+- `pageSettings`
+- `pageChat`
+- `pageMedia`
+- `pageCamera`
+- `MainUIViewC`
+
+### camera_hud
+- `HUDTopLeftIndicators`
+- `HUDTopIndicators`
+- `HUDTrailingIndicators`
+- `HUDLeadingIndicators`
+- `HUDCameraControls`
+- `PHUDCameraControls`
+- `SHUDCameraControls`
+- `PLHUDCameraControls`
+- `HUDTallyIndicator`
+- `HUDTimelapseIndicator`
+- `LutRecordButton`
+- `RecordTimerTextIndicator`
+- `RecordButton`
+- `_$s16CameraAppToolbox24HUDTimelapseIndicatorImpV17timelapseInterval8timecodeAcA023SettingsOptionTimelapseH0O_SStcfC`
+- `_$s16CameraAppToolbox24HUDTimelapseIndicatorImpV7SwiftUI4ViewAAMc`
+- `_$s16CameraAppToolbox24HUDTimelapseIndicatorImpVMn`
+- `_$s16CameraAppToolbox24HUDTimelapseIndicatorImpVN`
+- `HUDTimelapseIndicatorImp`
+- `HUDTimelapseIndicatorImpV`
+- `_associated conformance 16CameraAppToolbox24HUDTimelapseIndicatorImpV7SwiftUI4ViewAA4BodyAdEP_AdE`
+- `_symbolic _____ 16CameraAppToolbox24HUDTimelapseIndicatorImpV`
+
+### footer_controls
+- `LHUDFooterElements`
+- `PHUDFooterElements`
+- `PLHUDFooterElements`
+- `FpsOptions`
+- `FpsOptions_Previews`
+- `IrisScroll`
+- `IrisScroll_Previews`
+- `IsoScroll`
+- `IsoScroll_Previews`
+- `LensOptions`
+- `LensOptions_Previews`
+- `ShutterScroll`
+- `ShutterScroll_Previews`
+- `TintScroll`
+- `TintScroll_Previews`
+- `WhiteBalanceScroll`
+- `WhiteBalanceScroll_Previews`
+- `_$s16CameraAppToolbox03BmdA5IndexO4lensAA11LensOptionsOvg`
+- `_$s16CameraAppToolbox11LensOptionsO05frontD11DescriptionSSvg`
+- `_$s16CameraAppToolbox11LensOptionsO11cameraIndexAA03BmdaG0Ovg`
+- `_$s16CameraAppToolbox11LensOptionsO14getZoomPresets8focalLenSayAA0G6PresetOGSi_tF`
+- `_$s16CameraAppToolbox11LensOptionsO2idSSvg`
+- `_$s16CameraAppToolbox11LensOptionsO9imageName11focalLengthSSs6UInt32V_tF`
+- `_$s16CameraAppToolbox11LensOptionsOMn`
+- `_$s16CameraAppToolbox11LensOptionsON`
+- `_$s16CameraAppToolbox11LensOptionsOSEAAMc`
+- `_$s16CameraAppToolbox11LensOptionsOSHAAMc`
+- `_$s16CameraAppToolbox11LensOptionsOSeAAMc`
+- `_$s16CameraAppToolbox15BmdDialHDividerV7SwiftUI4ViewAAMc`
+- `_$s16CameraAppToolbox15BmdDialHDividerVMn`
+- `_$s16CameraAppToolbox15BmdDialHDividerVN`
+- `_$s16CameraAppToolbox15BmdDialHDividerV_12xStartOffset04xEndH0AC7SwiftUI5ColorV_12CoreGraphics7CGFloatVAKtcfC`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV01hE9IconWidth12CoreGraphics7CGFloatVvgZ`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV10isDraggingSbvau`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV11isAnimatingSbvau`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV13stopAnimationyyFZ`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV18getFormattedStringySSAA0F6PrefixO_12CoreGraphics7CGFloatVSaySSGSgtFZ`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV27vZebraExtraOptionIconHeight12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV28vZebraExtraOptionTotalHeight12CoreGraphics7CGFloatVvgZ`
+- `_$s16CameraAppToolbox17BmdAdjustmentDialV9isClampedSbvau`
+
+### monitor_overlays
+- `FalseColorNode`
+- `HUDFalseColor`
+- `HUDFalseColor_Previews`
+- `HUDGuides`
+- `HUDGuides_Previews`
+- `HUDSafeAreas`
+- `HUDSafeAreas_Previews`
+- `HUDWhiteBalanceOverlay`
+- `HUDWhiteBalanceOverlay_Previews`
+- `StorageStatusHUD`
+- `HdmiStorageStatusHUD`
+- `StorageStatusHUDScalable`
+- `UploadStatusHUD`
+- `UploadStatusHUD_Previews`
+- `AudioMeters`
+- `AudioMeterSingle`
+- `AudioMetersGroup`
+- `FalseColor`
+- `FalseColor_Previews`
+- `FocusAssistScroller`
+- `FocusAssistScroller_Previews`
+- `ZebraScroller`
+- `ZebraScroller_Previews`
+- `zebraShift`
+- `falseColorTable`
+- `_zebraEnabled`
+- `_focusAssistEnabled`
+- `_falseColorEnabled`
+- `audioMeterData`
+- `FalseColorLegend`
+- `Zebra`
+- `FocusAssist`
+- `falseColorEftOptionOn`
+- `focusAssistEftOptionOn`
+- `focusAssistValue`
+- `zebraEftOptionOn`
+- `zebraEftMidGreyOption`
+- `zebraValue`
+- `_zebraValue`
+- `_zebraEftOptionOn`
+
+### settings_media_chat
+- `ChatTableView`
+- `ChatTableViewControllerRepresentable`
+- `ChatViewSidebarItem`
+- `ChatViewSidebar`
+- `ChatViewSidebar_Previews`
+- `CloudLoginView`
+- `CloudLoginView_Previews`
+- `MediaClipDetailsLandscapePanel`
+- `MediaClipDetailsLandscapePanel_Previews`
+- `MediaSortPanelSortTypeItem`
+- `MediaSortPanelSortOrderItem`
+- `MediaSortPanel`
+- `MediaSortPanel_Previews`
+- `MediaViewToolbar`
+- `MediaViewToolbars_Previews`
+- `MediaUploadToCloudPanel`
+- `MediaUploadToCloudPanel_Previews`
+- `MediaViewSidebarItem`
+- `MediaViewSidebarCloudLogIn`
+- `MediaViewSidebar`
+- `MediaViewSidebar_Previews`
+- `RemoteSettingsCategoryPanel`
+- `RemoteSettingsOptionsPanel`
+- `OptionListView`
+- `RemoteHwSettingsCategoryPanel`
+- `HwSettingsOptionsPanel`
+- `SettingsCategoryPanel`
+- `SettingsOptionsPanel`
+- `SlateViewClipInfoSpecialKeysType`
+- `SlateViewClipInfoMidSelection`
+- `SlateViewProjectInfoFieldSelection`
+- `SlateViewLensInfoFieldSelection`
+- `LSlateViewClipInfo`
+- `PSlateViewClipInfo`
+- `SlateViewClipInfo`
+- `SlateViewClipInfo_Previews`
+- `LSlateViewLensInfo`
+- `SlateViewLensInfo`
+- `$s13BlackmagicCam0028SlateViewLensInfoswift_IxAFhfMX61_0_33_9E573813D58DCB80F29DB72ED9855B54Ll7PreviewfMf_15PreviewRegistryfMu_`
+- `LSlateViewProjectInfo`
+
+### layout_metrics
+- `_$s16CameraAppToolbox18MainViewLayoutDataV018hudControlPortraitF7Padding7SwiftUI10EdgeInsetsVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV03getafG08geomSize19PSTimecodebarHeightAA0afG0VSo6CGSizeV_12CoreGraphics7CGFloatVtFZ`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV03tabE15PaddingFromEdge12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV04mainE8SafeArea7SwiftUI10EdgeInsetsVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV06cachedafG0AA0afG0Vvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV07stealthfG0AA07StealthfG0Vvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV08portraitfG0AA08PortraitfG0Vvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV09landscapefG0AA09LandscapefG0Vvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV10isShowIrisSbvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV12footerHeight12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV12pageTabWidth12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV13hideStatusBarSbvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV13isSmallScreenSbvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV13pageTabHeight12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV13setScreenSize_4geom15isZoomedDisplayySo6CGSizeV_7SwiftUI13GeometryProxyVSbtFZ`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV15cameraLViewSizeSo6CGSizeVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV15cameraSViewSizeSo6CGSizeVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV15isZoomedDisplaySbvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV16actualScreenSizeSo6CGSizeVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV16getRecordBarSize12CoreGraphics7CGFloatVyFZ`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV16getTabButtonSizeSo6CGSizeVyFZ`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV16recordBarSpacing12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV17hudControlsHeight12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV18navMenuEdgePadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV19footerBottomPadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV21iPadHUDSidebarPadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV21mediaTabToolbarHeight12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV23hudControlButtonPadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV23recordBarLeadingPadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV24leftNavMenuSwipeThresold12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV24recordBarTrailingPadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV25leftNavMenuSwipeWidthArea12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV25mainControlLeadingPadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV25rightNavMenuSwipeThresold12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV26mainControlTrailingPadding12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV26rightNavMenuSwipeWidthArea12CoreGraphics7CGFloatVvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV31getPageTabWidthForLandscapeModey12CoreGraphics7CGFloatVSo6CGSizeVFZ`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV32isWhiteBalanceFormatMustShowUnitSbvau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV32maxRemoteItemsDisplayedForDialogSivau`
+- `_$s16CameraAppToolbox18MainViewLayoutDataV35leftNavMenuSwipeWidthAreaForStealth12CoreGraphics7CGFloatVvau`
+
+### appintents
+- `StartRecordIntent`
+- `StopRecordIntent`
+- `OpenCameraView`
+- `SetResolutionIntent`
+- `SetProjectIntent`
+- `SetFrameRateIntent`
+- `SetLensIntent`
+- `SetShutterSpeedIntent`
+- `SetISOIntent`
+- `SetWhiteBalanceIntent`
+- `TintIntent`
+- `ZoomIntent`
+- `StabilizationIntent`
+- `FocusIntent`
+- `ExposureIntent`
+- `CodecIntent`
+
+## Settings Categories
+- **About**: List Option
+- **Accessories**: List Option
+- **Audio**: Audio Format, Audio Metering, Audio Source, List Option, Record Audio As, Sample Rate, iPhone Microphone
+- **Blackmagic Cloud**: List Option
+- **Camera**: Anamorphic De-Squeeze, List Option, Shutter Measurement, Trigger Record Indicator
+- **HDMI Out**: List Option
+- **LUTs**: LUT Selection, List Option
+- **Media**: Filename Convention, List Option, Save Clips to, Upload Clips
+- **Monitor**: Focus Assist, Focus Assist Color, List Option
+- **Portrait**: Title
+- **Preset**: Preset Selection
+- **Presets**: List Option
+- **Record**: Capture 1 Frame Every, Codec, If Media Drops Frame, List Option, Resolution, Timecode Display
+- **Reset**: Reset Blackmagic Cam Settings
+- **Reset Settings**: List Option
+- **Reset Settings Dialog**: Body, Title
+- **Settings Category**: List Option
+
+## AppIntents
+- `StartRecordIntent`
+- `StopRecordIntent`
+- `OpenCameraView`
+- `SetLensIntent`
+- `SetFrameRateIntent`
+- `SetShutterSpeedIntent`
+- `SetISOIntent`
+- `SetWhiteBalanceIntent`
+- `TintIntent`
+- `ExposureIntent`
+- `FocusIntent`
+- `ZoomIntent`
+- `StabilizationIntent`
+- `CodecIntent`
+- `SetResolutionIntent`
+- `SetProjectIntent`
+
+## Asset Names
+- `Apple Watch/IconAf`
+- `Apple Watch/IconAf_active`
+- `Apple Watch/IconAwb`
+- `Apple Watch/IconAwb_active`
+- `Apple Watch/IconLock`
+- `Apple Watch/IconLock_active`
+- `Apple Watch/IconLut`
+- `Apple Watch/IconLut_active`
+- `Apple Watch/IconTimelapse`
+- `Apple Watch/IconTimelapse_active`
+- `Apple Watch/Lut`
+- `Apple Watch/Record`
+- `Apple Watch/Record_active`
+- `Apple Watch/Record_active_disabled`
+- `Apple Watch/Record_disabled`
+- `Apple Watch/RecordOffSpeed`
+- `Apple Watch/RecordOffSpeed_active`
+- `Apple Watch/RecordOffSpeed_active_disabled`
+- `Apple Watch/RecordOffSpeed_disabled`
+- `Apple Watch/RecordTimelapse`
+- `Apple Watch/RecordTimelapse_active`
+- `Apple Watch/RecordTimelapse_disabled`
+- `Apple Watch/RecordTimelapseActive _disabled`
+- `BatteryIndicator`
+- `BatteryIndicatorWarning`
+- `bmd_cloud_logo@3x.png`
+- `bmd_cloud_sidebar@3x.png`
+- `BmdCloudLogo`
+- `BmdCloudSidebar`
+- `Camera`
+- `camera@3x.png`
+- `Camera_active`
+- `camera_active@3x.png`
+- `camera_connected@3x.png`
+- `camera_identify@3x.png`
+- `camera_light@3x.png`
+- `camera_linked@3x.png`
+- `camera_linked_slate@3x.png`
+- `camera_linked_small@3x.png`
+- `CameraConnected`
+- `CameraIdentify`
+- `CameraLight`
+- `CameraLinked`
+- `CameraLinkedSlate`
+- `CameraLinkedSmall`
+- `Cloud`
+- `cloud@3x.png`
+- `ControlIcon`
+- `ControlIconNotConnected`
+- `Exposure`
+- `exposure@3x.png`
+- `Exposure_active`
+- `exposure_active@3x.png`
+- `exposure_auto_zoom@3x.png`
+- `exposure_auto_zoom_active@3x.png`
+- `exposure_lock_zoom@3x.png`
+- `exposure_lock_zoom_active@3x.png`
+- `ExposureAutoZoom`
+- `ExposureAutoZoom_active`
+- `ExposureLockZoom`
+- `ExposureLockZoom_active`
+- `FalseColor`
+- `FalseColorLegend`
+- `Focus`
+- `Focus1`
+- `Focus1_active`
+- `Focus2`
+- `Focus2_active`
+- `Focus3`
+- `Focus3_active`
+- `focus@3x.png`
+- `focus_1@3x.png`
+- `focus_1_active@3x.png`
+- `focus_2@3x.png`
+- `focus_2_active@3x.png`
+- `focus_3@3x.png`
+- `focus_3_active@3x.png`
+- `Focus_active`
+- `focus_active@3x.png`
+- `focus_afc@3x.png`
+- `focus_afs@3x.png`
+- `focus_assist@3x.png`
+- `focus_auto_zoom@3x.png`
+- `focus_auto_zoom_active@3x.png`
+- `focus_delete@3x.png`
+- `focus_delete_disabled@3x.png`
+- `focus_direction_1@3x.png`
+- `focus_direction_2@3x.png`
+- `focus_face@3x.png`
+- `focus_lock_zoom@3x.png`
+- `focus_lock_zoom_active@3x.png`
+- `focus_marker_1@3x.png`
+- `focus_marker_2@3x.png`
+- `focus_marker_3@3x.png`
+- `focus_object@3x.png`
+- `focus_pause@3x.png`
+- `focus_play@3x.png`
+- `focus_play_disabled@3x.png`
+- `focus_reset@3x.png`
+- `FocusAfc`
+- `FocusAfs`
+- `FocusAssist`
+- `FocusAutoZoom`
+- `FocusAutoZoom_active`
+- `FocusDelete`
+- `FocusDelete_disabled`
+- `FocusDirection1`
+- `FocusDirection2`
+- `FocusFace`
+- `FocusLockZoom`
+- `FocusLockZoom_active`
+- `FocusMarker1`
+- `FocusMarker2`
+- `FocusMarker3`
+- `FocusObject`
+- `FocusPause`
+- `FocusPlay`
+- `FocusPlay_disabled`
+- `FocusReset`
+- `follow_focus@3x.png`
+- `follow_focus_disabled@3x.png`
+- `FollowFocus`
+- `FollowFocus_disabled`
+- `Grids`
+- `grids@3x.png`
+- `grids_crosshairs@3x.png`
+- `grids_dot@3x.png`
+- `grids_horizon@3x.png`
+- `grids_thirds@3x.png`
+- `GridsCrosshairs`
+- `GridsDot`
+- `GridsHorizon`
+- `GridsThirds`
+- `Guides`
+- `guides@3x.png`
+- `Hdmi4kAuto`
+- `Hdmi4kBatteryVoltage`
+- `Hdmi4kDropFrame`
+- `Hdmi4kFalseColorLegend`
+- `Hdmi4kHistogramRgb`
+- `Hdmi4kLock`
+- `Hdmi4kLut`
+- `Hdmi4kLutBlue`
+- `Hdmi4kLutRecord`
+- `Hdmi4kNdClear`
+- `Hdmi4kNdFrac1`
+- `Hdmi4kNdFrac2`
+- `Hdmi4kNdFrac3`
+- `Hdmi4kNdFrac4`
+- `Hdmi4kNdNo1`
+- `Hdmi4kNdNo2`
+- `Hdmi4kNdNo3`
+- `Hdmi4kNdNo4`
+- `Hdmi4kNdStop1`
+- `Hdmi4kNdStop2`
+- `Hdmi4kNdStop3`
+- `Hdmi4kNdStop4`
+- `Hdmi4kPlay`
+- `Hdmi4kPlay_active`
+- `Hdmi4kRecord`
+- `Hdmi4kRecord_active`
+- `Hdmi4kRecord_disabled`
+- `Hdmi4kStorageDrive`
+- `Hdmi4kStorageIphone`
+- `Hdmi4kTimelapseRecord`
+- `Hdmi4kTimelapseRecord_active`
+- `Hdmi4kTimelapseRecord_disabled`
+- `HDMI_4K_auto@3x.png`
+- `HDMI_4K_battery_voltage@3x.png`
+- `HDMI_4K_drop_frame@3x.png`
+- `HDMI_4K_false_color_legend@3x.png`
+- `HDMI_4K_histogram_rgb@3x.png`
+- `HDMI_4K_lock@3x.png`
+- `HDMI_4K_LUT@3x.png`
+- `HDMI_4K_LUT_blue@3x.png`
+- `HDMI_4K_LUT_record@3x.png`
+- `HDMI_4K_nd_clear@3x.png`
+- `HDMI_4K_nd_frac_1@3x.png`
+- `HDMI_4K_nd_frac_2@3x.png`
+- `HDMI_4K_nd_frac_3@3x.png`
+
+## Update Rule
+When Blackmagic changes IPA/game-version-style UI, rerun this script against the new IPA, compare `complete_ui_facts.json`, then update `BlackmagicReverseSpec.swift` before view code.

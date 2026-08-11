@@ -152,16 +152,16 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
 
             HStack(alignment: .top) {
-                leftQuickAccessRail(compact: metrics.compact)
+                leftMonitorRail(compact: metrics.compact)
                     .padding(.leading, metrics.safePad)
                 Spacer()
-                rightProgrammableFunctionRail(compact: metrics.compact)
+                rightPageNavigationRail(compact: metrics.compact)
                     .frame(width: metrics.pageTabWidth)
                     .padding(.trailing, metrics.safePad)
             }
             .padding(.top, metrics.isLandscape ? (metrics.compact ? 76 : 104) : metrics.size.height * 0.24)
         }
-        // Firmware/update note: layout follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors; 3.2.00 uses icon-only side rails plus L/PHUD footer controls, so avoid app-style text nav buttons here.
+        // Firmware/update note: layout follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors; 3.2.00 uses right-edge pageCamera/pageMedia/pageChat/pageSettings and left-edge HUD monitor functions, so do not move page navigation back to the left rail on future IPA updates.
     }
 
     private func topHUD(compact: Bool) -> some View {
@@ -176,26 +176,15 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private func topLeftIndicators(compact: Bool) -> some View {
         HStack(spacing: compact ? 6 : 8) {
-            BMDAssetIcon(name: "Camera", activeName: "Camera_active", active: navSelection == .camera, fallback: "camera.fill", color: .white, size: compact ? 15 : 18)
-            VStack(alignment: .leading, spacing: 1) {
-                Text("BLACKMAGIC CAMERA")
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
-                    .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.72))
-                Text(subtitle.uppercased())
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-            }
+            HUDStatusChip(title: "CAM", value: subtitle.uppercased(), asset: "Camera", color: .white.opacity(0.82), compact: compact)
             HUDStatusChip(title: "LUT", value: "Rec.709", asset: "IconLut", color: BlackmagicCamStyle.activeBlue, compact: compact)
             HUDStatusChip(title: "TC", value: "TOD", asset: "IconLock", color: .white.opacity(0.74), compact: compact)
         }
-        .padding(.horizontal, compact ? 8 : 11)
-        .padding(.vertical, compact ? 6 : 8)
-        .background(.black.opacity(0.38), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
-        // Firmware/update note: top-left cluster follows recovered HUDTopLeftIndicators, HUDLutIndicator and RecordTimerTextIndicator anchors; future versions should only change values/assets.
+        .padding(.horizontal, compact ? 6 : 9)
+        .padding(.vertical, compact ? 5 : 7)
+        .background(.black.opacity(0.34), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: top-left cluster follows recovered HUDTopLeftIndicators, HUDLutIndicator and timecode mode labels; keep it as compact operator readouts rather than an app title banner when updating for a new IPA.
     }
 
     private func recordTimerBar(compact: Bool) -> some View {
@@ -293,18 +282,23 @@ struct ShootingHUDLayout<Preview: View>: View {
         // Firmware/update note: this maps recovered HUDLeftNavMenuIndicator, PresetScrollListView, SlateView and pageCamera/pageMedia/pageChat/pageSettings symbols; update asset order from IPA strings on future app changes.
     }
 
-    private func rightProgrammableFunctionRail(compact: Bool) -> some View {
-        VStack(spacing: compact ? 7 : 9) {
-            monitorIconButton(asset: "FalseColor", color: BlackmagicCamStyle.amber, scroller: .falseColor, compact: compact)
-            monitorIconButton(asset: "FocusAssist", color: BlackmagicCamStyle.cyan, scroller: .focusAssist, compact: compact)
-            monitorIconButton(asset: "Guides", color: .white.opacity(0.82), scroller: .guides, compact: compact)
+    private func rightPageNavigationRail(compact: Bool) -> some View {
+        VStack(spacing: compact ? 8 : 10) {
+            BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: onNavigate)
+            Button {
+                withAnimation(.snappy(duration: 0.18)) { showSlate = true }
+            } label: {
+                monitorIconShell(asset: "Slate", color: BlackmagicCamStyle.amber, active: showSlate, compact: compact)
+            }
+            .buttonStyle(.plain)
+            Button {
+                withAnimation(.snappy(duration: 0.18)) { activeScroller = .preset }
+            } label: {
+                monitorIconShell(asset: "Sync", color: BlackmagicCamStyle.okGreen, active: activeScroller == .preset, compact: compact)
+            }
+            .buttonStyle(.plain)
         }
-        .padding(.vertical, compact ? 7 : 10)
-        .padding(.horizontal, compact ? 4 : 6)
-        .background(.black.opacity(0.54), in: RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 15 : 20, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
-        .shadow(color: .black.opacity(0.38), radius: 18, x: 0, y: 10)
-        // Firmware/update note: this maps HUDRightNavMenuIndicator and the 3.2 right-edge programmable function affordance; keep it to three visible function buttons unless recovered symbols change.
+        // Firmware/update note: right rail is the recovered BmdTabView/BmdVTabView pageCamera/pageMedia/pageChat/pageSettings rail with Slate/Preset secondary controls; future IPA changes must be diffed against page symbols before reordering.
     }
 
     private func quickAccessButton(title: String, asset: String, color: Color, compact: Bool, action: @escaping () -> Void) -> some View {
@@ -442,18 +436,15 @@ struct ShootingHUDLayout<Preview: View>: View {
 
     private var bottomControlItems: [BottomControlItem] {
         [
-            BottomControlItem(title: "LENS", value: value(for: "Lens"), asset: "Lens", scroller: .lens),
-            BottomControlItem(title: "ZOOM", value: value(forAny: ["Zoom"], fallback: "1.0x"), asset: "Zoom", scroller: .zoom),
+            BottomControlItem(title: "LENS", value: value(for: "Lens"), asset: "Camera", scroller: .lens),
             BottomControlItem(title: "FPS", value: value(for: "FPS"), asset: "IconTimelapse", scroller: .fps),
             BottomControlItem(title: "SHUTTER", value: value(for: "Shutter"), asset: "Exposure", scroller: .shutter),
             BottomControlItem(title: "IRIS", value: value(forAny: ["Iris", "Aperture"]), asset: "Exposure", scroller: .iris),
             BottomControlItem(title: "ISO", value: value(for: "ISO"), asset: "Exposure", scroller: .iso),
-            BottomControlItem(title: "EXP", value: value(forAny: ["Exposure", "Exposure Compensation"], fallback: "0.0"), asset: "Exposure", scroller: .exposure),
             BottomControlItem(title: "WB", value: value(forAny: ["WB", "White Balance"]), asset: "IconAwb", scroller: .whiteBalance),
-            BottomControlItem(title: "TINT", value: value(for: "Tint"), asset: "IconAwb", scroller: .tint),
-            BottomControlItem(title: "STAB", value: "Off", asset: "ControlIcon", scroller: .stabilization),
-            BottomControlItem(title: "LUT", value: "Rec.709", asset: "IconLut", scroller: .lut)
+            BottomControlItem(title: "TINT", value: value(for: "Tint"), asset: "IconAwb", scroller: .tint)
         ]
+        // Firmware/update note: footer controls are constrained to recovered camera HUD short labels LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT; Zoom, Exposure, Stabilization and LUT stay in scrollers/side controls unless a future IPA exposes them as HUD footer labels.
     }
 
     private func value(for title: String) -> String {
@@ -549,7 +540,7 @@ enum ShootingHUDNavItem: String, CaseIterable, Identifiable {
         switch self {
         case .camera: return "Camera"
         case .media: return "Media"
-        case .chat: return "Chat"
+        case .chat: return "Cloud"
         case .settings: return "ControlIcon"
         }
     }

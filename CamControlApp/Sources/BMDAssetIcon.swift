@@ -30,7 +30,7 @@ struct BMDAssetIcon: View {
     private var loadedImage: UIImage? {
         let preferredName = active ? (activeName ?? "\(name)_active") : name
         var names: [String] = []
-        for assetName in [preferredName, name] where !assetName.isEmpty && !names.contains(assetName) {
+        for assetName in ([preferredName, name] + aliases(for: preferredName) + aliases(for: name)) where !assetName.isEmpty && !names.contains(assetName) {
             names.append(assetName)
         }
         let bundles = BMDAssetBundleStore.imageBundles
@@ -47,6 +47,25 @@ struct BMDAssetIcon: View {
             }
         }
         return nil
+    }
+
+    private func aliases(for assetName: String) -> [String] {
+        switch assetName {
+        case "IconAf": return ["Apple Watch/IconAf", "icon_AF"]
+        case "IconAf_active": return ["Apple Watch/IconAf_active", "icon_AF_active"]
+        case "IconAwb": return ["Apple Watch/IconAwb", "icon_AWB"]
+        case "IconAwb_active": return ["Apple Watch/IconAwb_active", "icon_AWB_active"]
+        case "IconLock": return ["Apple Watch/IconLock", "icon_lock", "Lock", "LockHud"]
+        case "IconLock_active": return ["Apple Watch/IconLock_active", "icon_lock_active", "Lock_active", "LockHud_active"]
+        case "IconLut": return ["Apple Watch/IconLut", "icon_LUT", "Lut"]
+        case "IconLut_active": return ["Apple Watch/IconLut_active", "icon_LUT_active", "Lut_active"]
+        case "IconTimelapse": return ["Apple Watch/IconTimelapse", "icon_timelapse", "Timelapse"]
+        case "IconTimelapse_active": return ["Apple Watch/IconTimelapse_active", "icon_timelapse_active"]
+        case "Chat", "Chat_active": return ["Cloud", "BmdCloudSidebar"]
+        case "Lens", "Lens_active": return ["Camera", "Camera_active"]
+        default: return []
+        }
+        // Firmware/update note: aliases are reverse-derived from assetutil rendition names in CameraAppToolbox.framework/Assets.car; rerun the asset reverse workflow before changing them for a new IPA.
     }
 }
 

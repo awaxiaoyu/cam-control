@@ -103,16 +103,22 @@ enum BlackmagicReverseSpec {
     static let slateFields = slateProjectFields + slateClipFields
 
     static let hudAssetNames = [
-        "Camera", "Camera_active", "Media", "Media_active", "Media_disabled", "Chat", "Chat_active", "Chat_disabled", "Cloud", "BmdCloudSidebar", "ControlIcon", "ControlIconNotConnected", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
-        "IconAe", "IconAe_active", "IconAf", "IconAf_active", "IconAwb", "IconAwb_active",
-        "IconLock", "IconLock_active", "IconLut", "IconLut_active", "IconStream", "IconStream_active", "IconTimelapse", "IconTimelapse_active",
+        "Camera", "Camera_active", "Media", "Media_active", "Media_disabled", "Cloud", "BmdCloudSidebar", "ControlIcon", "ControlIconNotConnected", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
+        "Apple Watch/IconAe", "Apple Watch/IconAe_active", "Apple Watch/IconAf", "Apple Watch/IconAf_active", "Apple Watch/IconAwb", "Apple Watch/IconAwb_active",
+        "Apple Watch/IconLock", "Apple Watch/IconLock_active", "Apple Watch/IconLut", "Apple Watch/IconLut_active", "Apple Watch/IconStream", "Apple Watch/IconStream_active", "Apple Watch/IconTimelapse", "Apple Watch/IconTimelapse_active",
         "BatteryIndicator", "BatteryIndicatorWarning", "StorageIphone", "StorageDrive",
-        "Exposure", "Exposure_active", "Lens", "Lens_active", "Zoom", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
+        "Exposure", "Exposure_active", "Apple Watch/Zoom", "FalseColor", "FalseColorLegend", "Focus", "FocusAssist", "Grids", "Guides", "Zebra",
         "Lut", "LutDisplay", "LutRecord", "LutSelector", "LutSelector_active",
         "Media", "Media_active", "MediaSync", "MediaSync_active", "MediaSync_disabled", "Sort", "Sort_active", "SortDatetime", "SortFilename", "SortLocation", "SortTimecode", "SortUploadStatus", "UploadToCloud", "UploadToCloud_active", "UploadToCloud_disabled", "UploadedToCloud", "UploadedToCloudHq", "UploadedToCloudPxy", "Uploading", "UploadingSmall", "UploadingPause", "UploadingDone", "UploadingFailedThumbnail", "ProjectUpload", "ProjectUploadFailed", "ProjectUploadNoConnection", "Sync", "Sync_active", "SyncFooter", "SyncSidebar",
         "Cloud", "BmdCloudLogo", "BmdCloudSidebar", "Slate", "Slate_active", "CameraLinkedSlate",
         "HdmiRecord", "HdmiRecord_active", "HdmiPlay", "HdmiPlay_active", "HdmiHistogramRgb",
         "HdmiStorageIphone", "HdmiStorageDrive", "HdmiFalseColorLegend", "HudStream"
+    ]
+
+    static let assetAliasNotes = [
+        "Chat tab glyph": "3.2.00 has pageChat symbols but no bare Chat asset; use recovered Cloud/BmdCloudSidebar glyphs.",
+        "HUD auto icons": "IconAf/IconAwb/IconLock/IconLut/IconTimelapse are recovered under Apple Watch/* plus png rendition aliases.",
+        "Lens footer glyph": "3.2.00 exposes LensOptions as UI symbols but no bare Lens asset; use Camera glyph while preserving LENS label."
     ]
 
     static let assetFallbackSystemImages: [String: String] = [
