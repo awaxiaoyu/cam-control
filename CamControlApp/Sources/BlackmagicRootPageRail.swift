@@ -5,23 +5,39 @@
 struct BlackmagicRootPageRail: View {
     let selection: ShootingHUDNavItem
     let compact: Bool
+    var horizontal: Bool = false
     let onNavigate: (ShootingHUDNavItem) -> Void
 
     var body: some View {
-        VStack(spacing: compact ? 8 : 11) {
-            ForEach(ShootingHUDNavItem.allCases) { item in
-                Button { onNavigate(item) } label: {
-                    RootPageRailButton(item: item, selected: item == selection, compact: compact)
+        Group {
+            if horizontal {
+                HStack(spacing: 0) {
+                    ForEach(ShootingHUDNavItem.allCases) { item in
+                        Button { onNavigate(item) } label: {
+                            RootPageRailButton(item: item, selected: item == selection, compact: compact, horizontal: true)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .buttonStyle(.plain)
+                .padding(.horizontal, compact ? 18 : 28)
+                .background(Color.black.opacity(0.96))
+                .overlay(Rectangle().fill(.white.opacity(0.08)).frame(height: 1), alignment: .top)
+            } else {
+                VStack(spacing: compact ? 0 : 2) {
+                    ForEach(ShootingHUDNavItem.allCases) { item in
+                        Button { onNavigate(item) } label: {
+                            RootPageRailButton(item: item, selected: item == selection, compact: compact, horizontal: false)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, compact ? 4 : 6)
+                .background(Color.black.opacity(0.96))
+                .overlay(Rectangle().fill(.white.opacity(0.08)).frame(width: 1), alignment: .leading)
             }
         }
-        .padding(.vertical, compact ? 4 : 6)
-        .padding(.horizontal, compact ? 2 : 3)
-        .background(.black.opacity(0.72), in: RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 9 : 12, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
-        .shadow(color: .black.opacity(0.42), radius: 14, x: 0, y: 8)
-        // Firmware/update note: visual proportions follow recovered 3.2.00 BmdVTabView/pageCamera/pageMedia/pageChat/pageSettings: a black right-edge page strip with icon-only cells, not app-style text tabs.
+        // Firmware/update note: visual proportions follow recovered 3.2.00 BmdVTabView/pageCamera/pageMedia/pageChat/pageSettings in landscape and BmdTabView bottom tabs in portrait.
     }
 }
 
@@ -29,30 +45,44 @@ private struct RootPageRailButton: View {
     let item: ShootingHUDNavItem
     let selected: Bool
     let compact: Bool
+    var horizontal: Bool = false
 
     private var iconColor: Color { selected ? .white : .white.opacity(0.64) }
     private var fillColor: Color { selected ? BlackmagicCamStyle.activeBlue.opacity(0.58) : .white.opacity(0.052) }
     private var strokeColor: Color { selected ? BlackmagicCamStyle.cyan.opacity(0.48) : .white.opacity(0.08) }
     private var cornerRadius: CGFloat { compact ? 6 : 8 }
-    private var buttonSize: CGSize { CGSize(width: compact ? 36 : 48, height: compact ? 36 : 48) }
-    private var iconSize: CGFloat { compact ? 16 : 20 }
+    private var buttonSize: CGSize { horizontal ? CGSize(width: compact ? 54 : 68, height: compact ? 54 : 64) : CGSize(width: compact ? 54 : 68, height: compact ? 46 : 56) }
+    private var iconSize: CGFloat { compact ? 17 : 21 }
 
     var body: some View {
-        ZStack(alignment: .trailing) {
-            ZStack {
+        VStack(spacing: horizontal ? 4 : 0) {
+            ZStack(alignment: horizontal ? .bottom : .trailing) {
                 BMDAssetIcon(name: item.assetName, active: selected, fallback: item.systemImage, color: iconColor, size: iconSize)
+                    .frame(width: buttonSize.width, height: horizontal ? 30 : buttonSize.height)
+                    .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.46) : Color.clear, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                if selected {
+                    if horizontal {
+                        Capsule()
+                            .fill(BlackmagicCamStyle.cyan)
+                            .frame(width: 22, height: 2)
+                            .offset(y: 3)
+                    } else {
+                        Capsule()
+                            .fill(BlackmagicCamStyle.cyan)
+                            .frame(width: 2, height: compact ? 24 : 30)
+                            .offset(x: compact ? 4 : 5)
+                    }
+                }
             }
-            .frame(width: buttonSize.width, height: buttonSize.height)
-            .background(fillColor, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous).stroke(strokeColor, lineWidth: 1))
-            if selected {
-                Capsule()
-                    .fill(BlackmagicCamStyle.cyan)
-                    .frame(width: 2, height: compact ? 22 : 28)
-                    .offset(x: compact ? 3 : 4)
+            if horizontal {
+                Text(item.title.capitalized)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                    .foregroundStyle(selected ? BlackmagicCamStyle.cyan : .white.opacity(0.72))
             }
         }
+        .frame(width: buttonSize.width, height: buttonSize.height)
+        .contentShape(Rectangle())
         .accessibilityLabel(item.title)
-        // Firmware/update note: page tabs map recovered pageCamera/pageMedia/pageChat/pageSettings, pageTabWidth and tabButton size symbols; keep labels accessibility-only unless a future IPA exposes visible page text.
+        // Firmware/update note: landscape page tabs are icon-only; portrait bottom BmdTabView shows compact labels exactly like the recovered screenshots.
     }
 }

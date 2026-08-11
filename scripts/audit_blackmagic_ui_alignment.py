@@ -16,6 +16,9 @@ REQUIRED_HUD_LABELS = ["LENS", "FPS", "SHUTTER", "IRIS", "ISO", "WB", "TINT"]
 FORBIDDEN_HUD_LABELS = ["Zoom", "Exposure", "Format", "STAB", "LUT"]
 REQUIRED_SOURCE_PATTERNS = {
     'right_page_rail': (SRC / 'ShootingHUDComponents.swift', r'rightPageNavigationRail\(compact:'),
+    'official_top_readout_bar': (SRC / 'ShootingHUDComponents.swift', r'officialTopReadoutBar\(compact:'),
+    'official_portrait_top_cluster': (SRC / 'ShootingHUDComponents.swift', r'officialPortraitTopCluster\(compact:'),
+    'portrait_bottom_page_tab_bar': (SRC / 'ShootingHUDComponents.swift', r'rightPageNavigationRail\(compact: true, horizontal: true\)'),
     'left_monitor_rail': (SRC / 'ShootingHUDComponents.swift', r'leftMonitorRail\(compact:'),
     'root_page_rail': (SRC / 'ShootingHUDComponents.swift', r'BlackmagicRootPageRail\(selection:'),
     'dial_scroller_options': (SRC / 'ShootingHUDComponents.swift', r'ScrollerOptionDial\('),
@@ -29,7 +32,8 @@ REQUIRED_SOURCE_PATTERNS = {
     'top_status_only_hud': (SRC / 'ShootingHUDComponents.swift', r'topLeftStatus\(compact: compact\)'),
     'footer_bmd_adjustment_dials': (SRC / 'ShootingHUDComponents.swift', r'BmdAdjustmentDialCell\(item: item, compact: compact, active: activeScroller == item\.scroller\)'),
     'footer_height_for_dials': (SRC / 'ShootingHUDComponents.swift', r'var footerHeight: CGFloat \{ compact \? 72 : 92 \}'),
-    'icon_only_page_rail': (SRC / 'BlackmagicRootPageRail.swift', r'icon-only cells'),
+    'icon_only_page_rail': (SRC / 'BlackmagicRootPageRail.swift', r'landscape page tabs are icon-only'),
+    'portrait_page_rail_labels': (SRC / 'BlackmagicRootPageRail.swift', r'Text\(item\.title\.capitalized\)'),
     'liveview_live_asset_button': (SRC / 'LiveViewPanel.swift', r'stripLabel\("LIVE", asset: "HdmiPlay"'),
     'liveview_review_asset_button': (SRC / 'LiveViewPanel.swift', r'stripLabel\("REVIEW", asset: "IconTimelapse"'),
     'liveview_stream_asset_button': (SRC / 'LiveViewPanel.swift', r'stripLabel\("STREAM", asset: "IconStream"'),
@@ -41,8 +45,8 @@ REQUIRED_SOURCE_PATTERNS = {
     'nd_filter_options_spec': (SRC / 'BlackmagicReverseSpec.swift', r'static let ndFilterOptions'),
     'stream_timelapse_top_status': (SRC / 'ShootingHUDComponents.swift', r'TopHudGlyph\(asset: "IconStream"[\s\S]*TopHudGlyph\(asset: "IconTimelapse"'),
     'stabilisation_reverse_anchor': (SRC / 'BlackmagicReverseSpec.swift', r'StabilisationOptions'),
-    'portrait_timecode_bar': (SRC / 'ShootingHUDComponents.swift', r'portraitTimecodeBar\(compact:'),
-    'portrait_status_no_duplicate_timer': (SRC / 'ShootingHUDComponents.swift', r'portraitStatusRow\(compact: true\)[\s\S]*excludes RecordTimerTextIndicator'),
+    'portrait_timecode_bar': (SRC / 'ShootingHUDComponents.swift', r'officialPortraitTopCluster\(compact: true\)'),
+    'portrait_status_no_duplicate_timer': (SRC / 'ShootingHUDComponents.swift', r'portrait top cluster matches 3\.2\.00 screenshot'),
     'stealth_layout_toggle': (SRC / 'ShootingHUDComponents.swift', r'stealthHUD[\s\S]*StealthLayoutData'),
     'reset_settings_category': (SRC / 'BlackmagicReverseSpec.swift', r'static let resetChoices'),
     'reset_settings_panel_rows': (SRC / 'PropertyPanel.swift', r'valueForResetOption[\s\S]*Reset Settings Dialog'),
@@ -58,7 +62,6 @@ FORBIDDEN_SOURCE_PATTERNS = {
     'bare_chat_asset_in_nav': (SRC / 'ShootingHUDComponents.swift', r'case \.chat: return "Chat"'),
     'top_footer_readout_duplication': (SRC / 'ShootingHUDComponents.swift', r'CameraTopReadout\(item:'),
     'mini_footer_not_bmd_dial': (SRC / 'ShootingHUDComponents.swift', r'MiniFooterReadout\(item:'),
-    'visible_page_rail_text': (SRC / 'BlackmagicRootPageRail.swift', r'Text\(item\.title\.capitalized\)'),
     'liveview_sf_striplabel': (SRC / 'LiveViewPanel.swift', r'stripLabel\([^\\n]*systemImage:'),
     'chat_toolbar_sf_person_icons': (SRC / 'CloudChatPanel.swift', r'Image\(systemName:.*person\.crop\.circle'),
     'stale_camera_linked_asset': (SRC / 'CloudChatPanel.swift', r'return "CameraLinked"'),
@@ -161,8 +164,20 @@ def check_asset_coverage():
         raise AssertionError(f'asset names not covered by IPA assets/aliases: {missing}')
 
 
+
+
+def check_page_rail_orientation_rules():
+    txt = read(SRC / 'BlackmagicRootPageRail.swift')
+    if 'Text(item.title.capitalized)' not in txt:
+        raise AssertionError('portrait BmdTabView labels missing from bottom tab rail')
+    if 'landscape page tabs are icon-only' not in txt:
+        raise AssertionError('landscape icon-only page rail rule missing')
+    if 'horizontal ? CGSize' not in txt or 'if horizontal' not in txt:
+        raise AssertionError('page rail does not separate portrait horizontal tabs from landscape vertical tabs')
+    # Firmware/update note: if a future IPA changes BmdTabView/BmdVTabView label behavior, update this orientation-specific rule from screenshots and symbols.
+
 def main():
-    checks = [check_spec, check_info_plist_parity, check_source_patterns, check_hud_labels, check_asset_coverage]
+    checks = [check_spec, check_info_plist_parity, check_source_patterns, check_hud_labels, check_asset_coverage, check_page_rail_orientation_rules]
     for check in checks:
         check()
     print('blackmagic-ui-alignment: PASS')

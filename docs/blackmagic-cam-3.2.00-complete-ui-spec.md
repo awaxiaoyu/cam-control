@@ -6,12 +6,12 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 
 ## Hard Requirements
 - Full-screen monitor-first camera page; no app title banner over preview.
-- Right edge page rail uses pageCamera/pageMedia/pageChat/pageSettings order.
-- Left edge is icon-only monitor/control rail: false color, focus assist, guides, zebra, LUT/clean feed.
-- Footer controls are exactly LENS, FPS, SHUTTER, IRIS, ISO, WB, TINT; secondary controls live in scrollers.
-- Top overlay is compact status/timecode/storage/upload, using BMD Lato fonts.
-- Top overlay must not duplicate footer camera controls; LENS/FPS/SHUTTER/IRIS/ISO/WB/TINT render only as footer `BmdAdjustmentDial` cells.
-- Right edge `pageCamera/pageMedia/pageChat/pageSettings` rail is icon-only in the visible UI; text labels remain accessibility-only.
+- Landscape camera page uses a right-edge pageCamera/pageMedia/pageChat/pageSettings BmdVTabView rail.
+- Portrait camera page uses a bottom pageCamera/pageMedia/pageChat/pageSettings BmdTabView rail with compact labels.
+- Monitor/control tools are icon-only chrome: a right utility strip in landscape and a bottom control dock in portrait.
+- Camera readouts are exactly LENS, FPS, SHUTTER, IRIS, ISO, WB, TINT in the official order.
+- Top overlay is compact project/timecode/status/readout, using BMD Lato fonts.
+- Guides, false color, focus assist, zebra and white-balance overlays are tool-activated, not always-on default chrome.
 - Settings, Media, Chat use Blackmagic side-panel layouts, not iOS grouped list chrome.
 - Use recovered CameraAppToolbox Assets.car names and documented aliases before SF Symbol fallback.
 
@@ -267,25 +267,6 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - `ExposureIntent`
 - `CodecIntent`
 
-
-
-## Page-Level Implementation Notes
-
-- Slate is implemented as tabbed `PROJECT INFO` / `CLIP INFO` / `LENS INFO` panels mapped to recovered `SlateViewProjectInfo`, `SlateViewClipInfo`, and `SlateViewLensInfo` symbols; the close button uses recovered `SlateClose`.
-- Settings option choices use square `OptionListView` / `BmdTextListSelector`-style selector cells rather than iOS capsule chips.
-- Media, Chat, Settings sidebars must remain dark panel-driven surfaces consistent with `MediaViewSidebar`, `ChatViewSidebar`, and `SettingsCategoryPanel` evidence.
-- Media page must mount `MediaSortPanel`, `MediaUploadToCloudPanel`, and `MediaClipDetailsLandscapePanel` as a dark contextual right panel beside the clip grid, not leave them as unused toolbar state.
-- Camera HUD layout separates `HUDTopLeftIndicators` / `HUDTopIndicators` status from `LHUDFooterElements` / `PHUDFooterElements`; top status shows camera/record/timecode/storage/upload only, while the footer uses `BmdAdjustmentDial`, `BmdDialHDivider`, and `BmdDialVDivider` for the seven camera controls.
-- Chat toolbar participant presence uses compact text-avatar dots and recovered project/cloud/upload/remote-camera assets; SF Symbol `person.crop.circle` glyphs are not part of the recovered `ChatViewToolbar`/`ChatTableView` surface.
-
-## Assetutil Dimension Evidence
-
-Dimension source: `docs/blackmagic-cam-3.2.00-asset-dimensions.tsv` generated from `CameraAppToolbox.framework/Assets.car` via `xcrun assetutil --info`.
-
-- `FalseColorLegend` renders from the recovered original-color 150x603 asset; do not replace it with synthetic color rectangles.
-- `BmdCloudLogo` renders from the recovered original-color 853x276 asset; Chat/Cloud pages should use this asset instead of text-only branding.
-- Core page/HUD icons are 96x96 assets; record controls are 132x132 assets; battery readout is 66x42 and should not be styled as a generic SF Symbol.
-
 ## Settings Categories
 - **About**: List Option
 - **Accessories**: List Option
@@ -332,6 +313,8 @@ Dimension source: `docs/blackmagic-cam-3.2.00-asset-dimensions.tsv` generated fr
 - `Apple Watch/IconLock_active`
 - `Apple Watch/IconLut`
 - `Apple Watch/IconLut_active`
+- `Apple Watch/IconStream`
+- `Apple Watch/IconStream_active`
 - `Apple Watch/IconTimelapse`
 - `Apple Watch/IconTimelapse_active`
 - `Apple Watch/Lut`
@@ -502,8 +485,6 @@ Dimension source: `docs/blackmagic-cam-3.2.00-asset-dimensions.tsv` generated fr
 - `HDMI_4K_LUT_record@3x.png`
 - `HDMI_4K_nd_clear@3x.png`
 - `HDMI_4K_nd_frac_1@3x.png`
-- `HDMI_4K_nd_frac_2@3x.png`
-- `HDMI_4K_nd_frac_3@3x.png`
 
 ## Update Rule
 When Blackmagic changes IPA/game-version-style UI, rerun this script against the new IPA, compare `complete_ui_facts.json`, then update `BlackmagicReverseSpec.swift` before view code.
