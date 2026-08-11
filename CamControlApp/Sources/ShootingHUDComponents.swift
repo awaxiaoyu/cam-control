@@ -13,6 +13,7 @@ struct ShootingHUDLayout<Preview: View>: View {
     let onToggleLive: () -> Void
     let onFocus: () -> Void
     let onRefresh: () -> Void
+    let onHUDOption: (String) -> Void
     let onNavigate: (ShootingHUDNavItem) -> Void
     let isCaptureActive: Bool
     let isLiveActive: Bool
@@ -41,6 +42,7 @@ struct ShootingHUDLayout<Preview: View>: View {
         onToggleLive: @escaping () -> Void,
         onFocus: @escaping () -> Void,
         onRefresh: @escaping () -> Void,
+        onHUDOption: @escaping (String) -> Void = { _ in },
         onNavigate: @escaping (ShootingHUDNavItem) -> Void,
         @ViewBuilder preview: () -> Preview
     ) {
@@ -59,6 +61,7 @@ struct ShootingHUDLayout<Preview: View>: View {
         self.onToggleLive = onToggleLive
         self.onFocus = onFocus
         self.onRefresh = onRefresh
+        self.onHUDOption = onHUDOption
         self.onNavigate = onNavigate
         self.preview = preview()
     }
@@ -190,8 +193,8 @@ struct ShootingHUDLayout<Preview: View>: View {
         ZStack {
             VStack(spacing: 0) {
                 officialPortraitTopCluster(compact: true)
-                    .padding(.top, metrics.safePad + 10)
-                    .padding(.horizontal, metrics.safePad + 12)
+                    .padding(.top, metrics.safePad + 14)
+                    .padding(.horizontal, metrics.safePad + 14)
                 Spacer()
                 HStack(alignment: .bottom) {
                     if let histogram = bottomCards.first {
@@ -298,35 +301,35 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func officialPortraitTopCluster(compact: Bool) -> some View {
-        VStack(spacing: 5) {
-            HStack(alignment: .center, spacing: 5) {
+        VStack(spacing: 6) {
+            HStack(alignment: .center, spacing: 6) {
                 Spacer()
                 Text("Short Films")
-                    .font(BlackmagicCamStyle.labelFont(size: 5.2, weight: .heavy))
+                    .font(BlackmagicCamStyle.labelFont(size: 6, weight: .heavy))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 1.5)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
                     .background(BlackmagicCamStyle.activeBlue, in: RoundedRectangle(cornerRadius: 2, style: .continuous))
                 Text("97%")
-                    .font(BlackmagicCamStyle.labelFont(size: 6.2, weight: .heavy))
+                    .font(BlackmagicCamStyle.labelFont(size: 7, weight: .heavy))
                     .foregroundStyle(.black.opacity(0.82))
                     .padding(.horizontal, 4)
-                    .padding(.vertical, 1.5)
+                    .padding(.vertical, 2)
                     .background(.white.opacity(0.92), in: RoundedRectangle(cornerRadius: 2, style: .continuous))
                 Spacer()
             }
             Text(timecode)
-                .font(BlackmagicCamStyle.timecodeFont(size: 22))
+                .font(BlackmagicCamStyle.timecodeFont(size: 25))
                 .foregroundStyle(BlackmagicCamStyle.recordRed.opacity(0.95))
-            HStack(alignment: .top, spacing: 9) {
+            HStack(alignment: .top, spacing: 12) {
                 ForEach(bottomControlItems) { item in
                     VStack(spacing: 1) {
                         Text(item.title)
-                            .font(BlackmagicCamStyle.labelFont(size: 5.2, weight: .heavy))
-                            .tracking(0.35)
+                            .font(BlackmagicCamStyle.labelFont(size: 6, weight: .heavy))
+                            .tracking(0.4)
                             .foregroundStyle(.white.opacity(0.72))
                         Text(item.value)
-                            .font(BlackmagicCamStyle.labelFont(size: 7.8, weight: .heavy))
+                            .font(BlackmagicCamStyle.labelFont(size: 9, weight: .heavy))
                             .foregroundStyle(.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.55)
@@ -335,8 +338,8 @@ struct ShootingHUDLayout<Preview: View>: View {
                 }
             }
         }
-        .padding(.horizontal, 4)
-        // Firmware/update note: portrait top cluster matches 3.2.00 screenshot but assumes native full-screen LaunchScreen geometry; rerun reverse_blackmagic_complete_ui.py before changing these dense readout ratios for a newer IPA.
+        .padding(.horizontal, 5)
+        // Firmware/update note: portrait top cluster matches 3.2.00 screenshot after native LaunchScreen removes compatibility scaling; rerun reverse_blackmagic_complete_ui.py before changing these readout ratios for a newer IPA.
     }
 
     private func portraitControlDock(compact: Bool) -> some View {
@@ -348,7 +351,7 @@ struct ShootingHUDLayout<Preview: View>: View {
             Spacer()
             Button(action: onCapture) {
                 RecordButtonView(active: isCaptureActive, enabled: canCapture, compact: false)
-                    .frame(width: 50, height: 50)
+                    .frame(width: 58, height: 58)
             }
             .buttonStyle(.plain)
             .disabled(!canCapture)
@@ -357,7 +360,7 @@ struct ShootingHUDLayout<Preview: View>: View {
             monitorIconButton(asset: "Guides", color: .white.opacity(0.78), scroller: .guides, compact: true)
             monitorIconButton(asset: "FalseColor", color: .white.opacity(0.78), scroller: .falseColor, compact: true)
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 14)
         .background(Color.black.opacity(0.94))
         .overlay(Rectangle().fill(.white.opacity(0.08)).frame(height: 1), alignment: .top)
         // Firmware/update note: portrait bottom control dock mirrors the 3.2.00 screenshot's clapper/focus/exposure, central record button, and monitor tools above the page tab bar.
@@ -626,7 +629,8 @@ struct ShootingHUDLayout<Preview: View>: View {
         if option == "Refresh" { onRefresh() }
         if option == "Live" { onToggleLive() }
         if option == "AF" { onFocus() }
-        // Firmware/update note: scroller labels are reverse-derived from CameraAppToolbox HUD/AppIntent strings; bind selection actions to cam_app_control properties when the controller layer exposes those writes.
+        onHUDOption(option)
+        // Firmware/update note: scroller labels are reverse-derived from CameraAppToolbox HUD/AppIntent strings; phone-camera mode maps local lens/zoom/AF/record options to AVCapture while tethered mode keeps property writes in CameraController.
     }
 }
 
@@ -636,15 +640,15 @@ private struct BlackmagicHUDMetrics {
     var compact: Bool { size.width < 980 || size.height < 620 }
     var safePad: CGFloat { compact ? 6 : 10 }
     var pageTabWidth: CGFloat { compact ? 54 : 68 }
-    var pageTabHeight: CGFloat { compact ? 58 : 70 }
+    var pageTabHeight: CGFloat { compact ? 70 : 82 }
     var footerBottomPadding: CGFloat { compact ? 6 : 10 }
     var leftHudWidth: CGFloat { compact ? 26 : 34 }
     var rightControlRailWidth: CGFloat { compact ? 38 : 50 }
     var rightPageRailWidth: CGFloat { compact ? 54 : 68 }
     var landscapeRightChromeWidth: CGFloat { rightControlRailWidth + rightPageRailWidth }
-    var portraitControlBarHeight: CGFloat { compact ? 58 : 72 }
+    var portraitControlBarHeight: CGFloat { compact ? 70 : 84 }
     var footerHeight: CGFloat { compact ? 72 : 92 }
-    // Firmware/update note: values are reverse-derived from 3.2.00 MainViewLayoutData/PortraitLayoutData/StealthLayoutData plus App Store 3.x screenshots; portrait heights are intentionally dense because LaunchScreen enables native full-screen viewport, so update these only after rerunning reverse_blackmagic_complete_ui.py on a newer IPA.
+    // Firmware/update note: values are reverse-derived from 3.2.00 MainViewLayoutData/PortraitLayoutData/StealthLayoutData plus App Store 3.x screenshots; portrait heights assume native LaunchScreen full-screen geometry, so update these only after rerunning reverse_blackmagic_complete_ui.py on a newer IPA.
 }
 
 struct ShootingHUDTopItem: Identifiable, Equatable {

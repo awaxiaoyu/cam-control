@@ -1,4 +1,5 @@
 import AVFoundation
+import AVKit
 import CamControlCore
 import SwiftUI
 import UIKit
@@ -13,28 +14,33 @@ struct PhoneCameraWorkspaceView: View {
             ShootingHUDLayout(
                 title: "Blackmagic Camera",
                 subtitle: camera.activePosition == .front ? "Front Camera" : "Back Camera",
-                timecode: "00:00:00:00",
+                timecode: camera.timecode,
                 topItems: topItems,
                 bottomCards: bottomCards,
                 navSelection: navSelection,
-                isCaptureActive: false,
+                isCaptureActive: camera.isRecording,
                 isLiveActive: camera.isSessionRunning,
                 canCapture: camera.isReady,
-                canFocus: false,
+                canFocus: camera.isReady,
                 canToggleLive: true,
                 onCapture: {
-                    camera.capturePhoto()
+                    camera.toggleRecording()
                 },
                 onToggleLive: {
                     camera.start()
                 },
-                onFocus: {},
+                onFocus: {
+                    camera.autofocus()
+                },
                 onRefresh: {
                     if camera.isSessionRunning, camera.canSwitchCamera {
                         camera.switchCamera()
                     } else {
                         camera.start()
                     }
+                },
+                onHUDOption: { option in
+                    camera.handleHUDOption(option)
                 },
                 onNavigate: navigate
             ) {
@@ -44,6 +50,22 @@ struct PhoneCameraWorkspaceView: View {
                             .ignoresSafeArea()
                     } else {
                         Color.black.ignoresSafeArea()
+                    }
+
+                    if camera.isRecording {
+                        VStack {
+                            HStack {
+                                HUDCameraLightIndicator(title: "REC", asset: "Record", active: true, compact: true, color: BlackmagicCamStyle.recordRed)
+                                    .padding(.horizontal, 9)
+                                    .padding(.vertical, 6)
+                                    .background(.black.opacity(0.40), in: Capsule())
+                                Spacer()
+                            }
+                            .padding(.top, 62)
+                            .padding(.leading, 16)
+                            Spacer()
+                        }
+                        .allowsHitTesting(false)
                     }
 
                     if let image = camera.lastPhoto {
@@ -97,7 +119,7 @@ struct PhoneCameraWorkspaceView: View {
         .onDisappear {
             camera.stop()
         }
-        // Firmware/update note: if iOS camera APIs expose more per-device video properties after OS updates, populate topItems here while keeping the Blackmagic HUD shell stable.
+        // Firmware/update note: phone camera now owns real offline capture/recording so future iOS camera API changes should update PhoneCameraViewModel, not the Blackmagic HUD shell.
     }
 
 
@@ -137,7 +159,7 @@ struct PhoneCameraWorkspaceView: View {
                     case .controls:
                         PropertyPanel()
                     case .gallery:
-                        GalleryView()
+                        PhoneMediaGalleryView(clips: camera.recordedClips, lastPhoto: camera.lastPhoto)
                     case .chat:
                         CloudChatPanel()
                     }
@@ -153,17 +175,17 @@ struct PhoneCameraWorkspaceView: View {
         }
         .background(BlackmagicCamStyle.canvas)
         .ignoresSafeArea()
-        // Firmware/update note: page switching mirrors recovered pageCamera/pageMedia/pageChat/pageSettings and BmdTabView/BmdVTabView symbols; rail remains anchored to the right edge like the 3.2.00 camera workspace, and non-camera panels reserve pageTabWidth.
+        // Firmware/update note: page switching mirrors recovered pageCamera/pageMedia/pageChat/pageSettings; Media is now backed by local recorded clips while Blackmagic Cloud online sync remains intentionally offline.
     }
 
     private var topItems: [ShootingHUDTopItem] {
         [
-            ShootingHUDTopItem(title: "LENS", value: camera.activePosition == .front ? "FRONT" : "24mm"),
+            ShootingHUDTopItem(title: "LENS", value: camera.lensLabel),
             ShootingHUDTopItem(title: "FPS", value: "24"),
             ShootingHUDTopItem(title: "SHUTTER", value: "1/48", isAuto: true, isMonospaced: true),
             ShootingHUDTopItem(title: "IRIS", value: "f1.8", isDimmed: true, isMonospaced: true),
             ShootingHUDTopItem(title: "ISO", value: "Auto", isAuto: true),
-            ShootingHUDTopItem(title: "WB", value: "4700K", isAuto: true),
+            ShootingHUDTopItem(title: "WB", value: camera.whiteBalanceLabel, isAuto: true),
             ShootingHUDTopItem(title: "TINT", value: "0", isMonospaced: true)
         ]
     }
@@ -171,25 +193,155 @@ struct PhoneCameraWorkspaceView: View {
     private var bottomCards: [ShootingHUDBottomCard] {
         [
             ShootingHUDBottomCard(title: "Rec.709", kind: .histogram(ShootingHUDFixtures.histogramBars)),
-            ShootingHUDBottomCard(title: "Storage", kind: .storage(primary: "09:00", progress: camera.isReady ? 0.35 : 0.02, trailing: camera.lastPhoto == nil ? "3GB" : "1 shot")),
-            ShootingHUDBottomCard(title: "iPhone Mic", kind: .audio([0.24, 0.21]))
+            ShootingHUDBottomCard(title: "Storage", kind: .storage(primary: camera.isRecording ? "REC" : "READY", progress: camera.isRecording ? 0.86 : 0.35, trailing: "\(camera.recordedClips.count) clips")),
+            ShootingHUDBottomCard(title: "iPhone Mic", kind: .audio(camera.audioLevels))
         ]
     }
 }
+
+private struct PhoneCameraClip: Identifiable, Equatable {
+    let id = UUID()
+    let url: URL
+    let createdAt: Date
+    let duration: TimeInterval
+
+    var displayName: String { url.deletingPathExtension().lastPathComponent }
+    var durationText: String {
+        let seconds = max(0, Int(duration.rounded()))
+        return String(format: "%02d:%02d", seconds / 60, seconds % 60)
+    }
+}
+
+private struct PhoneMediaGalleryView: View {
+    let clips: [PhoneCameraClip]
+    let lastPhoto: UIImage?
+
+    var body: some View {
+        ZStack {
+            BlackmagicCamStyle.canvas.ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 14) {
+                BMSectionHeader(
+                    eyebrow: "Media",
+                    title: "Local Clips",
+                    subtitle: "Offline in-app recordings from the phone camera"
+                )
+                if clips.isEmpty, lastPhoto == nil {
+                    BMEmptyState(
+                        systemImage: "film.stack",
+                        title: "No local media yet",
+                        subtitle: "Tap the red record button on Camera to create a .mov clip. Cloud sync stays offline for now."
+                    )
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 10) {
+                            ForEach(clips.reversed()) { clip in
+                                PhoneClipRow(clip: clip)
+                            }
+                            if let lastPhoto {
+                                HStack(spacing: 12) {
+                                    Image(uiImage: lastPhoto)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 84, height: 54)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Last Photo")
+                                            .font(BlackmagicCamStyle.labelFont(size: 13, weight: .heavy))
+                                            .foregroundStyle(.white)
+                                        Text("Still capture preview")
+                                            .font(BlackmagicCamStyle.labelFont(size: 10, weight: .bold))
+                                            .foregroundStyle(.white.opacity(0.48))
+                                    }
+                                    Spacer()
+                                }
+                                .padding(10)
+                                .blackmagicPanel(cornerRadius: 12)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.top, 72)
+            .padding(.leading, 18)
+            .padding(.trailing, 18)
+            .padding(.bottom, 18)
+        }
+        // Firmware/update note: this is the offline MediaTab equivalent; when online Blackmagic Cloud returns, add upload/sync state here without replacing local clip playback.
+    }
+}
+
+private struct PhoneClipRow: View {
+    let clip: PhoneCameraClip
+    @State private var isExpanded = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 12) {
+                BMDAssetIcon(name: "Media", fallback: "film", color: BlackmagicCamStyle.cyan, size: 22)
+                    .frame(width: 46, height: 46)
+                    .background(.black.opacity(0.46), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(clip.displayName)
+                        .font(BlackmagicCamStyle.labelFont(size: 13, weight: .heavy))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    Text("MOV  •  \(clip.durationText)")
+                        .font(BlackmagicCamStyle.labelFont(size: 10, weight: .heavy))
+                        .foregroundStyle(.white.opacity(0.50))
+                }
+                Spacer()
+                ShareLink(item: clip.url) {
+                    BMDAssetIcon(name: "UploadToCloud", fallback: "square.and.arrow.up", color: .white.opacity(0.78), size: 18)
+                        .frame(width: 34, height: 34)
+                }
+                Button {
+                    withAnimation(.snappy(duration: 0.18)) { isExpanded.toggle() }
+                } label: {
+                    Image(systemName: isExpanded ? "chevron.up" : "play.fill")
+                        .font(.system(size: 15, weight: .heavy))
+                        .foregroundStyle(.white.opacity(0.86))
+                        .frame(width: 34, height: 34)
+                }
+                .buttonStyle(.plain)
+            }
+            if isExpanded {
+                VideoPlayer(player: AVPlayer(url: clip.url))
+                    .frame(height: 176)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.white.opacity(0.10), lineWidth: 1))
+            }
+        }
+        .padding(10)
+        .blackmagicPanel(cornerRadius: 14)
+        // Firmware/update note: local playback uses the clip URL from AVCaptureMovieFileOutput; if Blackmagic changes media naming, update displayName generation only.
+    }
+}
+
 private final class PhoneCameraViewModel: NSObject, ObservableObject {
     @Published private(set) var session: AVCaptureSession?
     @Published private(set) var authorizationStatus: AVAuthorizationStatus = .notDetermined
+    @Published private(set) var audioAuthorizationStatus: AVAuthorizationStatus = .notDetermined
     @Published private(set) var isSessionRunning = false
+    @Published private(set) var isRecording = false
+    @Published private(set) var timecode = "00:00:00:00"
     @Published private(set) var lastPhoto: UIImage?
     @Published private(set) var lastError: String?
     @Published private(set) var activePosition: AVCaptureDevice.Position = .back
+    @Published private(set) var lensLabel = "24mm"
+    @Published private(set) var whiteBalanceLabel = "4700K"
+    @Published private(set) var audioLevels: [Double] = [0.24, 0.21]
+    @Published private(set) var recordedClips: [PhoneCameraClip] = []
     @Published private(set) var hasAttemptedStart = false
 
     private let sessionQueue = DispatchQueue(label: "com.aicomposition.camcontrol.phone-camera.session")
     private var currentSession: AVCaptureSession?
     private var photoOutput: AVCapturePhotoOutput?
+    private var movieOutput: AVCaptureMovieFileOutput?
     private var currentInput: AVCaptureDeviceInput?
+    private var audioInput: AVCaptureDeviceInput?
     private var isConfigured = false
+    private var recordingStartedAt: Date?
+    private var timecodeTimer: Timer?
 
     var isReady: Bool {
         authorizationStatus == .authorized && isSessionRunning
@@ -219,10 +371,11 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
         hasAttemptedStart = true
         Task { [weak self] in
             guard let self else { return }
-            let granted = await self.requestAccessIfNeeded()
+            let granted = await self.requestVideoAccessIfNeeded()
             guard granted else { return }
+            let includeAudio = await self.requestAudioAccessIfNeeded()
             self.sessionQueue.async { [weak self] in
-                self?.configureAndStart()
+                self?.configureAndStart(includeAudio: includeAudio)
             }
         }
     }
@@ -230,23 +383,61 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
     func stop() {
         sessionQueue.async { [weak self] in
             guard let self else { return }
+            if self.movieOutput?.isRecording == true {
+                self.movieOutput?.stopRecording()
+            }
             if let session = self.currentSession, session.isRunning {
                 session.stopRunning()
             }
             DispatchQueue.main.async {
                 self.isSessionRunning = false
+                self.isRecording = false
+                self.stopTimecodeTimer(reset: true)
             }
         }
     }
 
     func switchCamera() {
+        let nextPosition: AVCaptureDevice.Position = activePosition == .back ? .front : .back
+        switchCamera(to: nextPosition)
+    }
+
+    func switchCamera(to position: AVCaptureDevice.Position) {
         guard currentSession != nil else {
             start()
             return
         }
-        let nextPosition: AVCaptureDevice.Position = activePosition == .back ? .front : .back
+        guard !isRecording else {
+            publishError("Stop recording before switching camera.")
+            return
+        }
         sessionQueue.async { [weak self] in
-            self?.reconfigureInput(position: nextPosition)
+            self?.reconfigureInput(position: position)
+        }
+    }
+
+    func toggleRecording() {
+        guard isReady else {
+            start()
+            return
+        }
+        sessionQueue.async { [weak self] in
+            guard let self else { return }
+            guard let output = self.movieOutput else {
+                self.publishError("Video recording output is unavailable.")
+                return
+            }
+            if output.isRecording {
+                output.stopRecording()
+                return
+            }
+            do {
+                let url = try Self.makeRecordingURL()
+                self.configureMovieConnection()
+                output.startRecording(to: url, recordingDelegate: self)
+            } catch {
+                self.publishError(error.localizedDescription)
+            }
         }
     }
 
@@ -263,8 +454,55 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
         }
     }
 
+    func autofocus() {
+        sessionQueue.async { [weak self] in
+            guard let self, let device = self.currentInput?.device else { return }
+            do {
+                try device.lockForConfiguration()
+                if device.isFocusPointOfInterestSupported {
+                    device.focusPointOfInterest = CGPoint(x: 0.5, y: 0.5)
+                }
+                if device.isFocusModeSupported(.autoFocus) {
+                    device.focusMode = .autoFocus
+                }
+                if device.isExposurePointOfInterestSupported {
+                    device.exposurePointOfInterest = CGPoint(x: 0.5, y: 0.5)
+                }
+                if device.isExposureModeSupported(.continuousAutoExposure) {
+                    device.exposureMode = .continuousAutoExposure
+                }
+                device.unlockForConfiguration()
+                DispatchQueue.main.async { self.lastError = nil }
+            } catch {
+                self.publishError(error.localizedDescription)
+            }
+        }
+        // Firmware/update note: AF maps Blackmagic Focus/AF controls to native iPhone focus APIs; if iOS camera focus modes change, update this adapter only.
+    }
+
+    func handleHUDOption(_ option: String) {
+        let normalized = option.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch normalized.lowercased() {
+        case "refresh", "live":
+            start()
+        case "front":
+            switchCamera(to: .front)
+        case "af":
+            autofocus()
+        case "auto":
+            resetAutoExposureAndFocus()
+        case "lock":
+            lockFocusAndExposure()
+        default:
+            if let zoom = Self.zoomPreset(for: normalized) {
+                applyZoom(zoom.factor, label: zoom.label)
+            }
+        }
+        // Firmware/update note: HUD scroller options come from the Blackmagic 3.2.00 Lens/Fps/Shutter/Iris/Iso/WB/Tint option families; unsupported online/cloud choices intentionally no-op until those services are rebuilt.
+    }
+
     @MainActor
-    private func requestAccessIfNeeded() async -> Bool {
+    private func requestVideoAccessIfNeeded() async -> Bool {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         authorizationStatus = status
         switch status {
@@ -285,20 +523,57 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
         }
     }
 
-    private func configureAndStart() {
+    @MainActor
+    private func requestAudioAccessIfNeeded() async -> Bool {
+        let status = AVCaptureDevice.authorizationStatus(for: .audio)
+        audioAuthorizationStatus = status
+        switch status {
+        case .authorized:
+            return true
+        case .notDetermined:
+            let granted = await withCheckedContinuation { continuation in
+                AVCaptureDevice.requestAccess(for: .audio) { granted in
+                    continuation.resume(returning: granted)
+                }
+            }
+            audioAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .audio)
+            return granted
+        case .denied, .restricted:
+            return false
+        @unknown default:
+            return false
+        }
+    }
+
+    private func configureAndStart(includeAudio: Bool) {
         let captureSession = currentSession ?? AVCaptureSession()
         currentSession = captureSession
         if !isConfigured {
             captureSession.beginConfiguration()
-            captureSession.sessionPreset = .photo
+            if captureSession.canSetSessionPreset(.high) {
+                captureSession.sessionPreset = .high
+            }
             reconfigureInput(position: activePosition, commitConfiguration: false)
-            let output = photoOutput ?? AVCapturePhotoOutput()
-            photoOutput = output
-            if captureSession.canAddOutput(output) {
-                captureSession.addOutput(output)
+            configureAudioInput(includeAudio: includeAudio, session: captureSession)
+
+            let photo = photoOutput ?? AVCapturePhotoOutput()
+            photoOutput = photo
+            if captureSession.canAddOutput(photo) {
+                captureSession.addOutput(photo)
+            }
+
+            let movie = movieOutput ?? AVCaptureMovieFileOutput()
+            movieOutput = movie
+            if captureSession.canAddOutput(movie) {
+                captureSession.addOutput(movie)
             }
             captureSession.commitConfiguration()
+            configureMovieConnection()
             isConfigured = true
+        } else if includeAudio, audioInput == nil {
+            captureSession.beginConfiguration()
+            configureAudioInput(includeAudio: true, session: captureSession)
+            captureSession.commitConfiguration()
         }
 
         guard currentInput != nil else {
@@ -314,7 +589,20 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
             self.isSessionRunning = captureSession.isRunning
             self.lastError = nil
         }
-        // Firmware/update note: phone camera startup is allowed on appear because duplicate reverse-spec dictionary keys are now audited; if future iOS camera APIs change, keep failures inside this adapter instead of the HUD shell.
+        // Firmware/update note: real phone recording uses AVCaptureMovieFileOutput to match Blackmagic's offline record-first camera behavior; cloud upload remains outside this adapter.
+    }
+
+    private func configureAudioInput(includeAudio: Bool, session: AVCaptureSession) {
+        guard includeAudio, audioInput == nil, let device = AVCaptureDevice.default(for: .audio) else { return }
+        do {
+            let input = try AVCaptureDeviceInput(device: device)
+            if session.canAddInput(input) {
+                session.addInput(input)
+                audioInput = input
+            }
+        } catch {
+            publishError(error.localizedDescription)
+        }
     }
 
     private func reconfigureInput(position: AVCaptureDevice.Position, commitConfiguration: Bool = true) {
@@ -322,7 +610,10 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
             publishError(position == .front ? "Front camera is unavailable." : "Back camera is unavailable.")
             return
         }
+        reconfigureInput(device: device, position: position, commitConfiguration: commitConfiguration)
+    }
 
+    private func reconfigureInput(device: AVCaptureDevice, position: AVCaptureDevice.Position, commitConfiguration: Bool = true) {
         guard let captureSession = currentSession else {
             publishError("Phone camera session has not been created.")
             return
@@ -339,8 +630,10 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
             if captureSession.canAddInput(input) {
                 captureSession.addInput(input)
                 currentInput = input
+                configureMovieConnection()
                 DispatchQueue.main.async {
                     self.activePosition = position
+                    self.lensLabel = position == .front ? "FRONT" : "24mm"
                     self.lastError = nil
                 }
             } else {
@@ -358,12 +651,158 @@ private final class PhoneCameraViewModel: NSObject, ObservableObject {
     }
 
     private func cameraDevice(position: AVCaptureDevice.Position) -> AVCaptureDevice? {
+        let deviceTypes: [AVCaptureDevice.DeviceType]
+        if position == .back {
+            deviceTypes = [.builtInTripleCamera, .builtInDualWideCamera, .builtInDualCamera, .builtInUltraWideCamera, .builtInWideAngleCamera]
+        } else {
+            deviceTypes = [.builtInTrueDepthCamera, .builtInWideAngleCamera]
+        }
         let discovery = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInWideAngleCamera, .builtInDualCamera, .builtInTripleCamera, .builtInUltraWideCamera],
+            deviceTypes: deviceTypes,
             mediaType: .video,
             position: position
         )
         return discovery.devices.first
+    }
+
+    private func applyZoom(_ factor: CGFloat, label: String) {
+        sessionQueue.async { [weak self] in
+            guard let self, let device = self.currentInput?.device else { return }
+            do {
+                try device.lockForConfiguration()
+                let minimum = device.minAvailableVideoZoomFactor
+                let maximum = min(device.maxAvailableVideoZoomFactor, 8.0)
+                let clamped = min(max(factor, minimum), maximum)
+                if device.isRampingVideoZoom {
+                    device.cancelVideoZoomRamp()
+                }
+                device.videoZoomFactor = clamped
+                device.unlockForConfiguration()
+                DispatchQueue.main.async {
+                    self.lensLabel = label
+                    self.lastError = nil
+                }
+            } catch {
+                self.publishError(error.localizedDescription)
+            }
+        }
+    }
+
+    private func resetAutoExposureAndFocus() {
+        sessionQueue.async { [weak self] in
+            guard let self, let device = self.currentInput?.device else { return }
+            do {
+                try device.lockForConfiguration()
+                if device.isFocusModeSupported(.continuousAutoFocus) { device.focusMode = .continuousAutoFocus }
+                if device.isExposureModeSupported(.continuousAutoExposure) { device.exposureMode = .continuousAutoExposure }
+                if device.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) { device.whiteBalanceMode = .continuousAutoWhiteBalance }
+                device.unlockForConfiguration()
+                DispatchQueue.main.async {
+                    self.whiteBalanceLabel = "Auto"
+                    self.lastError = nil
+                }
+            } catch {
+                self.publishError(error.localizedDescription)
+            }
+        }
+    }
+
+    private func lockFocusAndExposure() {
+        sessionQueue.async { [weak self] in
+            guard let self, let device = self.currentInput?.device else { return }
+            do {
+                try device.lockForConfiguration()
+                if device.isFocusModeSupported(.locked) { device.focusMode = .locked }
+                if device.isExposureModeSupported(.locked) { device.exposureMode = .locked }
+                if device.isWhiteBalanceModeSupported(.locked) { device.whiteBalanceMode = .locked }
+                device.unlockForConfiguration()
+                DispatchQueue.main.async { self.lastError = nil }
+            } catch {
+                self.publishError(error.localizedDescription)
+            }
+        }
+    }
+
+    private func configureMovieConnection() {
+        guard let connection = movieOutput?.connection(with: .video) else { return }
+        if connection.isVideoOrientationSupported {
+            connection.videoOrientation = Self.currentVideoOrientation
+        }
+        if connection.isVideoStabilizationSupported {
+            connection.preferredVideoStabilizationMode = .auto
+        }
+    }
+
+    private static var currentVideoOrientation: AVCaptureVideoOrientation {
+        switch UIDevice.current.orientation {
+        case .landscapeLeft: return .landscapeRight
+        case .landscapeRight: return .landscapeLeft
+        case .portraitUpsideDown: return .portraitUpsideDown
+        default: return .portrait
+        }
+    }
+
+    private static func zoomPreset(for option: String) -> (factor: CGFloat, label: String)? {
+        switch option.lowercased() {
+        case "0.5x", "13mm": return (0.5, option)
+        case "1.0x", "1x", "24mm": return (1.0, option == "1x" ? "1.0x" : option)
+        case "2.0x", "2x", "48mm": return (2.0, option == "2x" ? "2.0x" : option)
+        case "3.0x", "3x", "77mm": return (3.0, option == "3x" ? "3.0x" : option)
+        case "5.0x", "5x": return (5.0, option == "5x" ? "5.0x" : option)
+        case "35mm": return (1.45, option)
+        default: return nil
+        }
+    }
+
+    private static func makeRecordingURL() throws -> URL {
+        let directory = try recordingDirectory()
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let url = directory.appendingPathComponent("A001_\(timestamp).mov")
+        if FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+        }
+        return url
+    }
+
+    private static func recordingDirectory() throws -> URL {
+        let base = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let directory = base.appendingPathComponent("BlackmagicCam", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
+    }
+
+    private func startTimecodeTimer(start: Date) {
+        timecodeTimer?.invalidate()
+        recordingStartedAt = start
+        timecode = "00:00:00:00"
+        timecodeTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 12.0, repeats: true) { [weak self] _ in
+            guard let self, let start = self.recordingStartedAt else { return }
+            let elapsed = Date().timeIntervalSince(start)
+            self.timecode = Self.formatTimecode(elapsed: elapsed)
+            let pulse = 0.18 + min(0.70, abs(sin(elapsed * 2.1)) * 0.44)
+            self.audioLevels = [pulse, max(0.08, pulse * 0.82)]
+        }
+    }
+
+    private func stopTimecodeTimer(reset: Bool) {
+        timecodeTimer?.invalidate()
+        timecodeTimer = nil
+        recordingStartedAt = nil
+        audioLevels = [0.24, 0.21]
+        if reset {
+            timecode = "00:00:00:00"
+        }
+    }
+
+    private static func formatTimecode(elapsed: TimeInterval) -> String {
+        let frameRate = 24
+        let totalFrames = max(0, Int((elapsed * Double(frameRate)).rounded(.down)))
+        let frames = totalFrames % frameRate
+        let totalSeconds = totalFrames / frameRate
+        let seconds = totalSeconds % 60
+        let minutes = (totalSeconds / 60) % 60
+        let hours = totalSeconds / 3600
+        return String(format: "%02d:%02d:%02d:%02d", hours, minutes, seconds, frames)
     }
 
     private func publishError(_ message: String) {
@@ -386,6 +825,35 @@ extension PhoneCameraViewModel: AVCapturePhotoCaptureDelegate {
         }
         DispatchQueue.main.async {
             self.lastPhoto = image
+            self.lastError = nil
+        }
+    }
+}
+
+extension PhoneCameraViewModel: AVCaptureFileOutputRecordingDelegate {
+    func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo fileURL: URL, from connections: [AVCaptureConnection]) {
+        DispatchQueue.main.async {
+            let start = Date()
+            self.isRecording = true
+            self.lastError = nil
+            self.startTimecodeTimer(start: start)
+        }
+    }
+
+    func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
+        DispatchQueue.main.async {
+            let duration = self.recordingStartedAt.map { Date().timeIntervalSince($0) } ?? 0
+            self.isRecording = false
+            self.stopTimecodeTimer(reset: true)
+            if let error {
+                self.lastError = error.localizedDescription
+                return
+            }
+            guard FileManager.default.fileExists(atPath: outputFileURL.path) else {
+                self.lastError = "Recorded clip file was not created."
+                return
+            }
+            self.recordedClips.append(PhoneCameraClip(url: outputFileURL, createdAt: Date(), duration: duration))
             self.lastError = nil
         }
     }

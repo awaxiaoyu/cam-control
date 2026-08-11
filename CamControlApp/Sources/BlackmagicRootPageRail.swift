@@ -20,7 +20,7 @@ struct BlackmagicRootPageRail: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, compact ? 14 : 24)
+                .padding(.horizontal, compact ? 18 : 28)
                 .background(Color.black.opacity(0.96))
                 .overlay(Rectangle().fill(.white.opacity(0.08)).frame(height: 1), alignment: .top)
             } else {
@@ -51,8 +51,8 @@ private struct RootPageRailButton: View {
     private var fillColor: Color { selected ? BlackmagicCamStyle.activeBlue.opacity(0.58) : .white.opacity(0.052) }
     private var strokeColor: Color { selected ? BlackmagicCamStyle.cyan.opacity(0.48) : .white.opacity(0.08) }
     private var cornerRadius: CGFloat { compact ? 6 : 8 }
-    private var buttonSize: CGSize { horizontal ? CGSize(width: compact ? 48 : 62, height: compact ? 48 : 60) : CGSize(width: compact ? 54 : 68, height: compact ? 46 : 56) }
-    private var iconSize: CGFloat { compact ? 15 : 20 }
+    private var buttonSize: CGSize { horizontal ? CGSize(width: compact ? 54 : 68, height: compact ? 54 : 64) : CGSize(width: compact ? 54 : 68, height: compact ? 46 : 56) }
+    private var iconSize: CGFloat { compact ? 17 : 21 }
 
     var body: some View {
         VStack(spacing: horizontal ? 4 : 0) {
@@ -76,7 +76,7 @@ private struct RootPageRailButton: View {
             }
             if horizontal {
                 Text(item.title.capitalized)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5.5 : 7.5, weight: .heavy))
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
                     .foregroundStyle(selected ? BlackmagicCamStyle.cyan : .white.opacity(0.72))
             }
         }
