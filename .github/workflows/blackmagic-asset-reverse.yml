@@ -1,0 +1,54 @@
+﻿name: Blackmagic Asset Reverse
+
+on:
+  workflow_dispatch:
+
+jobs:
+  assetutil:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dump CoreUI asset metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/assetutil
+          for car in \
+            "CamControlApp/Resources/BlackmagicAssets.bundle/Assets.car" \
+            "CamControlApp/Resources/Assets.car" \
+            "CamControlApp/Resources/BlackmagicAssets/CameraAppToolbox-Assets.car"; do
+            if [ -f "$car" ]; then
+              name="$(echo "$car" | tr '/.' '__')"
+              xcrun assetutil --info "$car" > "artifacts/assetutil/${name}.json"
+              python3 - <<'PY' "$car" "artifacts/assetutil/${name}.json" "artifacts/assetutil/${name}.summary.tsv"
+import json, sys
+car, src, out = sys.argv[1:]
+with open(src, 'r', encoding='utf-8') as f:
+    data = json.load(f)
+rows = []
+for item in data:
+    name = item.get('Name') or item.get('RenditionName') or item.get('AssetType') or ''
+    rendition = item.get('RenditionName') or ''
+    idiom = item.get('Idiom') or ''
+    scale = item.get('Scale') or item.get('ScaleFactor') or ''
+    w = item.get('PixelWidth') or item.get('Width') or ''
+    h = item.get('PixelHeight') or item.get('Height') or ''
+    subtype = item.get('Subtype') or ''
+    if name or rendition:
+        rows.append((str(name), str(rendition), str(idiom), str(scale), str(w), str(h), str(subtype)))
+rows.sort(key=lambda r: (r[0].lower(), r[1].lower()))
+with open(out, 'w', encoding='utf-8') as f:
+    f.write('car\tname\trendition\tidiom\tscale\twidth\theight\tsubtype\n')
+    for row in rows:
+        f.write(car + '\t' + '\t'.join(row) + '\n')
+print(car, len(rows))
+PY
+            fi
+          done
+
+      - name: Upload assetutil metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: blackmagic-assetutil-metadata
+          path: artifacts/assetutil
