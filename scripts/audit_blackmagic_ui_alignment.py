@@ -41,6 +41,11 @@ REQUIRED_SOURCE_PATTERNS = {
     'nd_filter_options_spec': (SRC / 'BlackmagicReverseSpec.swift', r'static let ndFilterOptions'),
     'stream_timelapse_top_status': (SRC / 'ShootingHUDComponents.swift', r'TopHudGlyph\(asset: "IconStream"[\s\S]*TopHudGlyph\(asset: "IconTimelapse"'),
     'stabilisation_reverse_anchor': (SRC / 'BlackmagicReverseSpec.swift', r'StabilisationOptions'),
+    'portrait_timecode_bar': (SRC / 'ShootingHUDComponents.swift', r'portraitTimecodeBar\(compact:'),
+    'portrait_status_no_duplicate_timer': (SRC / 'ShootingHUDComponents.swift', r'portraitStatusRow\(compact: true\)[\s\S]*excludes RecordTimerTextIndicator'),
+    'stealth_layout_toggle': (SRC / 'ShootingHUDComponents.swift', r'stealthHUD[\s\S]*StealthLayoutData'),
+    'reset_settings_category': (SRC / 'BlackmagicReverseSpec.swift', r'static let resetChoices'),
+    'reset_settings_panel_rows': (SRC / 'PropertyPanel.swift', r'valueForResetOption[\s\S]*Reset Settings Dialog'),
     'complete_reverse_script': (ROOT / 'scripts' / 'reverse_blackmagic_complete_ui.py', r'UI_BUCKETS'),
 }
 FORBIDDEN_SOURCE_PATTERNS = {

@@ -38,8 +38,9 @@ enum BlackmagicReverseSpec {
     ]
 
     static let settingsCategories = [
-        "Record", "Camera", "Monitor", "Audio", "LUTs", "Media", "Blackmagic Cloud", "HDMI Out", "Presets", "Accessories", "About"
+        "Record", "Camera", "Monitor", "Audio", "LUTs", "Media", "Blackmagic Cloud", "HDMI Out", "Presets", "Accessories", "About", "Reset"
     ]
+    static let portraitSettingsTitle = "Settings"
 
     static let monitorOptions = [
         "Display Audio Meters", "Display Battery Indicator", "Display Histogram", "Display Storage Status",
@@ -75,6 +76,13 @@ enum BlackmagicReverseSpec {
     static let presetSelectionOptions = ["Export Preset", "Import Preset", "Save New Preset"]
     static let accessoriesOptions = ["Nucleus Wireless Lens Control", "Use Bluetooth"]
     static let aboutOptions = ["App Version", "Learn More at Blackmagicdesign.com"]
+    static let resetOptions = ["Reset Blackmagic Cam Settings"]
+    static let resetChoices = ["Reset Camera Settings", "Reset Camera and Cloud Settings", "Reset All Settings and Erase All Content"]
+    static let resetDialogBodies = [
+        "This will revert all settings to default.",
+        "This will revert all camera and cloud settings to default.",
+        "This will revert all camera and cloud settings to default and erase all clips, presets and LUTS stored on this iphone. This cannot be undone."
+    ]
 
     static let settingsOptionChoices: [String: [String]] = [
         "Capture 1 Frame Every": ["1 Second", "%d Seconds", "1 Minute", "%d Minutes", "%d Frames"],
@@ -97,7 +105,8 @@ enum BlackmagicReverseSpec {
         "Save Clips to": ["In-App Only", "In-App and Photo Library", "Files"],
         "Upload Clips": ["Proxies Only", "Originals and Proxies"],
         "Preset Selection": presetSelectionOptions,
-        "LUT Selection": ["Import LUT"] + lutNames
+        "LUT Selection": ["Import LUT"] + lutNames,
+        "Reset Blackmagic Cam Settings": resetChoices
     ]
     static let slateProjectFields = ["PRODUCTION NAME", "DIRECTOR", "CAMERA", "CAMERA OPERATOR"]
     static let slateClipFields = ["SLATE FOR", "SCENE", "TAKE", "REEL", "LENS DATA", "Good Take Last Clip", "Interior", "Exterior", "Day", "Night", "Next Clip"]

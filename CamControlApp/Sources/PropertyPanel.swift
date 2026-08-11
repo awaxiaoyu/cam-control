@@ -178,6 +178,9 @@ struct PropertyPanel: View {
             return BlackmagicReverseSpec.presetOptions.map { settingRow($0, value: valueForPresetOption($0)) }
         case "Accessories":
             return BlackmagicReverseSpec.accessoriesOptions.map { settingRow($0, value: valueForAccessoriesOption($0)) }
+        case "Reset":
+            return BlackmagicReverseSpec.resetOptions.map { settingRow($0, value: valueForResetOption($0)) } +
+                BlackmagicReverseSpec.resetDialogBodies.map { SettingsOptionModel(title: "Reset Settings Dialog", value: $0, choices: [], color: BlackmagicCamStyle.recordRed) }
         default:
             return BlackmagicReverseSpec.aboutOptions.map { settingRow($0, value: valueForAboutOption($0)) }
         }
@@ -291,6 +294,14 @@ struct PropertyPanel: View {
         // Firmware/update note: About/Accessories rows mirror Settings > About and Settings > Accessories localization comments from Blackmagic Cam 3.2.00.
     }
 
+    private func valueForResetOption(_ title: String) -> String {
+        switch title {
+        case "Reset Blackmagic Cam Settings": return "Reset Camera and Cloud Settings"
+        default: return "Reset"
+        }
+        // Firmware/update note: Reset rows mirror Settings > Reset / Reset Settings Dialog localization comments; if Blackmagic changes destructive-copy text, update BlackmagicReverseSpec.resetChoices/resetDialogBodies from Localizable.strings first.
+    }
+
     private func propertyText(_ key: CameraPropertyKey, fallback: String) -> String {
         guard let property = controller.snapshot.properties.first(where: { $0.key == key }) else { return fallback }
         return PropertyValueFormatter.displayValue(property.value, for: key)
@@ -306,6 +317,7 @@ struct PropertyPanel: View {
         case "Media": return "Storage / Upload / Filename"
         case "Blackmagic Cloud": return "Project / Chat / Sync"
         case "HDMI Out": return "Clean Feed / Mirror Display"
+        case "Reset": return "Camera / Cloud / All Content"
         default: return "Presets / Accessories / About"
         }
     }
@@ -320,6 +332,7 @@ struct PropertyPanel: View {
         case "Media": return "Media storage, upload status and proxy/original upload behavior."
         case "Blackmagic Cloud": return "Project library, chat, upload, organization and remote camera control shell."
         case "HDMI Out": return "External monitor behavior including clean feed and mirror display."
+        case "Reset": return "Reset Camera Settings, Camera and Cloud Settings, or all app content with the recovered Blackmagic warning copy."
         default: return "Additional Blackmagic Camera settings."
         }
     }
@@ -336,6 +349,7 @@ struct PropertyPanel: View {
         case "HDMI Out": return "HdmiPlay"
         case "Presets": return "Sync"
         case "Accessories": return "ControlIcon"
+        case "Reset": return "Record"
         default: return "ControlIcon"
         }
     }
@@ -350,6 +364,7 @@ struct PropertyPanel: View {
         case "Media": return .white.opacity(0.82)
         case "Blackmagic Cloud": return BlackmagicCamStyle.cyan
         case "HDMI Out": return .white.opacity(0.72)
+        case "Reset": return BlackmagicCamStyle.recordRed
         default: return BlackmagicCamStyle.mutedText
         }
     }
@@ -412,7 +427,8 @@ private struct SettingsOptionRow: View {
                 Text(row.value)
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.55))
-                    .lineLimit(1)
+                    .lineLimit(row.title == "Reset Settings Dialog" ? 3 : 1)
+                    .multilineTextAlignment(.trailing)
                     .minimumScaleFactor(0.62)
                 Image(systemName: "chevron.right")
                     .font(.system(size: compact ? 7 : 9, weight: .bold))

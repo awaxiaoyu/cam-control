@@ -23,6 +23,7 @@ struct ShootingHUDLayout<Preview: View>: View {
     @State private var activeScroller: BlackmagicHUDScroller?
     @State private var showSlate = false
     @State private var cleanFeed = false
+    @State private var stealthHUD = false
 
     init(
         title: String,
@@ -68,7 +69,7 @@ struct ShootingHUDLayout<Preview: View>: View {
             ZStack {
                 BlackmagicCamStyle.canvas.ignoresSafeArea()
                 previewLayer
-                if !cleanFeed {
+                if !cleanFeed && !stealthHUD {
                     guideLayer(metrics: metrics)
                     cameraChrome(metrics: metrics)
                     if let activeScroller {
@@ -96,11 +97,14 @@ struct ShootingHUDLayout<Preview: View>: View {
                     }
                 } else {
                     VStack {
-                        HStack {
+                        HStack(spacing: 8) {
                             Button {
-                                withAnimation(.snappy(duration: 0.18)) { cleanFeed = false }
+                                withAnimation(.snappy(duration: 0.18)) {
+                                    cleanFeed = false
+                                    stealthHUD = false
+                                }
                             } label: {
-                                HUDAuxIndicator(title: "CLEAN FEED", value: "EXIT", color: BlackmagicCamStyle.okGreen, compact: metrics.compact)
+                                HUDAuxIndicator(title: cleanFeed ? "CLEAN FEED" : "STEALTH HUD", value: "EXIT", color: cleanFeed ? BlackmagicCamStyle.okGreen : BlackmagicCamStyle.cyan, compact: metrics.compact)
                             }
                             .buttonStyle(.plain)
                             .padding(metrics.safePad)
@@ -134,19 +138,30 @@ struct ShootingHUDLayout<Preview: View>: View {
     }
 
     private func cameraChrome(metrics: BlackmagicHUDMetrics) -> some View {
+        Group {
+            if metrics.isLandscape {
+                landscapeCameraChrome(metrics: metrics)
+            } else {
+                portraitCameraChrome(metrics: metrics)
+            }
+        }
+        // Firmware/update note: MainViewLayoutData exposes separate landscape/portrait/stealth layout data plus PSHUDTimecodeBar/PHUDCameraControls; keep this branch explicit when updating for a new IPA.
+    }
+
+    private func landscapeCameraChrome(metrics: BlackmagicHUDMetrics) -> some View {
         ZStack {
             VStack(spacing: 0) {
                 topHUD(compact: metrics.compact)
-                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.leftHudWidth + 6 : 0))
+                    .padding(.leading, metrics.safePad + metrics.leftHudWidth + 6)
                     .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 6)
                     .padding(.top, metrics.safePad + 2)
                 Spacer()
                 bottomScopeStrip(compact: metrics.compact)
-                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.leftHudWidth + 18 : 0))
+                    .padding(.leading, metrics.safePad + metrics.leftHudWidth + 18)
                     .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 12)
                     .padding(.bottom, metrics.compact ? 6 : 10)
                 bottomControls(compact: metrics.compact)
-                    .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.leftHudWidth + 6 : 0))
+                    .padding(.leading, metrics.safePad + metrics.leftHudWidth + 6)
                     .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 6)
                     .padding(.bottom, metrics.footerBottomPadding)
             }
@@ -162,9 +177,74 @@ struct ShootingHUDLayout<Preview: View>: View {
                     .frame(width: metrics.rightPageRailWidth)
                     .padding(.trailing, metrics.safePad)
             }
-            .padding(.top, metrics.isLandscape ? (metrics.compact ? 24 : 34) : metrics.size.height * 0.22)
+            .padding(.top, metrics.compact ? 24 : 34)
         }
-        // Firmware/update note: layout follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors and the 3.2.00 landscape screenshots: HUD icons live in a thin left strip, camera/media/chat/settings stay in a separate right page rail, and camera-control icons sit immediately to its left.
+        // Firmware/update note: landscape branch follows recovered LandscapeLayoutData: left monitor strip, right function rail, right page rail, centered transparent timecode/status and footer BmdAdjustmentDial controls.
+    }
+
+    private func portraitCameraChrome(metrics: BlackmagicHUDMetrics) -> some View {
+        ZStack {
+            VStack(spacing: 0) {
+                portraitTimecodeBar(compact: metrics.compact)
+                    .padding(.top, metrics.safePad + 4)
+                    .padding(.horizontal, metrics.safePad + metrics.rightPageRailWidth + 6)
+                portraitStatusRow(compact: true)
+                    .padding(.top, 6)
+                    .padding(.leading, metrics.safePad + 4)
+                    .padding(.trailing, metrics.safePad + metrics.rightPageRailWidth + 6)
+                Spacer()
+                bottomScopeStrip(compact: true)
+                    .padding(.leading, metrics.safePad + 8)
+                    .padding(.trailing, metrics.safePad + metrics.rightPageRailWidth + 6)
+                    .padding(.bottom, 6)
+                bottomControls(compact: true)
+                    .padding(.leading, metrics.safePad + 4)
+                    .padding(.trailing, metrics.safePad + metrics.rightPageRailWidth + 6)
+                    .padding(.bottom, metrics.footerBottomPadding + 4)
+            }
+
+            HStack(alignment: .center, spacing: 4) {
+                leftMonitorRail(compact: true)
+                    .frame(width: metrics.leftHudWidth)
+                    .padding(.leading, metrics.safePad)
+                Spacer()
+                VStack(spacing: 8) {
+                    rightPageNavigationRail(compact: true)
+                    rightControlRail(compact: true)
+                    Button {
+                        withAnimation(.snappy(duration: 0.18)) { stealthHUD = true }
+                    } label: {
+                        monitorIconShell(asset: "IconLock", color: BlackmagicCamStyle.cyan, active: stealthHUD, compact: true)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(width: metrics.rightPageRailWidth)
+                .padding(.trailing, metrics.safePad)
+            }
+            .padding(.top, metrics.size.height * 0.16)
+            .padding(.bottom, metrics.footerHeight + 20)
+        }
+        // Firmware/update note: portrait branch maps PHUDCameraControls/PSHUDCameraBaseControls/PSHUDTimecodeBar and StealthLayoutData; do not reuse the wide landscape offsets on narrow iPhone portrait screens.
+    }
+
+    private func portraitTimecodeBar(compact: Bool) -> some View {
+        HStack(spacing: 8) {
+            HUDTallyDot(active: isCaptureActive, compact: true)
+            Text(timecode)
+                .font(BlackmagicCamStyle.timecodeFont(size: compact ? 20 : 24))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
+            Text(isCaptureActive ? "REC" : "STBY")
+                .font(BlackmagicCamStyle.labelFont(size: 8, weight: .heavy))
+                .tracking(1.0)
+                .foregroundStyle(isCaptureActive ? BlackmagicCamStyle.recordRed : .white.opacity(0.50))
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(.black.opacity(0.34), in: Capsule())
+        .overlay(Capsule().stroke(.white.opacity(0.10), lineWidth: 1))
+        // Firmware/update note: explicit PSHUDTimecodeBar representation for portrait/small-screen mode; update only if recovered portrait timecode symbols change.
     }
 
     private func topHUD(compact: Bool) -> some View {
@@ -175,6 +255,15 @@ struct ShootingHUDLayout<Preview: View>: View {
             Spacer(minLength: compact ? 8 : 16)
             topStatusIcons(compact: compact)
         }
+    }
+
+    private func portraitStatusRow(compact: Bool) -> some View {
+        HStack(alignment: .center, spacing: 8) {
+            topLeftStatus(compact: compact)
+            Spacer(minLength: 6)
+            topStatusIcons(compact: compact)
+        }
+        // Firmware/update note: portrait uses PSHUDTimecodeBar for timecode, so this row deliberately excludes RecordTimerTextIndicator to avoid duplicating the portrait timecode bar.
     }
 
     private func topLeftStatus(compact: Bool) -> some View {
@@ -453,7 +542,7 @@ private struct BlackmagicHUDMetrics {
     var rightControlRailWidth: CGFloat { compact ? 34 : 44 }
     var rightPageRailWidth: CGFloat { compact ? 44 : 58 }
     var footerHeight: CGFloat { compact ? 72 : 92 }
-    // Firmware/update note: values are reverse-derived from 3.2.00 MainViewLayoutData plus App Store 3.x landscape screenshots: status-only top HUD, BmdAdjustmentDial footer controls, narrow left HUD strip, icon rail + page rail on the right, and no generic card-like bottom toolbar.
+    // Firmware/update note: values are reverse-derived from 3.2.00 MainViewLayoutData/PortraitLayoutData/StealthLayoutData plus App Store 3.x screenshots: status-only top HUD, PSHUDTimecodeBar in portrait, BmdAdjustmentDial footer controls, narrow left HUD strip, function rail + page rail on the right, and no generic card-like bottom toolbar.
 }
 
 struct ShootingHUDTopItem: Identifiable, Equatable {
