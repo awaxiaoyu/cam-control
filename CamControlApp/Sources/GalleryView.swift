@@ -60,12 +60,12 @@ struct GalleryView: View {
                         VStack(spacing: compact ? 6 : 8) {
                             BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
                                 .frame(width: compact ? 76 : 112, height: compact ? 24 : 36)
-                            Text("Log in to Blackmagic Cloud\nto access your projects")
+                            Text("Cloud login offline\nUI preview only")
                                 .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .bold))
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(.white.opacity(0.44))
                             Button { sidePanel = .upload } label: {
-                                Text("Log In")
+                                Text("Preview")
                                     .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, compact ? 6 : 8)
@@ -84,7 +84,7 @@ struct GalleryView: View {
             Spacer()
         }
         .background(Color.black.opacity(0.92))
-        // Firmware/update note: MediaViewSidebar now mirrors Blackmagic 3.x screenshots: simple dark source list, iPhone source card, Cloud login/projects block.
+        // Firmware/update note: MediaViewSidebar mirrors Blackmagic 3.x screenshots: simple dark source list, iPhone source card, and Cloud login/projects block; online Cloud login stays a local UI preview until transport is added.
     }
 
     @State private var selectedCloudProjectTitle = "Short Film"
@@ -407,8 +407,9 @@ private struct MediaSortPanel: View {
 private struct MediaUploadPanel: View {
     let compact: Bool
     private let rows = [
+        ("Cloud Transport", "Offline UI Only", BlackmagicCamStyle.cyan),
         ("Upload To", "No project selected - All Clips", BlackmagicCamStyle.amber),
-        ("Upload Clips", "Waiting to Upload...", .white.opacity(0.72)),
+        ("Upload Clips", "Offline", .white.opacity(0.72)),
         ("Upload Original", "Manual", BlackmagicCamStyle.cyan),
         ("Proxy", "Apple ProRes 422 Proxy", BlackmagicCamStyle.okGreen),
         ("Enable Upload Only Over Wi-Fi", "On", .white.opacity(0.70)),
@@ -426,7 +427,7 @@ private struct MediaUploadPanel: View {
             .padding(compact ? 14 : 18)
         }
         .background(.black.opacity(0.26))
-        // Firmware/update note: panel maps MediaUploadToCloudPanel, MediaUploadFailView and MediaClipUploadStatusText; bind rows to cloud upload state when transport is implemented.
+        // Firmware/update note: panel maps MediaUploadToCloudPanel, MediaUploadFailView and MediaClipUploadStatusText; online upload is intentionally deferred, so rows remain an offline UI preview until transport is implemented.
     }
 }
 
@@ -443,7 +444,7 @@ private struct MediaClipDetailsPanel: View {
                     MediaPanelRow(title: "Clip Name", value: item.filename, color: .white)
                     MediaPanelRow(title: "Files", value: ByteCountFormatter.string(fromByteCount: Int64(item.compressedSize), countStyle: .file), color: BlackmagicCamStyle.cyan)
                     MediaPanelRow(title: "Format", value: String(format: "0x%04X", Int(item.objectFormat)), color: BlackmagicCamStyle.amber)
-                    MediaPanelRow(title: "Upload", value: item.cachedURL == nil ? "Waiting to Upload..." : "Proxy uploaded", color: item.cachedURL == nil ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
+                    MediaPanelRow(title: "Upload", value: item.cachedURL == nil ? "Offline UI Only" : "Local cached", color: item.cachedURL == nil ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
                     Button(action: onOpen) {
                         HStack {
                             Text("OPEN CLIP")
@@ -521,20 +522,20 @@ private struct MediaFixtureClip: Identifiable {
     let id = UUID()
     let filename: String
     let duration: String
-    let colors: [Color]
+    let imageName: String
 
     static let samples: [MediaFixtureClip] = [
-        .init(filename: "IMG_1995", duration: "00:27", colors: [Color(red: 0.10, green: 0.42, blue: 0.82), Color(red: 0.90, green: 0.35, blue: 0.20)]),
-        .init(filename: "IMG_1996", duration: "00:15", colors: [Color(red: 0.08, green: 0.10, blue: 0.13), Color(red: 0.85, green: 0.70, blue: 0.48)]),
-        .init(filename: "IMG_1997", duration: "00:21", colors: [Color(red: 0.78, green: 0.88, blue: 0.96), Color(red: 0.12, green: 0.45, blue: 0.78)]),
-        .init(filename: "IMG_1998", duration: "00:08", colors: [Color(red: 0.95, green: 0.98, blue: 1.0), Color(red: 0.85, green: 0.22, blue: 0.18)]),
-        .init(filename: "IMG_2029", duration: "00:21", colors: [Color(red: 0.14, green: 0.54, blue: 0.92), Color(red: 0.92, green: 0.94, blue: 0.96)]),
-        .init(filename: "IMG_2031", duration: "00:21", colors: [Color(red: 0.06, green: 0.40, blue: 0.82), Color(red: 0.95, green: 0.34, blue: 0.20)]),
-        .init(filename: "IMG_2030", duration: "02:27", colors: [Color(red: 0.94, green: 0.62, blue: 0.25), Color(red: 0.12, green: 0.22, blue: 0.34)]),
-        .init(filename: "IMG_2032", duration: "00:27", colors: [Color(red: 0.95, green: 0.98, blue: 1.0), Color(red: 0.16, green: 0.48, blue: 0.82)]),
-        .init(filename: "IMG_2033", duration: "00:21", colors: [Color(red: 0.96, green: 0.96, blue: 0.92), Color(red: 0.85, green: 0.26, blue: 0.16)])
+        .init(filename: "IMG_1995", duration: "00:27", imageName: "bmd_media_01"),
+        .init(filename: "IMG_1996", duration: "00:15", imageName: "bmd_media_02"),
+        .init(filename: "IMG_1997", duration: "00:21", imageName: "bmd_media_03"),
+        .init(filename: "IMG_1998", duration: "00:08", imageName: "bmd_media_04"),
+        .init(filename: "IMG_2029", duration: "00:21", imageName: "bmd_media_05"),
+        .init(filename: "IMG_2031", duration: "00:21", imageName: "bmd_media_06"),
+        .init(filename: "IMG_2030", duration: "02:27", imageName: "bmd_media_07"),
+        .init(filename: "IMG_2032", duration: "00:27", imageName: "bmd_media_08"),
+        .init(filename: "IMG_2033", duration: "00:21", imageName: "bmd_media_09")
     ]
-    // Firmware/update note: sample names/durations mirror Blackmagic media marketing screenshots; replace with real media when gallery transport has data.
+    // Firmware/update note: sample thumbnails are cropped from the official 3.2.00 MediaView screenshot; replace with real media when gallery transport has data, not synthetic placeholders.
 }
 
 private struct FixtureGalleryCard: View {
@@ -544,9 +545,9 @@ private struct FixtureGalleryCard: View {
     var body: some View {
         VStack(spacing: compact ? 3 : 5) {
             ZStack(alignment: .bottomLeading) {
-                LinearGradient(colors: item.colors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                SnowRidgePattern()
-                    .fill(.white.opacity(0.36))
+                Image(item.imageName)
+                    .resizable()
+                    .scaledToFill()
                 HStack(spacing: 3) {
                     Text(item.duration)
                     Spacer(minLength: 2)
@@ -570,18 +571,6 @@ private struct FixtureGalleryCard: View {
     }
 }
 
-private struct SnowRidgePattern: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.maxY * 0.70))
-        path.addCurve(to: CGPoint(x: rect.maxX * 0.42, y: rect.maxY * 0.42), control1: CGPoint(x: rect.maxX * 0.14, y: rect.maxY * 0.58), control2: CGPoint(x: rect.maxX * 0.28, y: rect.maxY * 0.34))
-        path.addCurve(to: CGPoint(x: rect.maxX, y: rect.maxY * 0.60), control1: CGPoint(x: rect.maxX * 0.64, y: rect.maxY * 0.58), control2: CGPoint(x: rect.maxX * 0.80, y: rect.maxY * 0.48))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.closeSubpath()
-        return path
-    }
-}
 
 private struct GalleryCard: View {
     let item: GalleryItem

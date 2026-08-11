@@ -1,6 +1,6 @@
 # Blackmagic Cam 3.2.00 Complete UI Reverse Spec
 
-Source: `F:\Blackmagic Cam_3.2.00.ipa`
+Source: `G:\AI\Products\AI构图\cam-control\Blackmagic Cam_3.2.00.ipa`
 SHA256: `3e6721ce0673432ea4fb21bf7556b0433f2d0f22e3cb6170c1117b8d487e7c28`
 Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 

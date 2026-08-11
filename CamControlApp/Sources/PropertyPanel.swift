@@ -194,7 +194,7 @@ struct PropertyPanel: View {
             choices: BlackmagicReverseSpec.settingsOptionChoices[title] ?? [],
             color: color(for: selectedCategory)
         )
-        // Firmware/update note: row choices are generated from `Settings > ... > List Option` comments in F:\Blackmagic Cam_3.2.00.ipa; rerun _extract_settings_comments.py when Blackmagic changes Localizable.strings.
+        // Firmware/update note: row choices are generated from `Settings > ... > List Option` comments in the repo-local 3.2.00 IPA; rerun _extract_settings_comments.py when Blackmagic changes Localizable.strings.
     }
 
     private func valueForAudioOption(_ title: String) -> String {
@@ -243,7 +243,7 @@ struct PropertyPanel: View {
     private func valueForMediaOption(_ title: String) -> String {
         switch title {
         case "Save Clips to": return "In-App Only"
-        case "Upload Clips": return "Proxies Only"
+        case "Upload Clips": return "Offline"
         case "Filename Convention": return "Blackmagic Camera"
         case "Auto Upload To Selected Project": return "Off"
         default: return "On"
@@ -315,7 +315,7 @@ struct PropertyPanel: View {
         case "Audio": return "Gain / Source / Meters"
         case "LUTs": return "Display LUT / Import LUT"
         case "Media": return "Storage / Upload / Filename"
-        case "Blackmagic Cloud": return "Project / Chat / Sync"
+        case "Blackmagic Cloud": return "Offline UI / Chat / Sync"
         case "HDMI Out": return "Clean Feed / Mirror Display"
         case "Reset": return "Camera / Cloud / All Content"
         default: return "Presets / Accessories / About"
@@ -330,7 +330,7 @@ struct PropertyPanel: View {
         case "Audio": return "Audio source, gain, metering and format controls."
         case "LUTs": return "LUT selection, color space tags, display LUT and import controls."
         case "Media": return "Media storage, upload status and proxy/original upload behavior."
-        case "Blackmagic Cloud": return "Project library, chat, upload, organization and remote camera control shell."
+        case "Blackmagic Cloud": return "Offline UI shell for project library, chat, upload, organization and remote camera control."
         case "HDMI Out": return "External monitor behavior including clean feed and mirror display."
         case "Reset": return "Reset Camera Settings, Camera and Cloud Settings, or all app content with the recovered Blackmagic warning copy."
         default: return "Additional Blackmagic Camera settings."

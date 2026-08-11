@@ -1,4 +1,4 @@
-﻿import CamControlCore
+import CamControlCore
 import SwiftUI
 
 struct ShootingHUDLayout<Preview: View>: View {
@@ -183,7 +183,7 @@ struct ShootingHUDLayout<Preview: View>: View {
             }
             .padding(.trailing, metrics.safePad)
         }
-        // Firmware/update note: landscape branch is rebuilt from F:\Blackmagic Cam_3.2.00.ipa + App Store screenshots: full preview, one top readout row, histogram/audio overlays, right utility strip, and separate page tab strip.
+        // Firmware/update note: landscape branch is rebuilt from the repo-local Blackmagic Cam_3.2.00.ipa + App Store screenshots: full preview, one top readout row, histogram/audio overlays, right utility strip, and separate page tab strip.
     }
 
     private func portraitCameraChrome(metrics: BlackmagicHUDMetrics) -> some View {
@@ -1538,6 +1538,3 @@ private struct AudioMeterRow: View {
 enum ShootingHUDFixtures {
     static let histogramBars: [CGFloat] = [0.10, 0.18, 0.22, 0.15, 0.25, 0.38, 0.52, 0.44, 0.62, 0.74, 0.56, 0.43, 0.68, 0.82, 0.70, 0.48, 0.37, 0.28, 0.20, 0.16, 0.12, 0.09, 0.07, 0.05]
 }
-
-
-

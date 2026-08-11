@@ -21,7 +21,7 @@ struct CloudChatPanel: View {
             }
             .background(BlackmagicCamStyle.canvas)
         }
-        // Firmware/update note: CloudChatPanel mirrors the 3.2.00 ChatViewSidebar screenshot: project/member list on the left, compact participant dots in ChatViewToolbar, and ChatTableView bubbles; online transport can bind data later without changing hierarchy.
+        // Firmware/update note: CloudChatPanel mirrors the 3.2.00 ChatViewSidebar screenshot: project/member list on the left, compact participant dots in ChatViewToolbar, and ChatTableView bubbles; online transport is intentionally deferred and can bind data later without changing hierarchy.
     }
 
     private func cloudSidebar(compact: Bool) -> some View {
@@ -76,6 +76,7 @@ struct CloudChatPanel: View {
             Text("Short Film")
                 .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
                 .foregroundStyle(.white)
+            OfflineCloudBadge(compact: compact)
             Spacer()
             HStack(spacing: compact ? -4 : -6) {
                 ChatParticipantDot(initials: "MW", color: BlackmagicCamStyle.activeBlue, compact: compact)
@@ -107,7 +108,7 @@ struct CloudChatPanel: View {
             }
 
             HStack(spacing: compact ? 6 : 8) {
-                Text("Message...")
+                Text("Message disabled offline...")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.36))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -134,8 +135,8 @@ struct CloudChatPanel: View {
                 CloudActionRow(title: "Auto Upload To Selected Project", value: "Off")
                 CloudActionRow(title: "Enable Upload Only Over Wi-Fi", value: "On")
                 CloudActionRow(title: "Sync Presets to Cloud Project", value: "Manual")
-                CloudActionRow(title: "Upload Original", value: "Queued")
-                CloudActionRow(title: "Upload Proxy", value: "Ready")
+                CloudActionRow(title: "Upload Original", value: "Offline")
+                CloudActionRow(title: "Upload Proxy", value: "Local Only")
 
                 Divider().overlay(.white.opacity(0.12))
 
@@ -222,6 +223,22 @@ private struct CloudSidebarRoom: View {
         case "Green Book": return "ProjectUpload"
         default: return "BmdCloudSidebar"
         }
+    }
+}
+
+private struct OfflineCloudBadge: View {
+    let compact: Bool
+
+    var body: some View {
+        Text("OFFLINE UI")
+            .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+            .tracking(0.8)
+            .foregroundStyle(BlackmagicCamStyle.amber)
+            .padding(.horizontal, compact ? 6 : 8)
+            .padding(.vertical, compact ? 3 : 4)
+            .background(BlackmagicCamStyle.amber.opacity(0.12), in: Capsule())
+            .overlay(Capsule().stroke(BlackmagicCamStyle.amber.opacity(0.24), lineWidth: 1))
+        // Firmware/update note: remove this badge only after a future Blackmagic Cloud transport implementation is wired; keep the underlying ChatViewToolbar hierarchy intact.
     }
 }
 

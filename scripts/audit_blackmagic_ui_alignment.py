@@ -28,8 +28,12 @@ REQUIRED_SOURCE_PATTERNS = {
     'media_side_panel_rendered': (SRC / 'GalleryView.swift', r'mediaSidePanel\(compact: compact\)'),
     'media_side_panel_width': (SRC / 'GalleryView.swift', r'\.frame\(width: compact \? 190 : 280\)'),
     'media_fixture_grid': (SRC / 'GalleryView.swift', r'MediaFixtureClip\.samples'),
+    'media_fixture_uses_real_crops': (SRC / 'GalleryView.swift', r'Image\(item\.imageName\)'),
     'chat_participant_dots': (SRC / 'CloudChatPanel.swift', r'ChatParticipantDot\(initials: "MW"'),
     'chat_project_sidebar': (SRC / 'CloudChatPanel.swift', r'CloudRoom\(title: "Short Film"[\s\S]*ProjectUploadFailed'),
+    'cloud_chat_offline_badge': (SRC / 'CloudChatPanel.swift', r'OfflineCloudBadge\(compact: compact\)'),
+    'cloud_chat_message_disabled': (SRC / 'CloudChatPanel.swift', r'Message disabled offline'),
+    'media_upload_offline_stub': (SRC / 'GalleryView.swift', r'Cloud Transport", "Offline UI Only'),
     'top_status_only_hud': (SRC / 'ShootingHUDComponents.swift', r'topLeftStatus\(compact: compact\)'),
     'footer_bmd_adjustment_dials': (SRC / 'ShootingHUDComponents.swift', r'BmdAdjustmentDialCell\(item: item, compact: compact, active: activeScroller == item\.scroller\)'),
     'footer_height_for_dials': (SRC / 'ShootingHUDComponents.swift', r'var footerHeight: CGFloat \{ compact \? 72 : 92 \}'),
@@ -81,7 +85,9 @@ def check_spec():
     if not SPEC_JSON.exists():
         raise AssertionError(f'missing generated reverse facts: {SPEC_JSON}')
     facts = json.loads(read(SPEC_JSON))
-    assert facts.get('source_ipa', '').endswith('Blackmagic Cam_3.2.00.ipa'), facts.get('source_ipa')
+    source_ipa = facts.get('source_ipa', '')
+    assert source_ipa.endswith('Blackmagic Cam_3.2.00.ipa'), source_ipa
+    assert 'F:\\' not in source_ipa and 'F:/' not in source_ipa, source_ipa
     assert facts.get('bundle') == 'com.blackmagic-design.DaVinciCamera', facts.get('bundle')
     assert facts.get('version') == '3.2.00', facts.get('version')
     assert len(facts.get('asset_names', [])) >= 400, len(facts.get('asset_names', []))
@@ -112,7 +118,7 @@ def check_info_plist_parity():
     assert info.get('NSMicrophoneUsageDescription') == 'Access is required to monitor audio levels and record.', info.get('NSMicrophoneUsageDescription')
     assert info.get('NSPhotoLibraryUsageDescription') == 'Access is required to save videos to the Photo Library.', info.get('NSPhotoLibraryUsageDescription')
     assert info.get('NSBluetoothAlwaysUsageDescription') == 'Bluetooth access is required to support peripherals.', info.get('NSBluetoothAlwaysUsageDescription')
-    # Firmware/update note: these keys mirror F:\Blackmagic Cam_3.2.00.ipa Info.plist; rerun reverse_blackmagic_complete_ui.py before changing launch/status-bar behavior or permission UI text.
+    # Firmware/update note: these keys mirror the repo-local Blackmagic Cam_3.2.00.ipa Info.plist; rerun reverse_blackmagic_complete_ui.py before changing launch/status-bar behavior or permission UI text.
 
 def check_source_patterns():
     for name, (path, pattern) in REQUIRED_SOURCE_PATTERNS.items():
@@ -178,8 +184,28 @@ def check_page_rail_orientation_rules():
         raise AssertionError('page rail does not separate portrait horizontal tabs from landscape vertical tabs')
     # Firmware/update note: if a future IPA changes BmdTabView/BmdVTabView label behavior, update this orientation-specific rule from screenshots and symbols.
 
+
+
+def check_online_features_deferred():
+    combined = "\n".join(read(path) for path in SRC.glob("*.swift"))
+    forbidden = ["URLSession", "URLRequest", "uploadTask", "dataTask", "NWConnection", "CKContainer", "CloudKit", "WebSocket"]
+    hits = [token for token in forbidden if token in combined]
+    if hits:
+        raise AssertionError(f"online/cloud transport should stay deferred for this UI pass, found {hits}")
+    # Firmware/update note: when online features are implemented, replace this guard with transport-specific tests while preserving the recovered Blackmagic UI hierarchy.
+
+
+def check_media_fixture_resources():
+    media_dir = ROOT / 'CamControlApp' / 'Resources' / 'BlackmagicSampleMedia'
+    files = sorted(media_dir.glob('bmd_media_*.jpg'))
+    if len(files) != 9:
+        raise AssertionError(f'expected 9 cropped Blackmagic media fixtures, found {len(files)}')
+    if any(f.stat().st_size < 3000 for f in files):
+        raise AssertionError('one or more Blackmagic media fixture crops look empty/truncated')
+    # Firmware/update note: these crops come from the official 3.2.00 MediaView screenshot and should be regenerated when screenshots/IPA evidence changes.
+
 def main():
-    checks = [check_spec, check_info_plist_parity, check_source_patterns, check_hud_labels, check_asset_coverage, check_page_rail_orientation_rules]
+    checks = [check_spec, check_info_plist_parity, check_source_patterns, check_hud_labels, check_asset_coverage, check_page_rail_orientation_rules, check_online_features_deferred, check_media_fixture_resources]
     for check in checks:
         check()
     print('blackmagic-ui-alignment: PASS')

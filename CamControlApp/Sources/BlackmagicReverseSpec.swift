@@ -1,6 +1,6 @@
 import Foundation
 
-/// Reverse-derived UI anchors from `F:\Blackmagic Cam_3.2.00.ipa`.
+/// Reverse-derived UI anchors from `the repo-local Blackmagic Cam_3.2.00.ipa`.
 /// Firmware/update note: when Blackmagic Cam updates, rerun `scripts/reverse_blackmagic_ipa.py` and update these arrays from the new binary/resource strings before touching view layout.
 enum BlackmagicReverseSpec {
     static let sourceBundle = "Blackmagic Cam 3.2.00 / com.blackmagic-design.DaVinciCamera / build 3.2.000045"

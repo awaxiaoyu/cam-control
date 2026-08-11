@@ -1,6 +1,6 @@
 # Blackmagic Cam 3.2.00 UI Reverse Notes
 
-Source IPA: `F:\Blackmagic Cam_3.2.00.ipa`
+Source IPA: `G:\AI\Products\AI构图\cam-control\Blackmagic Cam_3.2.00.ipa`
 Bundle: `com.blackmagic-design.DaVinciCamera`
 Version: `3.2.00`, build `3.2.000045`
 Minimum iOS: `17.0`
