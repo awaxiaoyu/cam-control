@@ -114,12 +114,18 @@ struct PhoneCameraWorkspaceView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             selectedSourceRaw = CameraSourceKind.phone.rawValue
-            camera.start()
+            if !isLaunchSmokeTest {
+                camera.start()
+            }
         }
         .onDisappear {
             camera.stop()
         }
         // Firmware/update note: phone camera now owns real offline capture/recording so future iOS camera API changes should update PhoneCameraViewModel, not the Blackmagic HUD shell.
+    }
+
+    private var isLaunchSmokeTest: Bool {
+        ProcessInfo.processInfo.arguments.contains("--launch-smoke-test")
     }
 
 
