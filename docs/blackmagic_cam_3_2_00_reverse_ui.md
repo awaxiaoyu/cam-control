@@ -81,8 +81,8 @@ Slate fields from localization:
 
 ## Current implementation requirements
 
-- Keep page rail on the right edge for camera and non-camera pages.
+- Keep page rail on the right edge for camera and non-camera pages, icon-only rather than text-labeled app tabs.
 - Reserve `pageTabWidth` on non-camera panels so content is not hidden under the root rail.
-- Keep camera screen full black/preview-first; no iOS grouped list styling on `Media`, `Chat`, or `Settings`.
+- Keep camera screen full black/preview-first with icon-only monitor rail, top status/timecode overlay, bottom scope strip, and L/PHUD-style footer controls; no iOS grouped list styling on `Media`, `Chat`, or `Settings`.
 - Load real BMD assets from `BlackmagicAssets.bundle` before falling back to SF Symbols.
 - Keep update comments beside every reverse-derived feature so future IPA/game-version-style UI updates rerun `scripts/reverse_blackmagic_ipa.py`, refresh asset lists, then adjust mappings without rewriting layout from scratch.
