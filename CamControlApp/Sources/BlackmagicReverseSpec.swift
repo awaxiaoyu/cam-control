@@ -38,27 +38,43 @@ enum BlackmagicReverseSpec {
     ]
 
     static let settingsCategories = [
-        "Record", "Camera", "Monitor", "Audio", "LUTs", "Media", "Blackmagic Cloud", "HDMI Out", "Preset", "Accessories", "About"
+        "Record", "Camera", "Monitor", "Audio", "LUTs", "Media", "Blackmagic Cloud", "HDMI Out", "Presets", "Accessories", "About"
     ]
 
     static let monitorOptions = [
-        "Display Histogram", "Display Audio Meters", "Display Storage Status", "Display Battery Indicator",
-        "Display Upload Status", "Focus Assist", "Focus Assist Color", "Guides Color", "Guides Opacity", "Clean Feed"
+        "Display Audio Meters", "Display Battery Indicator", "Display Histogram", "Display Storage Status",
+        "Display Upload Status", "Focus Assist", "Focus Assist Color", "Guides Color", "Guides Opacity", "HDMI Out"
     ]
 
     static let recordOptions = [
-        "Codec", "Resolution", "Frame Rate", "If Media Drops Frame", "Record Audio as", "Lock White Balance on Record",
-        "Trigger Record Indicator", "Use Volume Button to Trigger Record"
+        "Capture 1 Frame Every", "Codec", "Color Space", "If Media Drops Frame", "Resolution", "Timecode Display", "Timelapse Recording"
     ]
+
+    static let recordCodecOptions = ["Apple ProRes 422", "Apple ProRes 422 HQ", "Apple ProRes 422 LT", "Apple ProRes 422 Proxy", "H.264", "HEVC (H.265)"]
+    static let recordResolutionOptions = ["4K", "720p", "HD"]
+    static let recordTimecodeOptions = ["Record Run", "Tentacle Sync", "Time of Day (TOD)"]
 
     static let cameraOptions = [
-        "Lens", "FPS", "Shutter", "Iris", "ISO", "White Balance", "Tint", "Anamorphic De-Squeeze", "Flicker Free Shutter Based On", "Stabilization"
+        "Anamorphic De-Squeeze", "Enable Vertical Video", "Flicker Free Shutter Based On", "Flip Image for SLR Lens",
+        "Lens Correction", "Lock Current Orientation", "Lock White Balance on Record", "Mirror Front-Facing Camera",
+        "Shutter Measurement", "Trigger Record Indicator", "Use Volume Button to Trigger Record"
     ]
 
+    static let hudControlLabels = ["LENS", "FPS", "SHUTTER", "IRIS", "ISO", "WB", "TINT"]
     static let lutColorSpaces = ["Rec.709", "Rec.2020", "P3 D65", "Apple Log", "Apple Log 2"]
     static let lutNames = ["Rec 709 Neutral", "Cinema Teal", "Day Night", "Dusty", "Monochrome", "Nature", "Nostalgic", "Paloma", "Rift", "Vivid", "Warm Fade"]
-    static let audioLabels = ["AUDIO GAIN", "Audio Source", "Audio Metering", "Audio Format", "Sample Rate"]
-    static let slateFields = ["SLATE FOR", "PROJECT", "SCENE", "TAKE", "REEL", "CAMERA OPERATOR", "LENS DATA", "GOOD TAKE"]
+    static let audioLabels = ["Audio Format", "Audio Metering", "Audio Source", "iPhone Microphone", "Record Audio as", "Sample Rate", "AUDIO GAIN"]
+    static let mediaOptions = ["Auto Upload To Selected Project", "Enable Upload Only Over Wi-Fi", "Filename Convention", "Save Clips to", "Save Location Data to Clip", "Upload Clips"]
+    static let cloudOptions = ["Available Cloud Projects", "Log in to Blackmagic Cloud"]
+    static let mediaSortOptions = ["Sort By", "Clip Name", "Date Time", "Location", "Scene, Shot", "Timecode", "Upload Status"]
+    static let mediaClipInfoLabels = ["Original Video", "Proxy", "Color Space", "Created", "File Size", "Frame Rate", "Iris", "ISO", "Lens Data", "Location", "Notes", "Reel", "Resolution", "Scene", "Shutter", "Take", "Tint", "WB"]
+    static let hdmiOutOptions = ["Clean Feed", "Mirror Display", "Status Text", "Status Text Surrounds Image"]
+    static let presetOptions = ["Preset Selection", "Sync Presets to Cloud Project", "Export Preset", "Import Preset", "Save New Preset"]
+    static let accessoriesOptions = ["Nucleus Wireless Lens Control", "Use Bluetooth"]
+    static let aboutOptions = ["App Version", "Learn More at Blackmagicdesign.com"]
+    static let slateProjectFields = ["PRODUCTION NAME", "DIRECTOR", "CAMERA", "CAMERA OPERATOR"]
+    static let slateClipFields = ["SLATE FOR", "SCENE", "TAKE", "REEL", "LENS DATA", "Good Take Last Clip", "Interior", "Exterior", "Day", "Night", "Next Clip"]
+    static let slateFields = slateProjectFields + slateClipFields
 
     static let hudAssetNames = [
         "Camera", "Camera_active", "Chat", "Chat_active", "Settings", "Settings_active", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",

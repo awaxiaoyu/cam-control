@@ -377,7 +377,7 @@ struct ShootingHUDLayout<Preview: View>: View {
                         Button {
                             withAnimation(.snappy(duration: 0.18)) { activeScroller = item.scroller }
                         } label: {
-                            CameraControlCell(item: item, compact: compact, active: activeScroller == item.scroller)
+                            BmdAdjustmentDialCell(item: item, compact: compact, active: activeScroller == item.scroller)
                         }
                         .buttonStyle(.plain)
                     }
@@ -552,12 +552,12 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
         switch self {
         case .lens: return ["0.5x", "13mm", "24mm", "35mm", "48mm", "77mm", "Front", "Refresh"]
         case .fps: return ["23.98", "24", "25", "29.97", "30", "48", "50", "59.94", "60"]
-        case .shutter: return ["1/24", "1/48", "180°", "172.8°", "1/50", "1/60", "1/120", "Auto"]
+        case .shutter: return ["1/24", "1/48", "180\u{00B0}", "172.8\u{00B0}", "1/50", "1/60", "1/120", "Auto"]
         case .iris: return ["f1.8", "f2.0", "f2.8", "f4", "f5.6", "f8", "Auto"]
         case .iso: return ["Auto", "100", "200", "400", "800", "1250", "1600", "3200", "6400"]
         case .whiteBalance: return ["Auto", "3200K", "4300K", "4700K", "5600K", "6500K", "7500K", "Lock"]
         case .tint: return ["-50", "-25", "0", "+10", "+25", "+50"]
-        case .codec: return ["Apple ProRes 422 HQ", "Apple ProRes 422", "Apple ProRes 422 LT", "Apple ProRes 422 Proxy", "H.265", "4K 16:9", "HD"]
+        case .codec: return BlackmagicReverseSpec.recordCodecOptions + BlackmagicReverseSpec.recordResolutionOptions + BlackmagicReverseSpec.recordTimecodeOptions
         case .lut: return BlackmagicReverseSpec.lutNames
         case .focus: return ["Near", "Soft", "Medium", "Hard", "Far", "AF", "Transition", "Marker 1", "Marker 2"]
         case .focusAssist: return ["Off", "On", "Focus Assist", "Focus Assist Color", "Blue", "Red", "Green", "White"]
@@ -565,7 +565,7 @@ private enum BlackmagicHUDScroller: String, Identifiable, CaseIterable {
         case .guides: return ["Off", "Thirds", "Crosshair", "Safe Area", "2.39:1", "1.85:1", "4:3", "Guides Opacity", "Guides Color"]
         case .zebra: return ["Off", "50%", "60%", "70%", "75%", "80%", "90%", "95%", "100%"]
         case .monitor: return BlackmagicReverseSpec.monitorOptions
-        case .audio: return BlackmagicReverseSpec.audioLabels + ["None", "iPhone Microphone", "AUDIO GAIN"]
+        case .audio: return BlackmagicReverseSpec.audioLabels + ["None", "iPhone Microphone"]
         case .stabilization: return ["Off", "Standard", "Cinematic", "Extreme"]
         }
     }
@@ -684,7 +684,7 @@ private struct FloatingNavPill: View {
     }
 }
 
-private struct CameraControlCell: View {
+private struct BmdAdjustmentDialCell: View {
     let item: BottomControlItem
     let compact: Bool
     let active: Bool
@@ -694,37 +694,117 @@ private struct CameraControlCell: View {
     }
 
     var body: some View {
-        VStack(spacing: compact ? 3 : 4) {
-            HStack(spacing: 5) {
-                BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.70), size: compact ? 12 : 14)
-                Text(item.title)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
-                    .tracking(0.8)
-                    .foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.50))
-            }
-            HStack(spacing: 5) {
+        ZStack {
+            BmdAdjustmentDialShape()
+                .fill(active ? BlackmagicCamStyle.activeBlue.opacity(0.24) : Color.black.opacity(0.58))
+            BmdAdjustmentDialShape()
+                .stroke(active ? BlackmagicCamStyle.cyan.opacity(0.52) : .white.opacity(0.13), lineWidth: 1)
+            BmdDialHDivider()
+                .stroke(.white.opacity(active ? 0.22 : 0.11), lineWidth: 1)
+                .padding(.horizontal, compact ? 10 : 12)
+            BmdDialVDivider()
+                .stroke(.white.opacity(active ? 0.20 : 0.09), lineWidth: 1)
+                .padding(.vertical, compact ? 9 : 11)
+
+            VStack(spacing: compact ? 3 : 5) {
+                HStack(spacing: 5) {
+                    BMDAssetIcon(name: item.asset, active: active, color: active ? BlackmagicCamStyle.cyan : .white.opacity(0.68), size: compact ? 11 : 13)
+                    Text(item.title)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
+                        .tracking(0.9)
+                        .foregroundStyle(active ? BlackmagicCamStyle.cyan : .white.opacity(0.52))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.65)
+                }
+
                 Text(item.value)
-                    .font(item.title == "FPS" || item.title == "ISO" || item.title == "TINT" ? BlackmagicCamStyle.readoutFont(size: compact ? 15 : 19, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 15 : 19, weight: .heavy))
+                    .font(item.title == "FPS" || item.title == "ISO" || item.title == "TINT" ? BlackmagicCamStyle.readoutFont(size: compact ? 18 : 24, weight: .heavy) : BlackmagicCamStyle.labelFont(size: compact ? 17 : 22, weight: .heavy))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.45)
-                if let autoLabel {
-                    Text(autoLabel)
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
-                        .tracking(0.5)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 1)
-                        .background(BlackmagicCamStyle.activeBlue, in: Capsule())
-                }
+                    .minimumScaleFactor(0.42)
+
+                BmdDialMarkerRow(active: active, compact: compact)
+            }
+            .padding(.horizontal, compact ? 8 : 10)
+
+            if let autoLabel {
+                Text(autoLabel)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
+                    .tracking(0.6)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(BlackmagicCamStyle.activeBlue.opacity(0.92), in: Capsule())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .padding(.top, compact ? 5 : 7)
+                    .padding(.trailing, compact ? 6 : 8)
             }
         }
-        .frame(width: compact ? 76 : 98, height: compact ? 48 : 62)
-        .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.24) : .white.opacity(0.060), in: RoundedRectangle(cornerRadius: compact ? 12 : 15, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 12 : 15, style: .continuous).stroke(active ? BlackmagicCamStyle.cyan.opacity(0.42) : .white.opacity(0.09), lineWidth: 1))
-        .contentShape(Rectangle())
+        .frame(width: compact ? 84 : 108, height: compact ? 62 : 78)
+        .shadow(color: active ? BlackmagicCamStyle.activeBlue.opacity(0.36) : .black.opacity(0.26), radius: active ? 10 : 5, x: 0, y: 4)
+        .contentShape(BmdAdjustmentDialShape())
         .accessibilityLabel("Camera HUD \(item.title) \(item.value)")
-        // Firmware/update note: footer readout is derived from MainControlsOption/BmdAdjustmentDial and Camera HUD Lens/FPS/Shutter/IRIS/ISO/WB/TINT strings; update only if those symbols change in a new IPA.
+        // Firmware/update note: footer readout is derived from BmdAdjustmentDial, BmdAdjustmentDialMarker, BmdDialVDivider/BmdDialHDivider and Camera HUD Lens/FPS/Shutter/IRIS/ISO/WB/TINT strings; update only if those symbols change in a new IPA.
+    }
+}
+
+private struct BmdAdjustmentDialShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let r = min(rect.width, rect.height) * 0.22
+        let notch = min(rect.width, rect.height) * 0.12
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX + r, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX - r, y: rect.minY))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY + r), control: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY - notch))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX - notch * 0.45, y: rect.midY), control: CGPoint(x: rect.maxX - notch * 0.15, y: rect.midY - notch * 0.45))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.midY + notch), control: CGPoint(x: rect.maxX - notch * 0.15, y: rect.midY + notch * 0.45))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - r))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX - r, y: rect.maxY), control: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX + r, y: rect.maxY))
+        path.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.maxY - r), control: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.midY + notch))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + notch * 0.45, y: rect.midY), control: CGPoint(x: rect.minX + notch * 0.15, y: rect.midY + notch * 0.45))
+        path.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.midY - notch), control: CGPoint(x: rect.minX + notch * 0.15, y: rect.midY - notch * 0.45))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + r))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + r, y: rect.minY), control: CGPoint(x: rect.minX, y: rect.minY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+private struct BmdDialHDivider: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+        return path
+    }
+}
+
+private struct BmdDialVDivider: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        return path
+    }
+}
+
+private struct BmdDialMarkerRow: View {
+    let active: Bool
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 2 : 3) {
+            ForEach(0..<7, id: \.self) { index in
+                Capsule()
+                    .fill(index == 3 ? (active ? BlackmagicCamStyle.cyan : .white.opacity(0.58)) : .white.opacity(active ? 0.28 : 0.18))
+                    .frame(width: index == 3 ? (compact ? 10 : 14) : (compact ? 4 : 5), height: compact ? 2 : 3)
+            }
+        }
+        .accessibilityHidden(true)
+        // Firmware/update note: marker ticks mirror the recovered BmdAdjustmentDialMarker affordance; if Blackmagic changes dial mechanics, adjust only this marker row/shape pair.
     }
 }
 
@@ -920,16 +1000,21 @@ private struct SlateOverlay: View {
     }
     private func defaultSlateValue(for field: String) -> String {
         switch field {
+        case "PRODUCTION NAME": return "No project selected - All Clips"
+        case "DIRECTOR": return "--"
+        case "CAMERA": return "A"
+        case "CAMERA OPERATOR": return "Blackmagic Camera"
         case "SLATE FOR": return "A001"
-        case "PROJECT": return "No project selected - All Clips"
         case "SCENE": return "001"
         case "TAKE": return "1"
         case "REEL": return "A"
-        case "CAMERA OPERATOR": return "Blackmagic Camera"
-        case "LENS DATA": return "24mm / f1.8"
-        case "GOOD TAKE": return "OFF"
+        case "LENS DATA": return "24mm / f1.8 / 16:9"
+        case "Good Take Last Clip": return "Off"
+        case "Interior", "Exterior", "Day", "Night": return "--"
+        case "Next Clip": return "A002"
         default: return "--"
         }
+        // Firmware/update note: values mirror Camera > Slate > Project Info / Clip Info labels recovered from Localizable.strings.
     }
 }
 

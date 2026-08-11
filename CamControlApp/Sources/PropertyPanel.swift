@@ -185,55 +185,25 @@ struct PropertyPanel: View {
                 SettingsOptionModel(title: "Import LUT", value: "\(BlackmagicReverseSpec.lutNames.count) built-in names", color: color(for: selectedCategory))
             ]
         case "Media":
-            return [
-                SettingsOptionModel(title: "Save Clips to", value: "Private Storage", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Auto Upload To Selected Project", value: "Off", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Enable Upload Only Over Wi-Fi", value: "On", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Filename Convention", value: "A001", color: color(for: selectedCategory))
-            ]
+            return BlackmagicReverseSpec.mediaOptions.map { SettingsOptionModel(title: $0, value: valueForMediaOption($0), color: color(for: selectedCategory)) }
         case "Blackmagic Cloud":
-            return [
-                SettingsOptionModel(title: "Log in to Blackmagic Cloud", value: "Offline", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Available Cloud Projects", value: "No project selected - All Clips", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Sync Presets to Cloud Project", value: "Manual", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Remote Cam Control", value: "Not linked", color: color(for: selectedCategory))
-            ]
+            return BlackmagicReverseSpec.cloudOptions.map { SettingsOptionModel(title: $0, value: valueForCloudOption($0), color: color(for: selectedCategory)) }
         case "HDMI Out":
-            return [
-                SettingsOptionModel(title: "Clean Feed", value: "Off", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Mirror Display", value: "On", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Display LUT", value: "On", color: color(for: selectedCategory))
-            ]
-        case "Preset":
-            return [
-                SettingsOptionModel(title: "Import Preset", value: "Ready", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Export Preset", value: "Ready", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Reset Camera Settings", value: "Protected", color: color(for: selectedCategory))
-            ]
+            return BlackmagicReverseSpec.hdmiOutOptions.map { SettingsOptionModel(title: $0, value: valueForHDMIOption($0), color: color(for: selectedCategory)) }
+        case "Presets":
+            return BlackmagicReverseSpec.presetOptions.map { SettingsOptionModel(title: $0, value: valueForPresetOption($0), color: color(for: selectedCategory)) }
         case "Accessories":
-            return [
-                SettingsOptionModel(title: "Tentacle Sync", value: "Disconnected", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Remote Camera", value: "Monitor Only", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Bluetooth Controller", value: "Off", color: color(for: selectedCategory))
-            ]
+            return BlackmagicReverseSpec.accessoriesOptions.map { SettingsOptionModel(title: $0, value: valueForAccessoriesOption($0), color: color(for: selectedCategory)) }
         default:
-            return [
-                SettingsOptionModel(title: "Blackmagic Camera", value: "3.2.00", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "App Version", value: "3.2.00", color: color(for: selectedCategory)),
-                SettingsOptionModel(title: "Open Blackmagic Cam Settings", value: "iPhone Settings", color: color(for: selectedCategory))
-            ]
+            return BlackmagicReverseSpec.aboutOptions.map { SettingsOptionModel(title: $0, value: valueForAboutOption($0), color: color(for: selectedCategory)) }
         }
     }
 
     private func valueForCameraOption(_ title: String) -> String {
         switch title {
-        case "Lens": return propertyText(.focusMode, fallback: "24mm")
-        case "FPS": return "24"
-        case "Shutter": return propertyText(.shutterSpeed, fallback: "1/48")
-        case "Iris": return propertyText(.aperture, fallback: "f1.8")
-        case "ISO": return propertyText(.iso, fallback: "Auto")
-        case "White Balance": return propertyText(.colorTemperature, fallback: "5600K")
-        case "Tint": return propertyText(.exposureCompensation, fallback: "0")
+        case "Shutter Measurement": return "Speed"
+        case "Trigger Record Indicator": return "Beeper and Flash"
+        case "Use Volume Button to Trigger Record", "Lock White Balance on Record", "Lock Current Orientation": return "On"
         default: return "Off"
         }
     }
@@ -241,9 +211,12 @@ struct PropertyPanel: View {
     private func valueForRecordOption(_ title: String) -> String {
         switch title {
         case "Codec": return "Apple ProRes 422"
-        case "Resolution": return "4K 16:9"
-        case "Frame Rate": return "24"
-        case "Record Audio as": return "AAC"
+        case "Resolution": return "4K"
+        case "Color Space": return "Rec.709"
+        case "Timecode Display": return "Record Run"
+        case "If Media Drops Frame": return "Alert"
+        case "Capture 1 Frame Every": return "Off"
+        case "Timelapse Recording": return "Off"
         default: return "On"
         }
     }
@@ -253,9 +226,63 @@ struct PropertyPanel: View {
         case "Focus Assist Color": return "Blue"
         case "Guides Color": return "White"
         case "Guides Opacity": return "60%"
-        case "Clean Feed": return "Off"
+        case "HDMI Out": return "Status Text"
         default: return "On"
         }
+    }
+
+    private func valueForMediaOption(_ title: String) -> String {
+        switch title {
+        case "Save Clips to": return "In-App Only"
+        case "Upload Clips": return "Proxies Only"
+        case "Filename Convention": return "Blackmagic Camera"
+        case "Auto Upload To Selected Project": return "Off"
+        default: return "On"
+        }
+    }
+
+    private func valueForCloudOption(_ title: String) -> String {
+        switch title {
+        case "Available Cloud Projects": return "No project selected - All Clips"
+        case "Log in to Blackmagic Cloud": return "Offline"
+        default: return "--"
+        }
+    }
+
+    private func valueForHDMIOption(_ title: String) -> String {
+        switch title {
+        case "Clean Feed": return "Off"
+        case "Mirror Display": return "On"
+        case "Status Text": return "On"
+        case "Status Text Surrounds Image": return "Off"
+        default: return "Off"
+        }
+    }
+
+    private func valueForPresetOption(_ title: String) -> String {
+        switch title {
+        case "Preset Selection": return "No preset selected"
+        case "Sync Presets to Cloud Project": return "Manual"
+        default: return "Ready"
+        }
+        // Firmware/update note: these rows mirror Settings > Presets / Preset Selection localization comments; update BlackmagicReverseSpec before changing values for a new IPA.
+    }
+
+    private func valueForAccessoriesOption(_ title: String) -> String {
+        switch title {
+        case "Nucleus Wireless Lens Control": return "Disconnected"
+        case "Use Bluetooth": return "Off"
+        default: return "--"
+        }
+    }
+
+    private func valueForAboutOption(_ title: String) -> String {
+        switch title {
+        case "App Version": return "3.2.00"
+        case "Learn More at Blackmagicdesign.com": return "Blackmagic Design"
+        default: return "--"
+        }
+        // Firmware/update note: About/Accessories rows mirror Settings > About and Settings > Accessories localization comments from Blackmagic Cam 3.2.00.
     }
 
     private func propertyText(_ key: CameraPropertyKey, fallback: String) -> String {
@@ -273,7 +300,7 @@ struct PropertyPanel: View {
         case "Media": return "Storage / Upload / Filename"
         case "Blackmagic Cloud": return "Project / Chat / Sync"
         case "HDMI Out": return "Clean Feed / Mirror Display"
-        default: return "Preset / Accessories / About"
+        default: return "Presets / Accessories / About"
         }
     }
 
@@ -301,7 +328,7 @@ struct PropertyPanel: View {
         case "Media": return "photo.on.rectangle"
         case "Blackmagic Cloud": return "cloud.fill"
         case "HDMI Out": return "display"
-        case "Preset": return "tray.full.fill"
+        case "Presets": return "tray.full.fill"
         case "Accessories": return "dot.radiowaves.left.and.right"
         default: return "info.circle"
         }
@@ -439,16 +466,21 @@ private struct SlateMetadataPanel: View {
 
     private func value(for field: String) -> String {
         switch field {
+        case "PRODUCTION NAME": return "No project selected - All Clips"
+        case "DIRECTOR": return "--"
+        case "CAMERA": return "A"
+        case "CAMERA OPERATOR": return "Blackmagic Camera"
         case "SLATE FOR": return "A001"
-        case "PROJECT": return "No project selected - All Clips"
         case "SCENE": return "001"
         case "TAKE": return "1"
         case "REEL": return "A"
-        case "CAMERA OPERATOR": return "Blackmagic Camera"
         case "LENS DATA": return "Lens Type / Aperture / Focal Length"
-        case "GOOD TAKE": return "Off"
+        case "Good Take Last Clip": return "Off"
+        case "Interior", "Exterior", "Day", "Night": return "--"
+        case "Next Clip": return "A002"
         default: return "--"
         }
+        // Firmware/update note: values mirror Camera > Slate > Project Info / Clip Info labels recovered from Localizable.strings.
     }
 }
 

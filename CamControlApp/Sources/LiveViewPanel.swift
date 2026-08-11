@@ -171,13 +171,13 @@ struct LiveViewPanel: View {
 
     private var topItems: [ShootingHUDTopItem] {
         [
-            ShootingHUDTopItem(title: "Lens", value: lensValue),
+            ShootingHUDTopItem(title: "LENS", value: lensValue),
             ShootingHUDTopItem(title: "FPS", value: frameRateValue),
-            ShootingHUDTopItem(title: "Shutter", value: propertyDisplay(.shutterSpeed), isAuto: isReadOnly(.shutterSpeed), isMonospaced: true),
-            ShootingHUDTopItem(title: "Aperture", value: propertyDisplay(.aperture), isDimmed: property(.aperture) == nil, isMonospaced: true),
+            ShootingHUDTopItem(title: "SHUTTER", value: propertyDisplay(.shutterSpeed), isAuto: isReadOnly(.shutterSpeed), isMonospaced: true),
+            ShootingHUDTopItem(title: "IRIS", value: propertyDisplay(.aperture), isDimmed: property(.aperture) == nil, isMonospaced: true),
             ShootingHUDTopItem(title: "ISO", value: propertyDisplay(.iso), isAuto: isReadOnly(.iso), isMonospaced: true),
             ShootingHUDTopItem(title: "WB", value: whiteBalanceValue, isAuto: isReadOnly(.whiteBalance) || isReadOnly(.colorTemperature)),
-            ShootingHUDTopItem(title: "Tint", value: propertyDisplay(.exposureCompensation), isMonospaced: true),
+            ShootingHUDTopItem(title: "TINT", value: propertyDisplay(.exposureCompensation), isMonospaced: true),
             ShootingHUDTopItem(title: "Format", value: "4K 16:9")
         ]
     }
