@@ -79,8 +79,8 @@ struct ShootingHUDLayout<Preview: View>: View {
                             } onClose: {
                                 withAnimation(.snappy(duration: 0.18)) { self.activeScroller = nil }
                             }
-                            .padding(.leading, metrics.safePad + (metrics.isLandscape ? metrics.pageTabWidth + 10 : 0))
-                            .padding(.trailing, metrics.safePad + (metrics.isLandscape ? 80 : 0))
+                            .padding(.leading, metrics.safePad)
+                            .padding(.trailing, metrics.safePad + (metrics.isLandscape ? metrics.pageTabWidth + 18 : 0))
                             .padding(.bottom, metrics.footerBottomPadding + metrics.footerHeight + 10)
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -138,25 +138,25 @@ struct ShootingHUDLayout<Preview: View>: View {
             if metrics.isLandscape {
                 VStack(spacing: 0) {
                     topHUD(compact: metrics.compact)
-                        .padding(.leading, metrics.safePad + metrics.pageTabWidth + 10)
-                        .padding(.trailing, metrics.safePad)
+                        .padding(.leading, metrics.safePad)
+                        .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 10)
                         .padding(.top, metrics.safePad)
                     Spacer()
                     monitorTools(compact: metrics.compact)
-                        .padding(.leading, metrics.safePad + metrics.pageTabWidth + 10)
-                        .padding(.trailing, metrics.safePad + 76)
+                        .padding(.leading, metrics.safePad + 76)
+                        .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 10)
                         .padding(.bottom, metrics.compact ? 6 : 8)
                     bottomControls(compact: metrics.compact)
-                        .padding(.leading, metrics.safePad + metrics.pageTabWidth + 10)
-                        .padding(.trailing, metrics.safePad)
+                        .padding(.leading, metrics.safePad)
+                        .padding(.trailing, metrics.safePad + metrics.pageTabWidth + 10)
                         .padding(.bottom, metrics.footerBottomPadding)
                 }
                 HStack {
-                    trailingIndicators(compact: metrics.compact)
-                        .frame(width: metrics.pageTabWidth)
+                    leadingIndicators(compact: metrics.compact)
                         .padding(.leading, metrics.safePad)
                     Spacer()
-                    leadingIndicators(compact: metrics.compact)
+                    trailingIndicators(compact: metrics.compact)
+                        .frame(width: metrics.pageTabWidth)
                         .padding(.trailing, metrics.safePad)
                 }
                 .padding(.top, metrics.compact ? 76 : 110)
@@ -188,7 +188,7 @@ struct ShootingHUDLayout<Preview: View>: View {
                 .padding(.top, metrics.size.height * 0.28)
             }
         }
-        // Firmware/update note: layout now follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors instead of a generic desktop card overlay.
+        // Firmware/update note: layout follows recovered MainViewLayoutData pageTabWidth/footerHeight/sidebar anchors; pageCamera/pageMedia/pageChat/pageSettings stay on the right-side root rail for 3.2.00.
     }
 
     private func topHUD(compact: Bool) -> some View {
@@ -268,8 +268,8 @@ struct ShootingHUDLayout<Preview: View>: View {
         return ZStack {
             RuleOfThirds()
                 .stroke(.white.opacity(0.28), style: StrokeStyle(lineWidth: 1, dash: [compact ? 5 : 7, compact ? 8 : 11]))
-                .padding(.leading, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 42 : 66) : (compact ? 48 : 72))
-                .padding(.trailing, metrics.isLandscape ? (compact ? 78 : 104) : (compact ? 48 : 72))
+                .padding(.leading, metrics.isLandscape ? metrics.safePad + (compact ? 42 : 66) : (compact ? 48 : 72))
+                .padding(.trailing, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 78 : 104) : (compact ? 48 : 72))
                 .padding(.vertical, metrics.isLandscape ? (compact ? 58 : 86) : (compact ? 108 : 132))
             RoundedRectangle(cornerRadius: 2)
                 .stroke(BlackmagicCamStyle.activeBlue.opacity(0.42), lineWidth: 1)
@@ -287,8 +287,8 @@ struct ShootingHUDLayout<Preview: View>: View {
                     WhiteBalanceOverlay(compact: compact, value: value(forAny: ["WB", "White Balance"]))
                 }
             }
-            .padding(.leading, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 10 : 16) : (compact ? 18 : 28))
-            .padding(.trailing, metrics.isLandscape ? (compact ? 84 : 112) : (compact ? 18 : 28))
+            .padding(.leading, metrics.isLandscape ? metrics.safePad + (compact ? 10 : 16) : (compact ? 18 : 28))
+            .padding(.trailing, metrics.isLandscape ? metrics.pageTabWidth + metrics.safePad + (compact ? 84 : 112) : (compact ? 18 : 28))
             .padding(.top, metrics.isLandscape ? (compact ? 70 : 106) : (compact ? 126 : 154))
             .padding(.bottom, metrics.isLandscape ? (compact ? 96 : 128) : (compact ? 126 : 154))
         }
@@ -504,13 +504,13 @@ enum ShootingHUDNavItem: String, CaseIterable, Identifiable {
         case .settings: return "slider.horizontal.3"
         }
     }
-    /// Firmware/update note: root page assets mirror recovered Camera/Media/Chat/Settings icons; update with BlackmagicReverseSpec.hudAssetNames after a new IPA reverse pass.
+    /// Firmware/update note: page names come from pageCamera/pageMedia/pageChat/pageSettings; visible glyphs use recovered Camera/Media plus Cloud/ControlIcon because Chat/Settings glyph asset names are not present in the 3.2.00 CameraAppToolbox Assets.car.
     var assetName: String {
         switch self {
         case .camera: return "Camera"
         case .media: return "Media"
-        case .chat: return "Chat"
-        case .settings: return "Settings"
+        case .chat: return "Cloud"
+        case .settings: return "ControlIcon"
         }
     }
 }
@@ -669,15 +669,15 @@ private struct FloatingNavPill: View {
         .frame(width: compact ? 42 : 52, height: compact ? 42 : 54)
         .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.56) : .white.opacity(0.055), in: RoundedRectangle(cornerRadius: compact ? 11 : 14, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 11 : 14, style: .continuous).stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.52) : .white.opacity(0.08), lineWidth: 1))
-        // Firmware/update note: page tabs map recovered pageCamera/pageMedia/pageChat/pageSettings, pageTabWidth and tabButton size symbols.
+        // Firmware/update note: page tabs map recovered pageCamera/pageMedia/pageChat/pageSettings, pageTabWidth and tabButton size symbols; glyph names must be checked against asset_ui_names_unique.txt on firmware updates.
     }
 
     private var assetName: String {
         switch title {
         case "CAMERA": return "Camera"
         case "MEDIA": return "Media"
-        case "CHAT": return "Chat"
-        case "SETTINGS": return "Settings"
+        case "CHAT": return "Cloud"
+        case "SETTINGS": return "ControlIcon"
         case "SLATE": return "Slate"
         default: return "Camera"
         }

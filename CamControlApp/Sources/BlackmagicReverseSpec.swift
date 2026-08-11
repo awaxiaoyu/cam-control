@@ -77,7 +77,7 @@ enum BlackmagicReverseSpec {
     static let slateFields = slateProjectFields + slateClipFields
 
     static let hudAssetNames = [
-        "Camera", "Camera_active", "Chat", "Chat_active", "Settings", "Settings_active", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
+        "Camera", "Camera_active", "Media", "Media_active", "Media_disabled", "Cloud", "BmdCloudSidebar", "ControlIcon", "ControlIconNotConnected", "Record", "Record_active", "Record_disabled", "RecordOffSpeed",
         "IconAe", "IconAe_active", "IconAf", "IconAf_active", "IconAwb", "IconAwb_active",
         "IconLock", "IconLock_active", "IconLut", "IconLut_active", "IconStream", "IconStream_active", "IconTimelapse", "IconTimelapse_active",
         "BatteryIndicator", "BatteryIndicatorWarning", "StorageIphone", "StorageDrive",
@@ -93,6 +93,8 @@ enum BlackmagicReverseSpec {
         "Camera": "camera.fill",
         "Camera_active": "camera.fill",
         "Chat": "ellipsis.message.fill",
+        "Cloud": "cloud.fill",
+        "ControlIcon": "slider.horizontal.3",
         "Settings": "slider.horizontal.3",
         "Record": "record.circle",
         "Record_active": "record.circle.fill",

@@ -133,13 +133,17 @@ private struct CameraWorkspaceView: View {
                 }
 
                 if selection != .live {
-                    BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: navigate)
-                        .padding(.leading, compact ? 8 : 14)
-                        .padding(.top, compact ? 76 : 110)
+                    HStack {
+                        Spacer()
+                        BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: navigate)
+                            .padding(.trailing, compact ? 8 : 14)
+                            .padding(.top, compact ? 76 : 110)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                 }
             }
         }
-        // Firmware/update note: non-camera pages now keep the recovered pageCamera/pageMedia/pageChat/pageSettings rail instead of one-off close buttons.
+        // Firmware/update note: non-camera pages keep the recovered pageCamera/pageMedia/pageChat/pageSettings rail on the right edge instead of one-off close buttons.
     }
 
     private var navSelection: ShootingHUDNavItem {

@@ -136,15 +136,15 @@ struct PhoneCameraWorkspaceView: View {
             GeometryReader { proxy in
                 let compact = proxy.size.width < 980 || proxy.size.height < 620
                 BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: navigate)
-                    .padding(.leading, compact ? 8 : 14)
+                    .padding(.trailing, compact ? 8 : 14)
                     .padding(.top, compact ? 76 : 110)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             }
             .allowsHitTesting(true)
         }
         .background(BlackmagicCamStyle.canvas)
         .ignoresSafeArea()
-        // Firmware/update note: page switching mirrors recovered pageCamera/pageMedia/pageChat/pageSettings and BmdTabView/BmdVTabView symbols; update rail mapping only if new Blackmagic pages are added.
+        // Firmware/update note: page switching mirrors recovered pageCamera/pageMedia/pageChat/pageSettings and BmdTabView/BmdVTabView symbols; rail remains anchored to the right edge like the 3.2.00 camera workspace.
     }
 
     private var topItems: [ShootingHUDTopItem] {

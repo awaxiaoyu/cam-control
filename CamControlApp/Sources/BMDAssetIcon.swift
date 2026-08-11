@@ -2,7 +2,7 @@
 import UIKit
 
 /// Runtime loader for asset names recovered from Blackmagic Cam 3.2.00 `CameraAppToolbox.framework/Assets.car`.
-/// Firmware/update note: update BlackmagicReverseSpec.hudAssetNames after rerunning reverse_blackmagic_ipa.py against a new IPA; fallbacks only exist to keep dev builds visible if a copied .car asset name changes.
+/// Firmware/update note: update BlackmagicReverseSpec.hudAssetNames and rebuild BlackmagicAssets.bundle/Assets.car after rerunning reverse_blackmagic_ipa.py against a new IPA.
 struct BMDAssetIcon: View {
     let name: String
     var activeName: String?
@@ -28,7 +28,35 @@ struct BMDAssetIcon: View {
     }
 
     private var loadedImage: UIImage? {
-        let assetName = active ? (activeName ?? "\(name)_active") : name
-        return UIImage(named: assetName) ?? UIImage(named: name)
+        let preferredName = active ? (activeName ?? "\(name)_active") : name
+        let names = Array(Set([preferredName, name])).filter { !$0.isEmpty }
+        let bundles = BMDAssetBundleStore.imageBundles
+        for bundle in bundles {
+            for assetName in names {
+                if let image = UIImage(named: assetName, in: bundle, compatibleWith: nil) {
+                    return image
+                }
+            }
+        }
+        for assetName in names {
+            if let image = UIImage(named: assetName) {
+                return image
+            }
+        }
+        return nil
     }
+}
+
+private enum BMDAssetBundleStore {
+    static let imageBundles: [Bundle] = {
+        var bundles: [Bundle] = []
+        if let url = Bundle.main.url(forResource: "BlackmagicAssets", withExtension: "bundle"), let bundle = Bundle(url: url) {
+            bundles.append(bundle)
+        }
+        if let url = Bundle.main.url(forResource: "BlackmagicAssets", withExtension: nil), let bundle = Bundle(url: url) {
+            bundles.append(bundle)
+        }
+        bundles.append(.main)
+        return bundles
+    }()
 }
