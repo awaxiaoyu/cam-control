@@ -133,25 +133,18 @@ struct PhoneCameraWorkspaceView: View {
                 CloudChatPanel()
             }
 
-            Button {
-                navigate(.camera)
-            } label: {
-                Label("CAMERA", systemImage: "camera.fill")
-                    .font(BlackmagicCamStyle.labelFont(size: 11, weight: .heavy))
-                    .tracking(1.2)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(.black.opacity(0.72), in: Capsule())
-                    .overlay(Capsule().stroke(BlackmagicCamStyle.cyan.opacity(0.38), lineWidth: 1))
+            GeometryReader { proxy in
+                let compact = proxy.size.width < 980 || proxy.size.height < 620
+                BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: navigate)
+                    .padding(.leading, compact ? 8 : 14)
+                    .padding(.top, compact ? 76 : 110)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .buttonStyle(.plain)
-            .padding(.top, 16)
-            .padding(.trailing, 18)
+            .allowsHitTesting(true)
         }
         .background(BlackmagicCamStyle.canvas)
         .ignoresSafeArea()
-        // Firmware/update note: page switching mirrors the recovered pageCamera/pageMedia/pageChat/pageSettings symbols; update this mapping only if new Blackmagic pages are added.
+        // Firmware/update note: page switching mirrors recovered pageCamera/pageMedia/pageChat/pageSettings and BmdTabView/BmdVTabView symbols; update rail mapping only if new Blackmagic pages are added.
     }
 
     private var topItems: [ShootingHUDTopItem] {

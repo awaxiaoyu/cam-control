@@ -109,28 +109,56 @@ private struct CameraWorkspaceView: View {
     @State private var selection: WorkspaceTab = .live
 
     var body: some View {
-        Group {
-            switch selection {
-            case .live:
-                LiveViewPanel(selectedTab: $selection)
-            case .controls:
-                PropertyPanel()
-            case .gallery:
-                GalleryView()
-            case .chat:
-                CloudChatPanel()
+        GeometryReader { proxy in
+            let compact = proxy.size.width < 980 || proxy.size.height < 620
+            ZStack(alignment: .topLeading) {
+                Group {
+                    switch selection {
+                    case .live:
+                        LiveViewPanel(selectedTab: $selection)
+                    case .controls:
+                        PropertyPanel()
+                    case .gallery:
+                        GalleryView()
+                    case .chat:
+                        CloudChatPanel()
+                    }
+                }
+                .background {
+                    if selection == .live {
+                        BlackmagicCamStyle.canvas
+                    } else {
+                        BlackmagicCamStyle.studioGradient
+                    }
+                }
+
+                if selection != .live {
+                    BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: navigate)
+                        .padding(.leading, compact ? 8 : 14)
+                        .padding(.top, compact ? 76 : 110)
+                }
             }
         }
-        .background {
-            if selection == .live {
-                BlackmagicCamStyle.canvas
-            } else {
-                BlackmagicCamStyle.studioGradient
-            }
+        // Firmware/update note: non-camera pages now keep the recovered pageCamera/pageMedia/pageChat/pageSettings rail instead of one-off close buttons.
+    }
+
+    private var navSelection: ShootingHUDNavItem {
+        switch selection {
+        case .live: return .camera
+        case .controls: return .settings
+        case .gallery: return .media
+        case .chat: return .chat
         }
     }
 
-
+    private func navigate(_ item: ShootingHUDNavItem) {
+        switch item {
+        case .camera: selection = .live
+        case .media: selection = .gallery
+        case .chat: selection = .chat
+        case .settings: selection = .controls
+        }
+    }
 }
 
 enum WorkspaceTab: Hashable {
