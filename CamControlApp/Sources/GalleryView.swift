@@ -60,8 +60,7 @@ struct GalleryView: View {
                         VStack(spacing: compact ? 6 : 8) {
                             BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
                                 .frame(width: compact ? 76 : 112, height: compact ? 24 : 36)
-                            Text("Log in to Blackmagic Cloud
-to access your projects")
+                            Text("Log in to Blackmagic Cloud\nto access your projects")
                                 .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .bold))
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(.white.opacity(0.44))
