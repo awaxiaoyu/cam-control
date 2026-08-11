@@ -212,3 +212,195 @@ struct LutNamesPanel: View {
         // Firmware/update note: maps LutNamesLandscapePanel/LutNamesPortraitPanel using the exact LUT color-space/name groups recovered from the IPA bundle.
     }
 }
+
+
+struct BmdPageControl<Item: Identifiable & Equatable>: View {
+    let items: [Item]
+    let selection: Item
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 3 : 4) {
+            ForEach(items) { item in
+                Capsule()
+                    .fill(item == selection ? BlackmagicCamStyle.cyan : .white.opacity(0.24))
+                    .frame(width: item == selection ? (compact ? 10 : 14) : (compact ? 4 : 5), height: compact ? 3 : 4)
+            }
+        }
+        .accessibilityLabel("BmdPageControl")
+        // Firmware/update note: maps recovered BmdPageControl(index:maxIndex:color:selected:deselected:) for pageCamera/pageMedia/pageChat/pageSettings rail state.
+    }
+}
+
+struct BmdPagingView<Content: View>: View {
+    let index: Int
+    let maxIndex: Int
+    let compact: Bool
+    let content: Content
+
+    init(index: Int, maxIndex: Int, compact: Bool, @ViewBuilder content: () -> Content) {
+        self.index = index
+        self.maxIndex = maxIndex
+        self.compact = compact
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(spacing: compact ? 5 : 7) {
+            content
+            Text("\(index + 1)/\(maxIndex + 1)")
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
+                .tracking(0.7)
+                .foregroundStyle(.white.opacity(0.34))
+                .accessibilityHidden(true)
+        }
+        // Firmware/update note: maps recovered BmdPagingView index/maxIndex shell; actual page gestures remain routed through the explicit rail buttons until controller paging is rebuilt.
+    }
+}
+
+struct TimecodeSettingsView: View {
+    let selected: String
+    let compact: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 7 : 9) {
+            HStack(spacing: 8) {
+                BMDAssetIcon(name: "IconLock", active: true, fallback: "lock.fill", color: BlackmagicCamStyle.cyan, size: compact ? 12 : 15)
+                Text("TimecodeSettingsView".uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy))
+                    .tracking(1.2)
+                    .foregroundStyle(BlackmagicCamStyle.cyan)
+                Spacer()
+                Text(selected.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .heavy))
+                    .foregroundStyle(.white.opacity(0.58))
+            }
+            BmdTextListSelector(title: "Timecode Display", options: BlackmagicReverseSpec.recordTimecodeOptions, selected: selected, compact: compact, color: BlackmagicCamStyle.cyan)
+        }
+        .padding(compact ? 10 : 14)
+        .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: maps Settings > Record > Timecode Display > TimecodeSettingsView and SettingsOptionTimecode recovered from the IPA.
+    }
+}
+
+struct RemoteSettingsCategoryPanel: View {
+    let compact: Bool
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 5 : 7) {
+            Text("RemoteSettingsCategoryPanel".uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
+                .tracking(1.1)
+                .foregroundStyle(.white.opacity(0.42))
+            ForEach(["Record", "Camera", "Monitor", "Audio"], id: \.self) { item in
+                HStack(spacing: 6) {
+                    Rectangle().fill(item == "Camera" ? BlackmagicCamStyle.activeBlue : .white.opacity(0.18)).frame(width: 2, height: compact ? 16 : 20)
+                    Text(item.uppercased())
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .heavy))
+                        .foregroundStyle(item == "Camera" ? .white : .white.opacity(0.58))
+                }
+            }
+        }
+        // Firmware/update note: category names mirror recovered RemoteSettingsCategoryPanel/RemoteHwSettingsCategoryPanel; bind to actual remote capability sections when controller exposes them.
+    }
+}
+
+struct RemoteSettingsOptionsPanel: View {
+    let compact: Bool
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 6 : 8) {
+            Text("RemoteSettingsOptionsPanel / HwSettingsOptionsPanel".uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
+                .tracking(1.0)
+                .foregroundStyle(BlackmagicCamStyle.activeBlue)
+            ForEach(["Lens Correction", "Trigger Record Indicator", "Lock White Balance on Record", "Use Volume Button to Trigger Record"], id: \.self) { item in
+                HStack {
+                    Text(item)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.76))
+                    Spacer()
+                    Text(item.contains("Lock") ? "On" : "Off")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .heavy))
+                        .foregroundStyle(.white.opacity(0.48))
+                }
+            }
+        }
+        // Firmware/update note: maps recovered RemoteSettingsOptionsPanel/HwSettingsOptionsPanel; values are placeholders until CameraPropertyKey writes cover these Blackmagic options.
+    }
+}
+
+struct RemoteHwSettingsCategoryPanel: View {
+    let compact: Bool
+    var body: some View {
+        HStack(alignment: .top, spacing: compact ? 10 : 14) {
+            RemoteSettingsCategoryPanel(compact: compact)
+                .frame(width: compact ? 94 : 126, alignment: .leading)
+            Rectangle().fill(.white.opacity(0.08)).frame(width: 1)
+            RemoteSettingsOptionsPanel(compact: compact)
+        }
+        .padding(compact ? 10 : 14)
+        .background(.black.opacity(0.24), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: this is the combined RemoteHwSettingsCategoryPanel + HwSettingsOptionsPanel shell recovered from CameraAppToolbox.
+    }
+}
+
+struct CloudLoginView: View {
+    let compact: Bool
+    var body: some View {
+        VStack(spacing: compact ? 12 : 16) {
+            BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
+                .frame(width: compact ? 156 : 220, height: compact ? 50 : 72)
+            Text("Log in to Blackmagic Cloud to\n access your projects")
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 15 : 20, weight: .heavy))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white)
+            VStack(spacing: compact ? 6 : 8) {
+                Text("Email")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.42))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, compact ? 10 : 12)
+                    .padding(.vertical, compact ? 7 : 9)
+                    .background(.black.opacity(0.46), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                BmdTextButton(title: "Use Email Account", active: true, compact: compact, color: BlackmagicCamStyle.activeBlue) {}
+            }
+            .frame(maxWidth: compact ? 260 : 360)
+            Text("CloudLoginView / BmdCloudWebPage")
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.32))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 0.035, green: 0.039, blue: 0.045))
+        // Firmware/update note: maps recovered CloudLoginView/BmdCloudWebPage and Blackmagic Cloud login copy; replace placeholder fields with DavCloud auth state without altering layout.
+    }
+}
+
+struct MediaClipDetailsPortraitPanel: View {
+    let compact: Bool
+    let rows: [(String, String)]
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 7 : 9) {
+            Text("MediaClipDetailsPortraitPanel".uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
+                .tracking(1.0)
+                .foregroundStyle(BlackmagicCamStyle.cyan)
+            ForEach(Array(rows.prefix(compact ? 4 : 6).enumerated()), id: \.offset) { _, row in
+                HStack {
+                    Text(row.0.uppercased())
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                        .foregroundStyle(.white.opacity(0.40))
+                    Spacer()
+                    Text(row.1)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.78))
+                }
+            }
+        }
+        .padding(compact ? 10 : 14)
+        .background(.black.opacity(0.38), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: maps recovered MediaClipDetailsPortraitPanel; compact media view should use this instead of only the wide landscape detail panel.
+    }
+}
