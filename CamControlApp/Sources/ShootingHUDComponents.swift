@@ -941,39 +941,132 @@ private struct WhiteBalanceOverlay: View {
     }
 }
 
+private enum SlateInfoTab: String, CaseIterable, Identifiable {
+    case project, clip, lens
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .project: return "PROJECT INFO"
+        case .clip: return "CLIP INFO"
+        case .lens: return "LENS INFO"
+        }
+    }
+    var evidenceName: String {
+        switch self {
+        case .project: return "SlateViewProjectInfo"
+        case .clip: return "SlateViewClipInfo"
+        case .lens: return "SlateViewLensInfo"
+        }
+    }
+    var fields: [String] {
+        switch self {
+        case .project:
+            return BlackmagicReverseSpec.slateProjectFields
+        case .clip:
+            return ["SLATE FOR", "SCENE", "TAKE", "REEL", "Good Take Last Clip", "Interior", "Exterior", "Day", "Night", "Next Clip"]
+        case .lens:
+            return ["LENS DATA", "Lens", "Frame Rate", "Iris", "ISO", "Shutter", "WB", "Tint"]
+        }
+    }
+}
+
 private struct SlateOverlay: View {
     let compact: Bool
     let onClose: () -> Void
+    @State private var selectedTab: SlateInfoTab = .project
+
     var body: some View {
+        HStack(spacing: 0) {
+            slateTabs
+                .frame(width: compact ? 142 : 188)
+            Rectangle()
+                .fill(.white.opacity(0.10))
+                .frame(width: 1)
+            slateContent
+        }
+        .frame(maxWidth: compact ? 720 : 980, maxHeight: compact ? 438 : 620)
+        .background(.black.opacity(0.90), in: RoundedRectangle(cornerRadius: compact ? 20 : 28, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 20 : 28, style: .continuous).stroke(BlackmagicCamStyle.cyan.opacity(0.22), lineWidth: 1))
+        .shadow(color: .black.opacity(0.62), radius: 30, x: 0, y: 18)
+        // Firmware/update note: tab split mirrors recovered SlateViewProjectInfo, SlateViewClipInfo and SlateViewLensInfo symbols; when Blackmagic updates slate field selections, update SlateInfoTab.fields from Localizable.strings/comments before layout.
+    }
+
+    private var slateTabs: some View {
+        VStack(alignment: .leading, spacing: compact ? 10 : 14) {
+            HStack(spacing: 8) {
+                BMDAssetIcon(name: "Slate", activeName: "Slate_active", active: true, fallback: "clapperboard.fill", color: BlackmagicCamStyle.amber, size: compact ? 18 : 22)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("SLATE FOR")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                        .tracking(1.4)
+                        .foregroundStyle(BlackmagicCamStyle.amber)
+                    Text("A001")
+                        .font(BlackmagicCamStyle.timecodeFont(size: compact ? 24 : 34))
+                        .foregroundStyle(.white)
+                }
+            }
+            .padding(.horizontal, compact ? 12 : 16)
+            .padding(.top, compact ? 14 : 20)
+
+            VStack(spacing: compact ? 6 : 8) {
+                ForEach(SlateInfoTab.allCases) { tab in
+                    Button {
+                        withAnimation(.snappy(duration: 0.16)) { selectedTab = tab }
+                    } label: {
+                        SlateTabButton(tab: tab, active: selectedTab == tab, compact: compact)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, compact ? 8 : 12)
+
+            Spacer()
+            VStack(alignment: .leading, spacing: 5) {
+                Text(selectedTab.evidenceName)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 8, weight: .heavy))
+                    .tracking(0.7)
+                    .foregroundStyle(.white.opacity(0.42))
+                Text("NEXT CLIP  A002")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                    .foregroundStyle(.white.opacity(0.72))
+            }
+            .padding(compact ? 12 : 16)
+        }
+        .background(LinearGradient(colors: [.black.opacity(0.96), BlackmagicCamStyle.rail.opacity(0.92)], startPoint: .top, endPoint: .bottom))
+    }
+
+    private var slateContent: some View {
         VStack(alignment: .leading, spacing: compact ? 12 : 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("SLATE FOR").font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 12, weight: .heavy)).tracking(1.5).foregroundStyle(BlackmagicCamStyle.cyan)
-                    Text("Blackmagic Camera Metadata").font(BlackmagicCamStyle.labelFont(size: compact ? 24 : 34, weight: .heavy)).foregroundStyle(.white)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(selectedTab.title)
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 22 : 32, weight: .heavy))
+                        .foregroundStyle(.white)
+                    Text("Blackmagic Camera Metadata")
+                        .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                        .tracking(1.2)
+                        .foregroundStyle(.white.opacity(0.48))
                 }
                 Spacer()
-                Button(action: onClose) { Image(systemName: "xmark").font(.system(size: compact ? 14 : 18, weight: .heavy)).foregroundStyle(.white).frame(width: compact ? 34 : 42, height: compact ? 34 : 42).background(.white.opacity(0.10), in: Circle()) }.buttonStyle(.plain)
+                Button(action: onClose) {
+                    BMDAssetIcon(name: "SlateClose", fallback: "xmark", color: .white, size: compact ? 14 : 18)
+                        .frame(width: compact ? 34 : 42, height: compact ? 34 : 42)
+                        .background(.white.opacity(0.10), in: Circle())
+                        .overlay(Circle().stroke(.white.opacity(0.12), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
             }
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: compact ? 8 : 12), count: 2), spacing: compact ? 8 : 12) {
-                ForEach(BlackmagicReverseSpec.slateFields, id: \.self) { field in
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(field).font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .heavy)).tracking(1.0).foregroundStyle(.white.opacity(0.52))
-                        Text(defaultSlateValue(for: field)).font(BlackmagicCamStyle.labelFont(size: compact ? 14 : 17, weight: .heavy)).foregroundStyle(.white)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(compact ? 10 : 13)
-                    .background(.white.opacity(0.055), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: compact ? 8 : 12), count: selectedTab == .clip ? 3 : 2), spacing: compact ? 8 : 12) {
+                ForEach(selectedTab.fields, id: \.self) { field in
+                    SlateInputCell(field: field, value: defaultSlateValue(for: field), compact: compact, accent: selectedTab == .project ? BlackmagicCamStyle.cyan : (selectedTab == .clip ? BlackmagicCamStyle.amber : BlackmagicCamStyle.activeBlue))
                 }
             }
+            Spacer(minLength: 0)
         }
-        .padding(compact ? 18 : 26)
-        .frame(maxWidth: compact ? 640 : 840)
-        .background(.black.opacity(0.86), in: RoundedRectangle(cornerRadius: compact ? 22 : 30, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 22 : 30, style: .continuous).stroke(BlackmagicCamStyle.cyan.opacity(0.22), lineWidth: 1))
-        .shadow(color: .black.opacity(0.60), radius: 30, x: 0, y: 18)
-        // Firmware/update note: Slate fields mirror reversed SlateViewProjectInfo, SlateViewClipInfo and SlateViewLensInfo strings.
+        .padding(compact ? 16 : 24)
     }
+
     private func defaultSlateValue(for field: String) -> String {
         switch field {
         case "PRODUCTION NAME": return "No project selected - All Clips"
@@ -985,12 +1078,80 @@ private struct SlateOverlay: View {
         case "TAKE": return "1"
         case "REEL": return "A"
         case "LENS DATA": return "24mm / f1.8 / 16:9"
+        case "Lens": return "24mm"
+        case "Frame Rate": return "24 FPS"
+        case "Iris": return "f1.8"
+        case "ISO": return "AUTO"
+        case "Shutter": return "1/48"
+        case "WB": return "4700K"
+        case "Tint": return "0"
         case "Good Take Last Clip": return "Off"
         case "Interior", "Exterior", "Day", "Night": return "--"
         case "Next Clip": return "A002"
         default: return "--"
         }
-        // Firmware/update note: values mirror Camera > Slate > Project Info / Clip Info labels recovered from Localizable.strings.
+        // Firmware/update note: values mirror Camera > Slate project/clip/lens metadata labels recovered from Localizable.strings and SlateView* symbols.
+    }
+}
+
+private struct SlateTabButton: View {
+    let tab: SlateInfoTab
+    let active: Bool
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 8 : 10) {
+            Capsule()
+                .fill(active ? BlackmagicCamStyle.amber : .white.opacity(0.18))
+                .frame(width: 3, height: compact ? 24 : 30)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tab.title)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .heavy))
+                    .tracking(0.8)
+                    .foregroundStyle(.white)
+                Text(tab.evidenceName)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 7, weight: .heavy))
+                    .foregroundStyle(.white.opacity(active ? 0.58 : 0.34))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, compact ? 8 : 10)
+        .padding(.vertical, compact ? 8 : 10)
+        .background(active ? BlackmagicCamStyle.amber.opacity(0.20) : .white.opacity(0.045), in: RoundedRectangle(cornerRadius: compact ? 11 : 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 11 : 14, style: .continuous).stroke(active ? BlackmagicCamStyle.amber.opacity(0.45) : .white.opacity(0.08), lineWidth: 1))
+    }
+}
+
+private struct SlateInputCell: View {
+    let field: String
+    let value: String
+    let compact: Bool
+    let accent: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 5 : 7) {
+            Text(field.uppercased())
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 7 : 9, weight: .heavy))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.48))
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+            Text(value)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 13 : 16, weight: .heavy))
+                .foregroundStyle(.white)
+                .lineLimit(2)
+                .minimumScaleFactor(0.62)
+            Rectangle()
+                .fill(accent.opacity(0.70))
+                .frame(height: 2)
+        }
+        .frame(maxWidth: .infinity, minHeight: compact ? 60 : 74, alignment: .leading)
+        .padding(compact ? 10 : 13)
+        .background(.white.opacity(0.052), in: RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: compact ? 10 : 13, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
+        // Firmware/update note: input styling maps BmdPopUpInput/BmdPopUpInputTextField and SlateView* field-selection symbols rather than generic cards.
     }
 }
 

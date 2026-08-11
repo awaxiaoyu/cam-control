@@ -22,6 +22,9 @@ REQUIRED_SOURCE_PATTERNS = {
     'asset_aliases': (SRC / 'BMDAssetIcon.swift', r'Apple Watch/IconAf'),
     'false_color_original_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetImage\(name: "FalseColorLegend".*preserveOriginalColors: true'),
     'bmd_cloud_logo_asset': (SRC / 'CloudChatPanel.swift', r'BMDAssetImage\(name: "BmdCloudLogo".*preserveOriginalColors: true'),
+    'slate_tab_panel': (SRC / 'ShootingHUDComponents.swift', r'SlateInfoTab|SlateViewProjectInfo|SlateViewClipInfo|SlateViewLensInfo'),
+    'slate_close_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetIcon\(name: "SlateClose"'),
+    'settings_option_list_cells': (SRC / 'PropertyPanel.swift', r'SettingsChoiceCell|OptionListView/BmdTextListSelector'),
     'chat_cloud_asset': (SRC / 'ShootingHUDComponents.swift', r'case \.chat: return "Cloud"'),
     'complete_reverse_script': (ROOT / 'scripts' / 'reverse_blackmagic_complete_ui.py', r'UI_BUCKETS'),
 }

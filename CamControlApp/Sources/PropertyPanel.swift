@@ -442,25 +442,52 @@ private struct SettingsOptionRow: View {
 
             if !row.choices.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: compact ? 6 : 8) {
+                    HStack(spacing: compact ? 7 : 9) {
                         ForEach(Array(row.choices.enumerated()), id: \.offset) { index, choice in
-                            Text(choice)
-                                .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: index == 0 ? .heavy : .bold))
-                                .foregroundStyle(index == 0 ? .white : .white.opacity(0.68))
-                                .lineLimit(1)
-                                .padding(.horizontal, compact ? 8 : 10)
-                                .padding(.vertical, compact ? 5 : 6)
-                                .background(index == 0 ? row.color.opacity(0.24) : .white.opacity(0.055), in: Capsule())
-                                .overlay(Capsule().stroke(index == 0 ? row.color.opacity(0.42) : .white.opacity(0.08), lineWidth: 1))
+                            SettingsChoiceCell(choice: choice, selected: index == 0, color: row.color, compact: compact)
                         }
                     }
+                    .padding(.vertical, 1)
                 }
             }
         }
         .padding(compact ? 12 : 15)
-        .background(.black.opacity(0.28), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(.white.opacity(0.08), lineWidth: 1))
-        // Firmware/update note: choice chips mirror SettingsOptionsPanel + OptionListView evidence from Localizable.strings comments; update via BlackmagicReverseSpec.settingsOptionChoices after app updates.
+        .background(.black.opacity(0.34), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
+        // Firmware/update note: option selectors mirror SettingsOptionsPanel + OptionListView/BmdTextListSelector evidence from Localizable.strings comments; update via BlackmagicReverseSpec.settingsOptionChoices after app updates.
+    }
+}
+
+private struct SettingsChoiceCell: View {
+    let choice: String
+    let selected: Bool
+    let color: Color
+    let compact: Bool
+
+    var body: some View {
+        HStack(spacing: compact ? 6 : 8) {
+            Rectangle()
+                .fill(selected ? color : .white.opacity(0.16))
+                .frame(width: 2, height: compact ? 24 : 30)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(choice.uppercased())
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: selected ? .heavy : .bold))
+                    .tracking(0.4)
+                    .foregroundStyle(selected ? .white : .white.opacity(0.66))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.58)
+                Text(selected ? "SELECTED" : "OPTION")
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 5 : 6, weight: .heavy))
+                    .tracking(0.7)
+                    .foregroundStyle(.white.opacity(selected ? 0.54 : 0.30))
+            }
+        }
+        .frame(minWidth: compact ? 96 : 132, alignment: .leading)
+        .padding(.horizontal, compact ? 8 : 10)
+        .padding(.vertical, compact ? 7 : 9)
+        .background(selected ? color.opacity(0.18) : .white.opacity(0.045), in: RoundedRectangle(cornerRadius: 3, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 3, style: .continuous).stroke(selected ? color.opacity(0.42) : .white.opacity(0.08), lineWidth: 1))
+        // Firmware/update note: square selector cells intentionally avoid iOS capsule styling and map to recovered OptionListView/BmdTextListSelector rows.
     }
 }
 

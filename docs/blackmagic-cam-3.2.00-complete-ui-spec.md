@@ -266,6 +266,13 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - `CodecIntent`
 
 
+
+## Page-Level Implementation Notes
+
+- Slate is implemented as tabbed `PROJECT INFO` / `CLIP INFO` / `LENS INFO` panels mapped to recovered `SlateViewProjectInfo`, `SlateViewClipInfo`, and `SlateViewLensInfo` symbols; the close button uses recovered `SlateClose`.
+- Settings option choices use square `OptionListView` / `BmdTextListSelector`-style selector cells rather than iOS capsule chips.
+- Media, Chat, Settings sidebars must remain dark panel-driven surfaces consistent with `MediaViewSidebar`, `ChatViewSidebar`, and `SettingsCategoryPanel` evidence.
+
 ## Assetutil Dimension Evidence
 
 Dimension source: `docs/blackmagic-cam-3.2.00-asset-dimensions.tsv` generated from `CameraAppToolbox.framework/Assets.car` via `xcrun assetutil --info`.
