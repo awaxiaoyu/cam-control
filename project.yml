@@ -68,6 +68,8 @@ targets:
         LSApplicationCategoryType: public.app-category.video
         LSSupportsOpeningDocumentsInPlace: true
         UIFileSharingEnabled: true
+        # Firmware/update note: mirrors Blackmagic Cam 3.2.00 LaunchScreen so future IPA UI updates keep native full-screen viewport and avoid scaled black bars.
+        UILaunchStoryboardName: LaunchScreen
         UIRequiresFullScreen: true
         UIStatusBarHidden: false
         UIViewControllerBasedStatusBarAppearance: true

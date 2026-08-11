@@ -40,6 +40,9 @@
 	<true/>
 	<key>UIFileSharingEnabled</key>
 	<true/>
+	<!-- Firmware/update note: Blackmagic Cam 3.2.00 declares UILaunchStoryboardName=LaunchScreen; keep this key when updating IPA-derived UI so iPhone uses native full-screen geometry instead of compatibility letterboxing. -->
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UIStatusBarHidden</key>
