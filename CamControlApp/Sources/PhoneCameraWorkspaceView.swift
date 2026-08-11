@@ -121,30 +121,33 @@ struct PhoneCameraWorkspaceView: View {
 
     @ViewBuilder
     private func cameraPage(_ tab: WorkspaceTab) -> some View {
-        ZStack(alignment: .topTrailing) {
-            switch tab {
-            case .live:
-                EmptyView()
-            case .controls:
-                PropertyPanel()
-            case .gallery:
-                GalleryView()
-            case .chat:
-                CloudChatPanel()
-            }
+        GeometryReader { proxy in
+            let compact = proxy.size.width < 980 || proxy.size.height < 620
+            ZStack(alignment: .topTrailing) {
+                Group {
+                    switch tab {
+                    case .live:
+                        EmptyView()
+                    case .controls:
+                        PropertyPanel()
+                    case .gallery:
+                        GalleryView()
+                    case .chat:
+                        CloudChatPanel()
+                    }
+                }
+                .padding(.trailing, compact ? 64 : 84)
 
-            GeometryReader { proxy in
-                let compact = proxy.size.width < 980 || proxy.size.height < 620
                 BlackmagicRootPageRail(selection: navSelection, compact: compact, onNavigate: navigate)
                     .padding(.trailing, compact ? 8 : 14)
                     .padding(.top, compact ? 76 : 110)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             }
+            .frame(width: proxy.size.width, height: proxy.size.height)
             .allowsHitTesting(true)
         }
         .background(BlackmagicCamStyle.canvas)
         .ignoresSafeArea()
-        // Firmware/update note: page switching mirrors recovered pageCamera/pageMedia/pageChat/pageSettings and BmdTabView/BmdVTabView symbols; rail remains anchored to the right edge like the 3.2.00 camera workspace.
+        // Firmware/update note: page switching mirrors recovered pageCamera/pageMedia/pageChat/pageSettings and BmdTabView/BmdVTabView symbols; rail remains anchored to the right edge like the 3.2.00 camera workspace, and non-camera panels reserve pageTabWidth.
     }
 
     private var topItems: [ShootingHUDTopItem] {

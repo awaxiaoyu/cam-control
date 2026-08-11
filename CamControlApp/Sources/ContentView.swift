@@ -124,6 +124,7 @@ private struct CameraWorkspaceView: View {
                         CloudChatPanel()
                     }
                 }
+                .padding(.trailing, selection == .live ? 0 : (compact ? 64 : 84))
                 .background {
                     if selection == .live {
                         BlackmagicCamStyle.canvas
