@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct CloudChatPanel: View {
-    @State private var selectedRoom = "Project"
+    @State private var selectedRoom = "Short Film"
 
     private let rooms = [
-        CloudRoom(title: "Project", value: "No project selected - All Clips", icon: "folder.fill", color: BlackmagicCamStyle.activeBlue),
-        CloudRoom(title: "Blackmagic Cloud", value: "Log in to Blackmagic Cloud", icon: "cloud.fill", color: BlackmagicCamStyle.cyan),
-        CloudRoom(title: "Upload Status", value: "Waiting to Upload...", icon: "arrow.up.circle.fill", color: BlackmagicCamStyle.amber),
-        CloudRoom(title: "Remote Cam Control", value: "No remote camera linked", icon: "dot.radiowaves.left.and.right", color: BlackmagicCamStyle.recordRed)
+        CloudRoom(title: "Melissa Williamson", value: "melissa@blackmagicdesign.com", icon: "BmdCloudSidebar", color: .white.opacity(0.34)),
+        CloudRoom(title: "Short Film", value: "3 Members", icon: "ProjectUpload", color: BlackmagicCamStyle.activeBlue),
+        CloudRoom(title: "Documentary", value: "3 Members", icon: "ProjectUploadFailed", color: BlackmagicCamStyle.recordRed),
+        CloudRoom(title: "Green Book", value: "11 Members", icon: "ProjectUpload", color: .white.opacity(0.30))
     ]
 
     var body: some View {
@@ -15,20 +15,20 @@ struct CloudChatPanel: View {
             let compact = proxy.size.width < 900
             HStack(spacing: 0) {
                 cloudSidebar(compact: compact)
-                    .frame(width: compact ? 150 : 220)
+                    .frame(width: compact ? 128 : 178)
                 Divider().overlay(.white.opacity(0.10))
                 chatSurface(compact: compact)
             }
             .background(BlackmagicCamStyle.canvas)
         }
-        // Firmware/update note: CloudChatPanel mirrors reversed ChatViewSidebar, ChatViewToolbar, ChatTableView, CloudLoginView and upload strings; use recovered Cloud/Upload/Project assets, and future protocol support should bind values without changing this hierarchy.
+        // Firmware/update note: CloudChatPanel mirrors the 3.2.00 ChatViewSidebar screenshot: project/member list on the left, compact participant dots in ChatViewToolbar, and ChatTableView bubbles; online transport can bind data later without changing hierarchy.
     }
 
     private func cloudSidebar(compact: Bool) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 7) {
-                BMDAssetIcon(name: "Cloud", active: true, fallback: "cloud.fill", color: BlackmagicCamStyle.cyan, size: compact ? 12 : 15)
-                Text(selectedRoom == "Project" ? "Short Film" : selectedRoom)
+                BMDAssetIcon(name: "BmdCloudSidebar", active: true, fallback: "cloud.fill", color: BlackmagicCamStyle.cyan, size: compact ? 12 : 15)
+                Text("Short Film")
                     .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -54,12 +54,12 @@ struct CloudChatPanel: View {
             ZStack(alignment: .bottomTrailing) {
                 Color.black.opacity(0.92)
                 BMDAssetImage(name: "BmdCloudLogo", fallback: "cloud.fill", preserveOriginalColors: true)
-                    .frame(width: compact ? 66 : 92, height: compact ? 22 : 30)
-                    .opacity(0.035)
-                    .padding(compact ? 8 : 12)
+                    .frame(width: compact ? 58 : 82, height: compact ? 19 : 27)
+                    .opacity(0.028)
+                    .padding(compact ? 7 : 10)
             }
         )
-        // Firmware/update note: ChatViewSidebar mirrors screenshot: compact dark room list with active blue outline; BmdCloudLogo remains as a barely-visible recovered asset watermark.
+        // Firmware/update note: ChatViewSidebar is a dense project/member list, not a generic Cloud feature menu; BmdCloudLogo remains only as a recovered asset watermark.
     }
 
     private func chatSurface(compact: Bool) -> some View {
@@ -73,7 +73,7 @@ struct CloudChatPanel: View {
 
     private func chatToolbar(compact: Bool) -> some View {
         HStack(spacing: compact ? 7 : 10) {
-            Text(selectedRoom == "Project" ? "Short Film" : selectedRoom)
+            Text("Short Film")
                 .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
                 .foregroundStyle(.white)
             Spacer()
@@ -206,17 +206,21 @@ private struct CloudSidebarRoom: View {
         }
         .padding(.horizontal, compact ? 9 : 12)
         .padding(.vertical, compact ? 9 : 12)
-        .background(active ? room.color.opacity(0.22) : .white.opacity(0.045), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).stroke(active ? room.color.opacity(0.55) : .white.opacity(0.08), lineWidth: 1))
+        .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.88) : .white.opacity(0.085), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .overlay(alignment: .trailing) {
+            if room.title == "Documentary" {
+                Circle().fill(BlackmagicCamStyle.recordRed).frame(width: compact ? 8 : 10, height: compact ? 8 : 10).padding(.trailing, compact ? 7 : 9)
+            }
+        }
     }
 
     private var assetName: String {
         switch room.title {
-        case "Project": return "ProjectUpload"
-        case "Blackmagic Cloud": return "BmdCloudSidebar"
-        case "Upload Status": return "UploadToCloud"
-        case "Remote Cam Control": return "CameraLinkedSmall"
-        default: return "Cloud"
+        case "Melissa Williamson": return "BmdCloudSidebar"
+        case "Short Film": return "ProjectUpload"
+        case "Documentary": return "ProjectUploadFailed"
+        case "Green Book": return "ProjectUpload"
+        default: return "BmdCloudSidebar"
         }
     }
 }

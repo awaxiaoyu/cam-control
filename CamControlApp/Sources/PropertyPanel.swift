@@ -61,18 +61,13 @@ struct PropertyPanel: View {
     private func settingsOptionsPanel(compact: Bool) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: compact ? 10 : 14) {
-                HStack {
-                    Spacer()
-                    Text(selectedCategory)
-                        .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 16, weight: .heavy))
-                        .foregroundStyle(.white)
-                    Spacer()
-                    BMStatusPill(title: "Props", value: "\(controller.snapshot.properties.count)", color: controller.snapshot.properties.isEmpty ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
-                        .scaleEffect(compact ? 0.72 : 0.82)
-                        .opacity(0.72)
-                }
-                .padding(.horizontal, compact ? 8 : 12)
-                .padding(.top, compact ? 7 : 10)
+                Text(selectedCategory)
+                    .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.horizontal, compact ? 8 : 12)
+                    .padding(.top, compact ? 7 : 10)
+                    .padding(.bottom, compact ? 4 : 6)
 
                 settingsRows(compact: compact)
 
@@ -155,7 +150,7 @@ struct PropertyPanel: View {
         .background(Color.black.opacity(0.26), in: RoundedRectangle(cornerRadius: compact ? 3 : 4, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: compact ? 3 : 4, style: .continuous).stroke(.white.opacity(0.07), lineWidth: 1))
         .padding(.horizontal, compact ? 8 : 12)
-        // Firmware/update note: Settings rows are an OptionListView-style table; choices remain in BlackmagicReverseSpec but are not sprayed inline.
+        // Firmware/update note: Settings rows are an OptionListView-style table matching the screenshot's centered category title and right-aligned values; choices remain in BlackmagicReverseSpec.
     }
 
     private var categoryRows: [SettingsOptionModel] {
@@ -396,7 +391,7 @@ private struct SettingsCategoryRow: View {
             Spacer(minLength: 0)
         }
         .padding(.horizontal, compact ? 7 : 9)
-        .padding(.vertical, compact ? 7 : 9)
+        .padding(.vertical, compact ? 6 : 8)
         .background(active ? BlackmagicCamStyle.activeBlue.opacity(0.95) : Color.clear, in: RoundedRectangle(cornerRadius: 2, style: .continuous))
         .overlay(alignment: .bottom) { Rectangle().fill(.white.opacity(0.06)).frame(height: 1) }
         // Firmware/update note: category row intentionally text-first like the recovered SettingsCategoryPanel screenshot; icons remain available in spec for future panel variants.
@@ -421,7 +416,7 @@ private struct SettingsOptionRow: View {
     var body: some View {
         HStack(alignment: .center, spacing: compact ? 8 : 12) {
             Text(row.title)
-                .font(BlackmagicCamStyle.labelFont(size: compact ? 9 : 11, weight: .bold))
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 8 : 10, weight: .bold))
                 .foregroundStyle(.white.opacity(0.88))
                 .lineLimit(1)
                 .minimumScaleFactor(0.66)

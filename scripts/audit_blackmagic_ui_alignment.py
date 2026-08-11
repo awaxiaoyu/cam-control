@@ -26,9 +26,10 @@ REQUIRED_SOURCE_PATTERNS = {
     'false_color_original_asset': (SRC / 'ShootingHUDComponents.swift', r'BMDAssetImage\(name: "FalseColorLegend".*preserveOriginalColors: true'),
     'bmd_cloud_logo_asset': (SRC / 'CloudChatPanel.swift', r'BMDAssetImage\(name: "BmdCloudLogo".*preserveOriginalColors: true'),
     'media_side_panel_rendered': (SRC / 'GalleryView.swift', r'mediaSidePanel\(compact: compact\)'),
-    'media_side_panel_width': (SRC / 'GalleryView.swift', r'\.frame\(width: compact \? 220 : 320\)'),
+    'media_side_panel_width': (SRC / 'GalleryView.swift', r'\.frame\(width: compact \? 190 : 280\)'),
+    'media_fixture_grid': (SRC / 'GalleryView.swift', r'MediaFixtureClip\.samples'),
     'chat_participant_dots': (SRC / 'CloudChatPanel.swift', r'ChatParticipantDot\(initials: "MW"'),
-    'chat_remote_camera_asset': (SRC / 'CloudChatPanel.swift', r'return "CameraLinkedSmall"'),
+    'chat_project_sidebar': (SRC / 'CloudChatPanel.swift', r'CloudRoom\(title: "Short Film"[\s\S]*ProjectUploadFailed'),
     'top_status_only_hud': (SRC / 'ShootingHUDComponents.swift', r'topLeftStatus\(compact: compact\)'),
     'footer_bmd_adjustment_dials': (SRC / 'ShootingHUDComponents.swift', r'BmdAdjustmentDialCell\(item: item, compact: compact, active: activeScroller == item\.scroller\)'),
     'footer_height_for_dials': (SRC / 'ShootingHUDComponents.swift', r'var footerHeight: CGFloat \{ compact \? 72 : 92 \}'),
@@ -54,7 +55,6 @@ REQUIRED_SOURCE_PATTERNS = {
     'hud_camera_light_indicator': (SRC / 'ShootingHUDComponents.swift', r'HUDCameraLightIndicator\(title:'),
     'lut_names_panel_scroller': (SRC / 'ShootingHUDComponents.swift', r'LutNamesPanel\(compact:'),
     'audio_meter_mini': (SRC / 'ShootingHUDComponents.swift', r'AudioMeterMini\(levels:'),
-    'remote_clip_sync_footer': (SRC / 'GalleryView.swift', r'RemoteClipSyncStatusFooterView\('),
     'complete_reverse_script': (ROOT / 'scripts' / 'reverse_blackmagic_complete_ui.py', r'UI_BUCKETS'),
 }
 FORBIDDEN_SOURCE_PATTERNS = {
@@ -65,7 +65,9 @@ FORBIDDEN_SOURCE_PATTERNS = {
     'liveview_sf_striplabel': (SRC / 'LiveViewPanel.swift', r'stripLabel\([^\\n]*systemImage:'),
     'chat_toolbar_sf_person_icons': (SRC / 'CloudChatPanel.swift', r'Image\(systemName:.*person\.crop\.circle'),
     'stale_camera_linked_asset': (SRC / 'CloudChatPanel.swift', r'return "CameraLinked"'),
+    'chat_feature_menu_sidebar': (SRC / 'CloudChatPanel.swift', r'CloudRoom\(title: "Remote Cam Control"|CloudRoom\(title: "Upload Status"'),
     'media_side_panel_unmounted': (SRC / 'GalleryView.swift', r'auxiliary panels are represented by toolbar/sidebar states'),
+    'media_default_footer_status': (SRC / 'GalleryView.swift', r'RemoteClipSyncStatusFooterView\(status:'),
 }
 
 

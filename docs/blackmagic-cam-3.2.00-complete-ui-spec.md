@@ -12,7 +12,9 @@ Bundle/version: `com.blackmagic-design.DaVinciCamera` `3.2.00 / 3.2.000045`
 - Camera readouts are exactly LENS, FPS, SHUTTER, IRIS, ISO, WB, TINT in the official order.
 - Top overlay is compact project/timecode/status/readout, using BMD Lato fonts.
 - Guides, false color, focus assist, zebra and white-balance overlays are tool-activated, not always-on default chrome.
-- Settings, Media, Chat use Blackmagic side-panel layouts, not iOS grouped list chrome.
+- Settings uses a left SettingsCategoryPanel and a centered-title SettingsOptionsPanel with dense right-aligned rows.
+- Media uses a compact MediaViewSidebar, icon-only MediaViewToolbar, dense thumbnail grid, and optional right contextual panel only when a media tool is selected.
+- Chat uses a project/member ChatViewSidebar, compact participant-dot ChatViewToolbar, and dark ChatTableView message surface.
 - Use recovered CameraAppToolbox Assets.car names and documented aliases before SF Symbol fallback.
 
 ## Evidence Buckets

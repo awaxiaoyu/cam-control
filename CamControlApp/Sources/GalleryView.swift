@@ -14,7 +14,7 @@ struct GalleryView: View {
             let compact = proxy.size.width < 900
             HStack(spacing: 0) {
                 mediaSidebar(compact: compact)
-                    .frame(width: compact ? 150 : 220)
+                    .frame(width: compact ? 128 : 178)
                 Divider().overlay(.white.opacity(0.10))
                 mediaWorkspace(compact: compact)
             }
@@ -92,16 +92,16 @@ struct GalleryView: View {
     private func mediaWorkspace(compact: Bool) -> some View {
         VStack(spacing: 0) {
             mediaToolbar(compact: compact)
-            HStack(spacing: 0) {
+            ZStack(alignment: .trailing) {
                 mediaPool(compact: compact)
                 if sidePanel != .allClips {
-                    Divider().overlay(.white.opacity(0.10))
                     mediaSidePanel(compact: compact)
-                        .frame(width: compact ? 220 : 320)
+                        .frame(width: compact ? 190 : 280)
+                        .background(Color.black.opacity(0.90))
+                        .overlay(Rectangle().fill(.white.opacity(0.10)).frame(width: 1), alignment: .leading)
                         .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
             }
-            RemoteClipSyncStatusFooterView(status: sidePanel == .upload ? "Uploading proxy..." : "Waiting to Upload...", clips: controller.galleryItems.count, compact: compact)
         }
         .background(Color(red: 0.045, green: 0.048, blue: 0.052))
         // Firmware/update note: main media area follows recovered MediaViewToolbar plus MediaSortPanel/MediaUploadToCloudPanel/MediaClipDetailsLandscapePanel: grid left, dark contextual panel right, never a floating iOS sheet.
@@ -110,20 +110,10 @@ struct GalleryView: View {
     private func mediaPool(compact: Bool) -> some View {
         ZStack {
             if controller.galleryItems.isEmpty {
-                VStack {
-                    Spacer()
-                    BMEmptyState(
-                        systemImage: "photo.on.rectangle.angled",
-                        title: "No Clips",
-                        subtitle: "Captured clips appear here. Sort, upload, export, or open clip details from the media pool."
-                    )
-                    .frame(maxWidth: 560)
-                    Spacer()
-                }
-                .padding(24)
+                mediaFixturePool(compact: compact)
             } else {
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 96 : 132), spacing: compact ? 8 : 10)], spacing: compact ? 10 : 14) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 74 : 108), spacing: compact ? 7 : 10)], spacing: compact ? 8 : 12) {
                         ForEach(controller.galleryItems) { item in
                             Button {
                                 withAnimation(.snappy(duration: 0.16)) {
@@ -141,10 +131,22 @@ struct GalleryView: View {
                             }
                         }
                     }
-                    .padding(compact ? 10 : 14)
+                    .padding(compact ? 7 : 12)
                 }
             }
         }
+    }
+
+    private func mediaFixturePool(compact: Bool) -> some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: compact ? 74 : 108), spacing: compact ? 7 : 10)], spacing: compact ? 8 : 12) {
+                ForEach(MediaFixtureClip.samples) { item in
+                    FixtureGalleryCard(item: item, compact: compact)
+                }
+            }
+            .padding(compact ? 7 : 12)
+        }
+        // Firmware/update note: fixture clips mirror App Store / Blackmagic sample media thumbnails only when no real gallery items exist; replace samples with controller media without changing MediaView grid density.
     }
 
     private func mediaToolbar(compact: Bool) -> some View {
@@ -154,14 +156,18 @@ struct GalleryView: View {
                 .font(BlackmagicCamStyle.labelFont(size: compact ? 10 : 13, weight: .heavy))
                 .foregroundStyle(.white)
             Spacer()
-            toolbarIconButton(.allClips, asset: "Media", fallback: "rectangle.grid.2x2", compact: compact)
-            toolbarIconButton(.clipDetails, asset: "HdmiPlay", fallback: "play.rectangle", compact: compact)
+            toolbarIconButton(.allClips, asset: "MediaSync", fallback: "rectangle.grid.2x2", compact: compact)
+            toolbarIconButton(.clipDetails, asset: "SortClapper", fallback: "play.rectangle", compact: compact)
             toolbarIconButton(.sort, asset: "Sort", fallback: "arrow.up.arrow.down", compact: compact)
             toolbarIconButton(.upload, asset: "UploadToCloud", fallback: "icloud.and.arrow.up", compact: compact)
-            Circle()
-                .fill(.white.opacity(0.24))
-                .frame(width: compact ? 22 : 28, height: compact ? 22 : 28)
-                .overlay(BMDAssetIcon(name: "Cloud", active: true, fallback: "person.crop.circle", color: .white, size: compact ? 12 : 15))
+            HStack(spacing: compact ? -4 : -5) {
+                ForEach(0..<4, id: \.self) { index in
+                    Circle()
+                        .fill(toolbarAvatarColor(index))
+                        .frame(width: compact ? 14 : 18, height: compact ? 14 : 18)
+                        .overlay(Circle().stroke(.black.opacity(0.75), lineWidth: 1))
+                }
+            }
         }
         .padding(.horizontal, compact ? 9 : 12)
         .padding(.vertical, compact ? 6 : 8)
@@ -173,10 +179,20 @@ struct GalleryView: View {
     private func toolbarIconButton(_ panel: MediaPanel, asset: String, fallback: String, compact: Bool) -> some View {
         Button { withAnimation(.snappy(duration: 0.16)) { sidePanel = panel } } label: {
             BMDAssetIcon(name: asset, active: sidePanel == panel, fallback: fallback, color: sidePanel == panel ? .white : .white.opacity(0.70), size: compact ? 12 : 15)
-                .frame(width: compact ? 24 : 30, height: compact ? 22 : 28)
-                .background(sidePanel == panel ? BlackmagicCamStyle.activeBlue.opacity(0.82) : .white.opacity(0.055), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                .frame(width: compact ? 22 : 26, height: compact ? 20 : 24)
+                .background(sidePanel == panel ? BlackmagicCamStyle.activeBlue.opacity(0.82) : Color.clear, in: RoundedRectangle(cornerRadius: 3, style: .continuous))
         }
         .buttonStyle(.plain)
+    }
+
+    private func toolbarAvatarColor(_ index: Int) -> Color {
+        switch index {
+        case 0: return BlackmagicCamStyle.activeBlue
+        case 1: return BlackmagicCamStyle.cyan
+        case 2: return Color.orange.opacity(0.86)
+        default: return Color.white.opacity(0.30)
+        }
+        // Firmware/update note: avatar colors are offline stand-ins for MediaViewToolbar participant/account thumbnails; bind to cloud profiles when online features return.
     }
 
     private func toolbarButton(_ panel: MediaPanel, _ title: String, _ value: String, asset: String, compact: Bool) -> some View {
@@ -501,15 +517,81 @@ private struct MediaPanelRow: View {
     }
 }
 
+private struct MediaFixtureClip: Identifiable {
+    let id = UUID()
+    let filename: String
+    let duration: String
+    let colors: [Color]
+
+    static let samples: [MediaFixtureClip] = [
+        .init(filename: "IMG_1995", duration: "00:27", colors: [Color(red: 0.10, green: 0.42, blue: 0.82), Color(red: 0.90, green: 0.35, blue: 0.20)]),
+        .init(filename: "IMG_1996", duration: "00:15", colors: [Color(red: 0.08, green: 0.10, blue: 0.13), Color(red: 0.85, green: 0.70, blue: 0.48)]),
+        .init(filename: "IMG_1997", duration: "00:21", colors: [Color(red: 0.78, green: 0.88, blue: 0.96), Color(red: 0.12, green: 0.45, blue: 0.78)]),
+        .init(filename: "IMG_1998", duration: "00:08", colors: [Color(red: 0.95, green: 0.98, blue: 1.0), Color(red: 0.85, green: 0.22, blue: 0.18)]),
+        .init(filename: "IMG_2029", duration: "00:21", colors: [Color(red: 0.14, green: 0.54, blue: 0.92), Color(red: 0.92, green: 0.94, blue: 0.96)]),
+        .init(filename: "IMG_2031", duration: "00:21", colors: [Color(red: 0.06, green: 0.40, blue: 0.82), Color(red: 0.95, green: 0.34, blue: 0.20)]),
+        .init(filename: "IMG_2030", duration: "02:27", colors: [Color(red: 0.94, green: 0.62, blue: 0.25), Color(red: 0.12, green: 0.22, blue: 0.34)]),
+        .init(filename: "IMG_2032", duration: "00:27", colors: [Color(red: 0.95, green: 0.98, blue: 1.0), Color(red: 0.16, green: 0.48, blue: 0.82)]),
+        .init(filename: "IMG_2033", duration: "00:21", colors: [Color(red: 0.96, green: 0.96, blue: 0.92), Color(red: 0.85, green: 0.26, blue: 0.16)])
+    ]
+    // Firmware/update note: sample names/durations mirror Blackmagic media marketing screenshots; replace with real media when gallery transport has data.
+}
+
+private struct FixtureGalleryCard: View {
+    let item: MediaFixtureClip
+    let compact: Bool
+
+    var body: some View {
+        VStack(spacing: compact ? 3 : 5) {
+            ZStack(alignment: .bottomLeading) {
+                LinearGradient(colors: item.colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                SnowRidgePattern()
+                    .fill(.white.opacity(0.36))
+                HStack(spacing: 3) {
+                    Text(item.duration)
+                    Spacer(minLength: 2)
+                    BMDAssetIcon(name: "UploadedToCloudPxy", fallback: "checkmark.circle.fill", color: BlackmagicCamStyle.okGreen, size: compact ? 8 : 10)
+                }
+                .font(BlackmagicCamStyle.readoutFont(size: compact ? 5 : 7, weight: .heavy))
+                .foregroundStyle(.white.opacity(0.90))
+                .padding(.horizontal, 3)
+                .padding(.vertical, 2)
+                .background(.black.opacity(0.56))
+            }
+            .frame(height: compact ? 48 : 74)
+            .clipped()
+            .overlay(Rectangle().stroke(.white.opacity(0.10), lineWidth: 1))
+            Text(item.filename)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                .foregroundStyle(.white.opacity(0.92))
+                .lineLimit(1)
+        }
+        // Firmware/update note: visual density follows MediaView screenshot thumbnails: square corners, filename below, tiny duration/upload overlays.
+    }
+}
+
+private struct SnowRidgePattern: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY * 0.70))
+        path.addCurve(to: CGPoint(x: rect.maxX * 0.42, y: rect.maxY * 0.42), control1: CGPoint(x: rect.maxX * 0.14, y: rect.maxY * 0.58), control2: CGPoint(x: rect.maxX * 0.28, y: rect.maxY * 0.34))
+        path.addCurve(to: CGPoint(x: rect.maxX, y: rect.maxY * 0.60), control1: CGPoint(x: rect.maxX * 0.64, y: rect.maxY * 0.58), control2: CGPoint(x: rect.maxX * 0.80, y: rect.maxY * 0.48))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
 private struct GalleryCard: View {
     let item: GalleryItem
     let selected: Bool
     let compact: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 8 : 11) {
-            ZStack(alignment: .topTrailing) {
-                RoundedRectangle(cornerRadius: compact ? 14 : 18, style: .continuous)
+        VStack(alignment: .center, spacing: compact ? 3 : 5) {
+            ZStack(alignment: .bottomLeading) {
+                Rectangle()
                     .fill(.black.opacity(0.42))
 
                 if let url = item.thumbnailURL ?? item.cachedURL, let image = PlatformImage(contentsOfFile: url.path) {
@@ -528,35 +610,28 @@ private struct GalleryCard: View {
                     .foregroundStyle(BlackmagicCamStyle.mutedText)
                 }
 
-                Text(formatCode)
-                    .font(BlackmagicCamStyle.readoutFont(size: compact ? 8 : 10, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 5)
-                    .background(.black.opacity(0.62), in: Capsule())
-                    .padding(8)
-            }
-            .frame(height: compact ? 112 : 144)
-            .clipShape(RoundedRectangle(cornerRadius: compact ? 14 : 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: compact ? 14 : 18, style: .continuous).stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.70) : .white.opacity(0.12), lineWidth: selected ? 2 : 1))
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(item.filename)
-                    .font(BlackmagicCamStyle.labelFont(size: compact ? 12 : 14, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                HStack {
-                    Text(ByteCountFormatter.string(fromByteCount: Int64(item.compressedSize), countStyle: .file))
-                    Spacer()
-                    BMDAssetIcon(name: item.cachedURL == nil ? "UploadToCloud" : "UploadedToCloud", activeName: item.cachedURL == nil ? "UploadToCloud_active" : "UploadedToCloud", active: item.cachedURL != nil, fallback: item.cachedURL == nil ? "arrow.down.circle" : "checkmark.circle.fill", color: item.cachedURL == nil ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen, size: 16)
+                HStack(spacing: 3) {
+                    Text("00:27")
+                    Spacer(minLength: 2)
+                    BMDAssetIcon(name: item.cachedURL == nil ? "UploadToCloud" : "UploadedToCloud", activeName: item.cachedURL == nil ? "UploadToCloud_active" : "UploadedToCloud", active: item.cachedURL != nil, fallback: item.cachedURL == nil ? "arrow.up.circle" : "checkmark.circle.fill", color: item.cachedURL == nil ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen, size: compact ? 8 : 10)
                 }
-                .font(BlackmagicCamStyle.readoutFont(size: compact ? 9 : 11, weight: .medium))
-                .foregroundStyle(item.cachedURL == nil ? BlackmagicCamStyle.amber : BlackmagicCamStyle.okGreen)
+                .font(BlackmagicCamStyle.readoutFont(size: compact ? 5 : 7, weight: .heavy))
+                .foregroundStyle(.white.opacity(0.88))
+                .padding(.horizontal, 3)
+                .padding(.vertical, 2)
+                .background(.black.opacity(0.58))
             }
+            .frame(height: compact ? 48 : 74)
+            .clipped()
+            .overlay(Rectangle().stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.82) : .white.opacity(0.10), lineWidth: selected ? 2 : 1))
+
+            Text(item.filename)
+                .font(BlackmagicCamStyle.labelFont(size: compact ? 6 : 8, weight: .heavy))
+                .foregroundStyle(.white.opacity(0.92))
+                .lineLimit(1)
+                .frame(maxWidth: .infinity)
         }
-        .padding(compact ? 10 : 12)
-        .background(selected ? BlackmagicCamStyle.activeBlue.opacity(0.18) : .white.opacity(0.06), in: RoundedRectangle(cornerRadius: compact ? 18 : 22, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: compact ? 18 : 22, style: .continuous).stroke(selected ? BlackmagicCamStyle.cyan.opacity(0.55) : .white.opacity(0.12), lineWidth: 1))
+        .padding(0)
     }
 
     private var formatCode: String {
